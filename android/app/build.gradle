@@ -10,6 +10,18 @@ if (localPropertiesFile.exists()) {
     localPropertiesFile.withReader("UTF-8") { reader ->
         localProperties.load(reader)
     }
+}android {
+    compileSdkVersion 34  // یا 35 (آخرین نسخه)
+
+    defaultConfig {
+        applicationId "com.radical.mafia"
+        minSdkVersion 24
+        targetSdkVersion 34
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    // سایر تنظیمات (buildTypes, etc.)
 }
 
 def flutterVersionCode = localProperties.getProperty("flutter.versionCode")
