@@ -22,3 +22,7 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+dependencies {
+    classpath 'com.android.tools.build:gradle:8.5.0' // یا 8.5.2 / 8.7.0
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+}
