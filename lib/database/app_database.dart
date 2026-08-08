@@ -1,6 +1,6 @@
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart' as sqflite; // تغییر ۱: اضافه کردن نام مستعار
+import 'package:sqflite/sqflite.dart' as sqflite; 
 
 import '../core/constants/app_constants.dart';
 import '../core/errors/exceptions.dart';
@@ -13,20 +13,22 @@ class AppDatabase {
   AppDatabase._internal();
   static final AppDatabase instance = AppDatabase._internal();
 
-  Database? _database;
+  // تغییر ۱: استفاده از sqflite.Database
+  sqflite.Database? _database;
 
-  Future<Database> get database async {
+  // تغییر ۲: استفاده از sqflite.Database
+  Future<sqflite.Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
   }
 
-  Future<Database> _initDatabase() async {
+  // تغییر ۳: استفاده از sqflite.Database
+  Future<sqflite.Database> _initDatabase() async {
     try {
       final docsDir = await getApplicationDocumentsDirectory();
       final dbPath = p.join(docsDir.path, AppConstants.dbName);
 
-      // تغییر ۲: استفاده از sqflite.openDatabase
       return await sqflite.openDatabase(
         dbPath,
         version: AppConstants.dbVersion,
@@ -37,12 +39,10 @@ class AppDatabase {
         },
         onUpgrade: (db, oldVersion, newVersion) async {
           AppLogger.i('ارتقای دیتابیس از $oldVersion به $newVersion');
-          // Migration های آینده اینجا اضافه می‌شوند
         },
       );
     } catch (e, st) {
       AppLogger.e('خطا در راه‌اندازی دیتابیس', e, st);
-      // این خطا اکنون فقط به فایل exceptions.dart خودتان اشاره می‌کند
       throw DatabaseException('امکان راه‌اندازی دیتابیس وجود نداشت');
     }
   }
