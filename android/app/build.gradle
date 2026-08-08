@@ -10,18 +10,6 @@ if (localPropertiesFile.exists()) {
     localPropertiesFile.withReader("UTF-8") { reader ->
         localProperties.load(reader)
     }
-}android {
-    compileSdkVersion 34  // یا 35 (آخرین نسخه)
-
-    defaultConfig {
-        applicationId "com.radical.mafia"
-        minSdkVersion 24
-        targetSdkVersion 34
-        versionCode 1
-        versionName "1.0.0"
-    }
-
-    // سایر تنظیمات (buildTypes, etc.)
 }
 
 def flutterVersionCode = localProperties.getProperty("flutter.versionCode")
@@ -35,9 +23,11 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace = "com.mafiaradical.app"
+    namespace = "com.mafiaradical.app" // یا هر نام یکتای دیگری که در فروشگاه ثبت می‌کنید
     compileSdk = 34
-    ndkVersion = flutter.ndkVersion
+    
+    // این خط مهم‌ترین بخش برای حل خطای NDK است:
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -53,7 +43,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.mafiaradical.app"
+        applicationId = "com.mafiaradical.app" // باید دقیقاً با namespace یکی باشد
         minSdk = 23
         targetSdk = 34
         versionCode = flutterVersionCode.toInteger()
@@ -63,7 +53,6 @@ android {
     buildTypes {
         release {
             // امضای موقت با کلید debug تا فعلا بیلد ریلیز هم اجرا شود.
-            // قبل از انتشار در Google Play حتما یک keystore واقعی بساز و اینجا جایگزین کن.
             signingConfig = signingConfigs.debug
         }
     }
