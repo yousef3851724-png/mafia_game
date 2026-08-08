@@ -47,3 +47,6 @@ flutter:
   assets:
     - assets/images/
     - assets/sounds/
+dependencies:
+  # خط قبلی را حذف کنید و این را جایگزین کنید:
+  package_info_plus: ^8.0.0
