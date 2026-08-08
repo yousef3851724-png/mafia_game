@@ -1,3 +1,15 @@
+buildscript {
+    ext.kotlin_version = '1.9.22' // نسخه‌ی پایدار Kotlin
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.5.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
 ext {
     compileSdkVersion = 34
     minSdkVersion = 23
@@ -21,8 +33,4 @@ subprojects {
 
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
-}
-dependencies {
-    classpath 'com.android.tools.build:gradle:8.5.0' // یا 8.5.2 / 8.7.0
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 }
