@@ -47,12 +47,3 @@ flutter:
   assets:
     - assets/images/
     - assets/sounds/
-
-  # نکته: فونت Vazirmatn هنوز آپلود نشده (فقط .gitkeep در assets/fonts وجود دارد).
-  # وقتی فایل‌های .ttf را در assets/fonts/ گذاشتی، این بخش را از حالت کامنت خارج کن:
-  # fonts:
-  #   - family: Vazirmatn
-  #     fonts:
-  #       - asset: assets/fonts/Vazirmatn-Regular.ttf
-  #       - asset: assets/fonts/Vazirmatn-Bold.ttf
-  #         weight: 700
