@@ -36,12 +36,13 @@ class AppTheme {
         labelSmall: AppTextStyles.caption,
         labelLarge: AppTextStyles.button,
       ),
-      cardTheme: CardThemeData(
+      // 🔥 تغییر اصلی اینجاست: CardThemeData -> CardTheme
+      cardTheme: CardTheme(
         color: AppColors.surface,
         elevation: 4,
-        shadowColor: Colors.black.withValues(alpha: 0.4),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+        shadowColor: Colors.black.withOpacity(0.4),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -78,12 +79,12 @@ class AppTheme {
         color: AppColors.divider,
         thickness: 1,
       ),
-      snackBarTheme: SnackBarThemeData(
+      snackBarTheme: const SnackBarThemeData(
         backgroundColor: AppColors.surfaceVariant,
         contentTextStyle: AppTextStyles.body,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
       ),
     );
