@@ -61,7 +61,7 @@ flutter:
         - asset: assets/fonts/vazirmatn-medium.ttf
           weight: 500
         - asset: assets/fonts/vazirmatn-bold.ttf
-          weight: 700
+          weight: 600
  
 
 # تنظیمات پکیج اسپلش اسکرین
