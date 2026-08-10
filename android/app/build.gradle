@@ -61,3 +61,16 @@ android {
 flutter {
     source = "../.."
 }
+android {
+    compileSdkVersion 34
+
+    defaultConfig {
+        applicationId "com.radical.mafia"
+        minSdkVersion 24
+        targetSdkVersion 34
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    // بقیه تنظیمات (buildTypes, etc.)
+}
