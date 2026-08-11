@@ -77,3 +77,7 @@ android {
 
     // بقیه تنظیمات (buildTypes, etc.)
 }
+android {
+    compileSdkVersion 34
+    // ...
+}
