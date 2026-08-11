@@ -1,14 +1,35 @@
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: cirrusci/flutter:stable   # این یعنی فلاتر از قبل نصب شده و نیازی به Setup نیست
     steps:
       - uses: actions/checkout@v4
+
+      # 1. تنظیم فلاتر روی سرور گیت‌هاب (از آینه استفاده می‌کنیم تا سریع شود)
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.3'
+          channel: 'stable'
+          cache: true
+        env:
+          FLUTTER_ROOT: https://mirrors.tuna.tsinghua.edu.cn/flutter/flutter.git
+
+      # 2. حذف کامل پوشه‌ی اندروید خراب (اگر وجود دارد)
+      - name: Clean old android folder
+        run: rm -rf android
+
+      # 3. دستور طلایی! (فلاتر پوشه‌ی اندروید را درست بازسازی می‌کند)
+      - name: Recreate android folder
+        run: flutter create --org com.yourname.yourapp .
+
+      # 4. نصب وابستگی‌ها و ساخت APK
       - name: Install dependencies
         run: flutter pub get
+
       - name: Build APK
-        run: flutter build apk --release
+        run: flutter build apk --release --split-per-abi
+
+      # 5. آپلود فایل APK نهایی
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
