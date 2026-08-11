@@ -1,44 +1,5 @@
-name: Build APK
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      # تنظیم فلاتر روی سرور با استفاده از آینه
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.3'
-          channel: 'stable'
-          cache: true
-        env:
-          FLUTTER_ROOT: https://mirrors.tuna.tsinghua.edu.cn/flutter/flutter.git
-
-      # 1. پاک کردن کامل پوشه‌ی اندروید (برای اطمینان از حذف فایل‌های خراب)
-      - name: Clean old android folder
-        run: rm -rf android
-
-      # 2. ساختن پوشه‌ی اندروید از صفر (این کار خطای v1 را برای همیشه حذف می‌کند)
-      - name: Recreate android folder
-        run: flutter create --org com.yourname.yourapp .
-
-      # 3. نصب پکیج‌ها
-      - name: Install dependencies
-        run: flutter pub get
-
-      # 4. ساخت APK
-      - name: Build APK
-        run: flutter build apk --release --split-per-abi
-
-      # 5. آپلود فایل نهایی
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/*.apk
