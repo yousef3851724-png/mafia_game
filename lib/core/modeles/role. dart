@@ -1,0 +1,34 @@
+enum Role {
+  mafia,
+  citizen,
+  doctor,
+  detective,
+}
+
+extension RoleExtension on Role {
+  String get name {
+    switch (this) {
+      case Role.mafia:
+        return 'مافیا';
+      case Role.citizen:
+        return 'شهروند';
+      case Role.doctor:
+        return 'دکتر';
+      case Role.detective:
+        return 'کارآگاه';
+    }
+  }
+
+  String get emoji {
+    switch (this) {
+      case Role.mafia:
+        return '🔪';
+      case Role.citizen:
+        return '👤';
+      case Role.doctor:
+        return '💉';
+      case Role.detective:
+        return '🔍';
+    }
+  }
+}
