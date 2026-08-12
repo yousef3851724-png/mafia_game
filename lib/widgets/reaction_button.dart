@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 enum ReactionType {
-  like,
-  dislike,
-  laugh,
-  cry,
+  like,      // 👍
+  dislike,   // 👎
+  laugh,     // 😂
+  cry,       // 😢
   none,
 }
 
@@ -35,6 +35,8 @@ class _ReactionButtonState extends State<ReactionButton>
 
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
+
+  // برای انیمیشن اشک (گریه)
   List<Offset> _tearDrops = [];
 
   @override
@@ -57,15 +59,18 @@ class _ReactionButtonState extends State<ReactionButton>
 
   void _handleReaction(ReactionType type) {
     setState(() {
+      // اگر همین واکنش قبلاً زده شده، لغو کن
       if (_currentReaction == type) {
         _currentReaction = ReactionType.none;
         _decrementCount(type);
       } else {
+        // اگر واکنش قبلی وجود داشت، countش رو کم کن
         if (_currentReaction != ReactionType.none) {
           _decrementCount(_currentReaction);
         }
         _currentReaction = type;
         _incrementCount(type);
+        // اجرای انیمیشن
         _scaleController.forward(from: 0);
       }
       widget.onReactionChanged?.call(_currentReaction);
@@ -171,8 +176,10 @@ class _ReactionButtonState extends State<ReactionButton>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // دکمه اصلی با انیمیشن
         GestureDetector(
           onTap: () {
+            // چرخش بین واکنش‌ها
             final next = {
               ReactionType.none: ReactionType.like,
               ReactionType.like: ReactionType.dislike,
@@ -203,10 +210,14 @@ class _ReactionButtonState extends State<ReactionButton>
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
+                      // ایموجی اصلی
                       Text(
                         _getEmoji(_currentReaction),
-                        style: TextStyle(fontSize: widget.size * 0.5),
+                        style: TextStyle(
+                          fontSize: widget.size * 0.5,
+                        ),
                       ),
+                      // انیمیشن جرقه برای لایک
                       if (_currentReaction == ReactionType.like)
                         ...List.generate(8, (i) {
                           final angle = (i / 8) * 2 * 3.14159;
@@ -220,7 +231,7 @@ class _ReactionButtonState extends State<ReactionButton>
                             child: Container(
                               width: 6,
                               height: 6,
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Colors.yellow,
                               ),
@@ -230,6 +241,7 @@ class _ReactionButtonState extends State<ReactionButton>
                             ),
                           );
                         }),
+                      // قطره اشک برای گریه
                       if (_currentReaction == ReactionType.cry)
                         for (var offset in _tearDrops)
                           Positioned(
@@ -251,8 +263,10 @@ class _ReactionButtonState extends State<ReactionButton>
             },
           ),
         ),
+
         if (widget.showCount) ...[
           const SizedBox(height: 4),
+          // نمایش تعداد هر واکنش به صورت آیکون‌های کوچک
           Wrap(
             spacing: 8,
             children: ReactionType.values
