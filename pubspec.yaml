@@ -90,3 +90,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.1.1
+  flutter_animate: ^4.5.0
+  shared_preferences: ^2.2.3
