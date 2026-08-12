@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../logic/game_controller.dart';
-import '../logic/ai_player.dart';
-import 'game_screen.dart';
+import '../../core/models/player.dart';
+import '../../logic/game_controller.dart';
+import '../../logic/ai_player.dart';
+import '../game/game_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,7 +13,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _nameController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   final List<String> _players = [];
   int _aiCount = 2;
   AIDifficulty _aiDifficulty = AIDifficulty.medium;
@@ -20,8 +21,18 @@ class _HomeScreenState extends State<HomeScreen> {
   void _addPlayer() {
     final name = _nameController.text.trim();
     if (name.isNotEmpty && _players.length < 12) {
-      setState(() => _players.add(name));
-      _nameController.clear();
+      setState(() {
+        _players.add(name);
+        _nameController.clear();
+      });
+    } else if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('لطفاً اسم بازیکن رو وارد کن!')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('حداکثر ۱۲ بازیکن می‌تونی اضافه کنی!')),
+      );
     }
   }
 
@@ -32,12 +43,14 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       return;
     }
+
     final controller = context.read<GameController>();
     controller.initializeGameWithAI(
       playerNames: _players,
       aiCount: _aiCount,
       difficulty: _aiDifficulty,
     );
+
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const GameScreen()),
@@ -47,11 +60,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('🎭 بازی مافیا')),
+      appBar: AppBar(
+        title: const Text('🎭 بازی مافیا'),
+        backgroundColor: Colors.red[900],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            // ورودی اسم بازیکن
             Row(
               children: [
                 Expanded(
@@ -71,20 +88,35 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             const SizedBox(height: 16),
+
+            // لیست بازیکن‌ها
             Expanded(
-              child: ListView.builder(
-                itemCount: _players.length,
-                itemBuilder: (ctx, i) => ListTile(
-                  leading: CircleAvatar(child: Text('${i + 1}')),
-                  title: Text(_players[i]),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.remove, color: Colors.red),
-                    onPressed: () => setState(() => _players.removeAt(i)),
-                  ),
-                ),
-              ),
+              child: _players.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'هنوز بازیکنی اضافه نشده',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: _players.length,
+                      itemBuilder: (ctx, i) => ListTile(
+                        leading: CircleAvatar(
+                          child: Text('${i + 1}'),
+                        ),
+                        title: Text(_players[i]),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.remove_circle, color: Colors.red),
+                          onPressed: () {
+                            setState(() => _players.removeAt(i));
+                          },
+                        ),
+                      ),
+                    ),
             ),
+
             const SizedBox(height: 16),
+
             // تنظیمات هوش مصنوعی
             Card(
               color: Colors.grey[850],
@@ -99,16 +131,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         Row(
                           children: [
                             IconButton(
-                              onPressed: () => setState(() {
-                                if (_aiCount > 0) _aiCount--;
-                              }),
+                              onPressed: () {
+                                if (_aiCount > 0) {
+                                  setState(() => _aiCount--);
+                                }
+                              },
                               icon: const Icon(Icons.remove),
                             ),
                             Text('$_aiCount'),
                             IconButton(
-                              onPressed: () => setState(() {
-                                if (_aiCount < 6) _aiCount++;
-                              }),
+                              onPressed: () {
+                                if (_aiCount < 6) {
+                                  setState(() => _aiCount++);
+                                }
+                              },
                               icon: const Icon(Icons.add),
                             ),
                           ],
@@ -138,7 +174,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                           onChanged: (val) {
-                            if (val != null) setState(() => _aiDifficulty = val);
+                            if (val != null) {
+                              setState(() => _aiDifficulty = val);
+                            }
                           },
                         ),
                       ],
@@ -147,7 +185,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
+
             const SizedBox(height: 16),
+
+            // دکمه شروع بازی
             FilledButton.icon(
               onPressed: _startGame,
               icon: const Icon(Icons.play_arrow),
