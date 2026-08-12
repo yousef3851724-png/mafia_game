@@ -15,3 +15,4 @@ class Player {
     this.isAI = false,
   });
 }
+git commit -m "افزودن بازی کامل مافیا با هوش مصنوعی و انیمیشن"
