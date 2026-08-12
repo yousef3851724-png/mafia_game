@@ -19,3 +19,25 @@ Future<void> initDependencies() async {
 
   // Repository ها و Provider های مربوط به منطق بازی در Section-02 اینجا اضافه می‌شوند
 }
+name: mafia_game
+description: A complete Mafia game with AI
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.1.1
+  flutter_animate: ^4.5.0
+  shared_preferences: ^2.2.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
