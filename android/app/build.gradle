@@ -49,14 +49,17 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
+android {
+    compileSdkVersion 35
 
-    buildTypes {
-        release {
-            signingConfig signingConfigs.debug
-        }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
-}
 
-flutter {
-    source '../..'
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    // بقيه کدها را دست نزنيد و دست نخورده نگه داريد
 }
+```*
