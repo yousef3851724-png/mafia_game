@@ -1,201 +1,120 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../core/models/player.dart';
-import '../../logic/game_controller.dart';
-import '../../logic/ai_player.dart';
-import '../game/game_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class HomeScreen extends StatefulWidget {
+// یک Provider ساده برای مدیریت لیست بازیکنان در لابی
+final playersProvider = StateProvider<List<String>>((ref) => []);
+
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final players = ref.watch(playersProvider);
+    final TextEditingController nameController = TextEditingController();
 
-class _HomeScreenState extends State<HomeScreen> {
-  final TextEditingController _nameController = TextEditingController();
-  final List<String> _players = [];
-  int _aiCount = 2;
-  AIDifficulty _aiDifficulty = AIDifficulty.medium;
-
-  void _addPlayer() {
-    final name = _nameController.text.trim();
-    if (name.isNotEmpty && _players.length < 12) {
-      setState(() {
-        _players.add(name);
-        _nameController.clear();
-      });
-    } else if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('لطفاً اسم بازیکن رو وارد کن!')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('حداکثر ۱۲ بازیکن می‌تونی اضافه کنی!')),
-      );
-    }
-  }
-
-  void _startGame() {
-    if (_players.length < 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('حداقل ۳ بازیکن واقعی نیاز است!')),
-      );
-      return;
+    void addPlayer() {
+      final name = nameController.text.trim();
+      if (name.isNotEmpty && players.length < 12) {
+        ref.read(playersProvider.notifier).state = [...players, name];
+        nameController.clear();
+      } else if (name.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('لطفاً اسم خود را وارد کنید!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('حداکثر ۱۲ بازیکن می‌توانند وارد شوند!')),
+        );
+      }
     }
 
-    final controller = context.read<GameController>();
-    controller.initializeGameWithAI(
-      playerNames: _players,
-      aiCount: _aiCount,
-      difficulty: _aiDifficulty,
-    );
+    void removePlayer(int index) {
+      final updatedList = List<String>.from(players);
+      updatedList.removeAt(index);
+      ref.read(playersProvider.notifier).state = updatedList;
+    }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const GameScreen()),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('🎭 بازی مافیا'),
-        backgroundColor: Colors.red[900],
+        title: const Text('🎭 لابی مافیا رادیکال'),
+        backgroundColor: const Color(0xFF1A1D23), // تم تاریک
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // ورودی اسم بازیکن
+            // ورودی نام بازیکن
             Row(
               children: [
                 Expanded(
                   child: TextField(
-                    controller: _nameController,
+                    controller: nameController,
                     decoration: const InputDecoration(
-                      labelText: 'اسم بازیکن',
+                      hintText: 'نام خود را وارد کنید...',
+                      filled: true,
+                      fillColor: Color(0xFF2C2F36),
                       border: OutlineInputBorder(),
                     ),
+                    onSubmitted: (_) => addPlayer(),
                   ),
                 ),
-                const SizedBox(width: 8),
-                IconButton.filled(
-                  onPressed: _addPlayer,
-                  icon: const Icon(Icons.add),
+                const SizedBox(width: 10),
+                IconButton(
+                  icon: const Icon(Icons.add_circle, color: Colors.green, size: 40),
+                  onPressed: addPlayer,
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            // لیست بازیکن‌ها
+            // لیست بازیکنان
             Expanded(
-              child: _players.isEmpty
+              child: players.isEmpty
                   ? const Center(
                       child: Text(
-                        'هنوز بازیکنی اضافه نشده',
+                        'هنوز بازیکنی اضافه نشده است.',
                         style: TextStyle(color: Colors.grey),
                       ),
                     )
                   : ListView.builder(
-                      itemCount: _players.length,
-                      itemBuilder: (ctx, i) => ListTile(
-                        leading: CircleAvatar(
-                          child: Text('${i + 1}'),
-                        ),
-                        title: Text(_players[i]),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.remove_circle, color: Colors.red),
-                          onPressed: () {
-                            setState(() => _players.removeAt(i));
-                          },
-                        ),
-                      ),
+                      itemCount: players.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          leading: CircleAvatar(
+                            child: Text('${index + 1}'),
+                          ),
+                          title: Text(players[index]),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.remove_circle, color: Colors.red),
+                            onPressed: () => removePlayer(index),
+                          ),
+                        );
+                      },
                     ),
             ),
 
             const SizedBox(height: 16),
 
-            // تنظیمات هوش مصنوعی
-            Card(
-              color: Colors.grey[850],
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('🤖 تعداد ربات‌ها:'),
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                if (_aiCount > 0) {
-                                  setState(() => _aiCount--);
-                                }
-                              },
-                              icon: const Icon(Icons.remove),
-                            ),
-                            Text('$_aiCount'),
-                            IconButton(
-                              onPressed: () {
-                                if (_aiCount < 6) {
-                                  setState(() => _aiCount++);
-                                }
-                              },
-                              icon: const Icon(Icons.add),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('🎯 سطح دشواری:'),
-                        DropdownButton<AIDifficulty>(
-                          value: _aiDifficulty,
-                          dropdownColor: Colors.grey[800],
-                          items: const [
-                            DropdownMenuItem(
-                              value: AIDifficulty.easy,
-                              child: Text('آسان'),
-                            ),
-                            DropdownMenuItem(
-                              value: AIDifficulty.medium,
-                              child: Text('متوسط'),
-                            ),
-                            DropdownMenuItem(
-                              value: AIDifficulty.hard,
-                              child: Text('سخت'),
-                            ),
-                          ],
-                          onChanged: (val) {
-                            if (val != null) {
-                              setState(() => _aiDifficulty = val);
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
+            // دکمه رفتن به لیست لابی‌ها
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: players.length >= 3
+                    ? () {
+                        // هدایت به صفحه لیست لابی‌ها (برای اینکه برود لابی بسازد)
+                        context.go('/lobbies');
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFB99445), // طلایی رادیکال
+                  foregroundColor: Colors.black,
                 ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // دکمه شروع بازی
-            FilledButton.icon(
-              onPressed: _startGame,
-              icon: const Icon(Icons.play_arrow),
-              label: const Text('شروع بازی'),
-              style: FilledButton.styleFrom(
-                backgroundColor: Colors.green,
-                minimumSize: const Size(double.infinity, 56),
+                child: const Text(
+                  'رفتن به لابی‌ها و شروع بازی',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],
