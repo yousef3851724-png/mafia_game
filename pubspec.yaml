@@ -1,4 +1,4 @@
-name: mafia_radical
+nano lib/main.dartname: mafia_radical
 description: "مافیا رادیکال — اپلیکیشن گرداننده هوشمند بازی مافیا"
 publish_to: 'none'
 version: 1.0.0+1
