@@ -10,7 +10,7 @@ class MafiaRadicalApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Mafia Radical',
       theme: appTheme,
-      routerConfig: router, // از core/router.dart
+      routerConfig: router,
       debugShowCheckedModeBanner: false,
     );
   }
