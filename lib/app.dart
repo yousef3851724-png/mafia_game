@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'core/router.dart';
-import 'core/theme.dart';
 
 class MafiaRadicalApp extends StatelessWidget {
   const MafiaRadicalApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Mafia Radical',
-      theme: appTheme,
-      routerConfig: router,
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
+      title: 'Mafia Radical',
+      home: const Scaffold(
+        body: Center(
+          child: Text('Mafia Radical'),
+        ),
+      ),
     );
   }
 }
