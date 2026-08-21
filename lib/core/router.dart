@@ -1,14 +1,19 @@
-import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
+import 'core/router/router.dart';
 
-import '../../screens/home_screen.dart';
+void main() {
+  runApp(const MafiaRadicalApp());
+}
 
-final GoRouter router = GoRouter(
-  initialLocation: '/',
-  routes: [
-    GoRoute(
-      path: '/',
-      name: 'home',
-      builder: (context, state) => const HomeScreen(),
-    ),
-  ],
-);
+class MafiaRadicalApp extends StatelessWidget {
+  const MafiaRadicalApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      title: 'مافیا رادیکال',
+      routerConfig: router,
+    );
+  }
+}
