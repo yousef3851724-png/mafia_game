@@ -60,8 +60,31 @@ flutter:
           weight: 700
         - asset: assets/fonts/Vazirmatn-Medium.ttf
           weight: 500
-- name: Install dependencies
-  run: flutter pub get
+- 
+name: mafia_game
+description: A new Flutter project.
 
-- name: Build APK
-  run: flutter build apk --release
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+
+  
+- name: Install dependencies
