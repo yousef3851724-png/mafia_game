@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import '../core/constants/app_constants.dart';
-// اگر logger رو در core/utils/ ساختید، از این مسیر استفاده کنید:
-// import '../core/utils/logger.dart'; 
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // لاگ (در صورت وجود)
-    // AppLogger.log('HomeScreen loaded');
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mafia Radical'),
