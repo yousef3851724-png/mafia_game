@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
-import 'core/router/router.dart';
+import 'package:go_router/go_router.dart';
 
-void main() {
-  runApp(const MafiaRadicalApp());
-}
+final GoRouter appRouter = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) {
+        return const Scaffold(
+          body: Center(
+            child: Text('Mafia Radical'),
+          ),
+        );
+      },
+    ),
+  ],
+);
 
 class MafiaRadicalApp extends StatelessWidget {
   const MafiaRadicalApp({super.key});
@@ -12,8 +24,7 @@ class MafiaRadicalApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'مافیا رادیکال',
-      routerConfig: router,
+      routerConfig: appRouter,
     );
   }
 }
