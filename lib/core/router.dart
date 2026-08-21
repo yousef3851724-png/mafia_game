@@ -9,6 +9,5 @@ final GoRouter router = GoRouter(
       name: 'home',
       builder: (context, state) => const HomeScreen(),
     ),
-    // مسیرهای بعدی در Section-02 به بعد اضافه می‌شوند
   ],
 );
