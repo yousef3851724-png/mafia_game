@@ -41,3 +41,4 @@ jobs:
   with:
     distribution: zulu
     java-version: "17"
+uses: actions/setup-java@v4
