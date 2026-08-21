@@ -1,29 +1,35 @@
-name: mafia_radical
-description: Mafia Radical - بازی مافیا بدون کارت فیزیکی
-publish_to: "none"
+name: Build Flutter Android
 
-version: 1.0.0+1
+on:
+  push:
+    branches:
+      - main
 
-environment:
-  sdk: ">=3.0.0 <4.0.0"
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-dependencies:
-  flutter:
-    sdk: flutter
-  go_router: ^14.2.7
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
 
-  cupertino_icons: ^1.0.8
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: stable
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
+      - name: Install dependencies
+        run: flutter pub get
 
-  flutter_lints: ^5.0.0
+      - name: Analyze
+        run: flutter analyze
 
-flutter:
-  uses-material-design: true
-   - uses: actions/setup-java@v3
-     with:
-       distribution: 'temurin'
-       java-version: '17'
+      - name: Build APK
+        run: flutter build apk --release
