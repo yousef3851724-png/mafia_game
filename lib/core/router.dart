@@ -6,25 +6,17 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) {
+      name: 'home',
+      builder: (BuildContext context, GoRouterState state) {
         return const Scaffold(
           body: Center(
-            child: Text('Mafia Radical'),
+            child: Text(
+              'مافیا رادیکال (Mafia Radical)',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
           ),
         );
       },
     ),
   ],
 );
-
-class MafiaRadicalApp extends StatelessWidget {
-  const MafiaRadicalApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      routerConfig: appRouter,
-    );
-  }
-}
