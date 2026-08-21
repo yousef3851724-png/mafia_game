@@ -1,29 +1,41 @@
-# 1. گرفتن آخرین نسخه
-git pull origin main
+name: Build APK
 
-# 2. ساخت شاخه جدید
-git checkout -b update-build-yml
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
 
-# 3. بازنویسی کامل فایل (محتواهای داخل EOF را با محتوای جدید خود عوض کنید)
-cat > build.yml << 'EOF'
-# اینجا محتوای جدید فایل build.yml را قرار دهید
-# مثلاً:
-name: CI
-on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-EOF
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-# 4. افزودن، کامیت و پوش کردن
-git add build.yml
-git commit -m "به‌روزرسانی کامل build.yml"
-git push origin update-build-yml
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-# 5. لینک ساخت Pull Request
-echo "✅ لینک ساخت Pull Request:"
-echo "https://github.com/$(git remote get-url origin | sed 's/.*://' | sed 's/\.git//')/compare/main...update-build-yml"
-environment:        # ✅ اول environment میاد
-  sdk: ">=2.12.0 <3.0.0"   # بعدش sdk تعریف میشه
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Get Dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
