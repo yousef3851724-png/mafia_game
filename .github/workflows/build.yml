@@ -1,35 +1,49 @@
-name: Build APK
+name: Build Flutter APK
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      PUB_HOSTED_URL: https://pub.dev
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Java JDK
-        uses: actions/setup-java@v3
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '17'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.0'
-          channel: 'stable'
+          channel: stable
           cache: true
 
-      - name: Get Dependencies
+      - name: Clear invalid pub credentials
+        run: |
+          unset DART_PUB_TOKEN
+          unset PUB_TOKEN
+          dart pub token remove https://pub.dev || true
+
+      - name: Install dependencies
         run: flutter pub get
+
+      - name: Analyze project
+        run: flutter analyze
 
       - name: Build APK
         run: flutter build apk --release
@@ -37,5 +51,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
+          name: mafia-radical-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
