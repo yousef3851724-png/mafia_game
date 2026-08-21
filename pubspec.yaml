@@ -1,27 +1,37 @@
-name: mafia_game
-description: A new Flutter project.
-publish_to: 'none'
-version: 1.0.0+1
+# ۱. برو به ریشه‌ی پروژه (اگه نیستی)
+cd /home/runner/work/mafia_game/mafia_game   # یا مسیر خودت
 
-environment:
-  sdk: environment:
-  sdk: ">=3.5.0 <4.0.0"
+# ۲. بگیر آخرین نسخه
+git pull origin main
 
-dependencies:
-  flutter:
-    sdk: flutter
+# ۳. یک شاخه جدید برای رفع خطا بساز (جلوی هر گونه محدودیت)
+git checkout -b fix-pubspec-error
 
-  # وابستگی‌های قبلی خودت را اینجا اضافه کن
-  # مثال: 
-  # cupertino_icons: ^1.0.8
-  # provider: ^6.0.0
+# ۴. با یه دستور ساده، خطای خط ۷ رو اصلاح کن
+# این کار خط ۷ رو به "environment:" تغییر میده
+sed -i '7s/.*/environment:/' pubspec.yaml
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
+# ۵. حالا خط بعدی (خط ۸) رو درست کن تا sdk رو تعریف کنه
+# اگه خط ۸ وجود نداره، اضافه می‌کنه
+if ! grep -q "sdk:" pubspec.yaml; then
+    sed -i '8i\  sdk: ">=2.12.0 <3.0.0"' pubspec.yaml
+else
+    sed -i '8s/.*/  sdk: ">=2.12.0 <3.0.0"/' pubspec.yaml
+fi
 
-  flutter_lints: ^5.0.0
+# ۶. (اختیاری) فایل رو نشون بده تا ببینی درست شده
+echo "===== محتوای اصلاح‌شده ====="
+cat pubspec.yaml | head -10
 
-flutter:
-  uses-material-design: true
-  # اگر Assets (عکس/فونت) داری، آنها را اینجا اضافه کن
+# ۷. اضافه کن به استیج
+git add pubspec.yaml
+
+# ۸. کامیت کن
+git commit -m "رفع خطای syntax در pubspec.yaml (environment)"
+
+# ۹. پوش به شاخه جدید
+git push origin fix-pubspec-error
+
+# ۱۰. لینک بساز برای Pull Request
+echo "✅ خطا رفع شد. حالا برو به آدرس زیر و Pull Request بساز:"
+echo "https://github.com/$(git remote get-url origin | sed 's/.*://' | sed 's/\.git//')/compare/main...fix-pubspec-error"
