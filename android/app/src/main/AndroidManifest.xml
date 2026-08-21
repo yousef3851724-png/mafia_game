@@ -31,3 +31,8 @@
             android:value="2" />
     </application>
 </manifest>
+package com.example.mafia_game
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()
