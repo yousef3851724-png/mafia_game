@@ -62,7 +62,3 @@ flutter:
           weight: 500
         - asset: assets/fonts/Vazirmatn-Bold.ttf
           weight: 700
-- name: Install dependencies
-  run: flutter pub get
-- name: Build APK
-  run: flutter build apk --release
