@@ -83,3 +83,9 @@ class GameConstants {
     return playerCount >= minPlayers && playerCount <= maxPlayers;
   }
 }
+import 'package:mafia_game/core/constants/app_constants.dart';
+
+final mafiaCount = GameConstants.getMafiaCount(10); // 3
+final citizenCount = GameConstants.getCitizenCount(10); // 7
+
+print(AppConstants.appName); // مافیا رادیکال
