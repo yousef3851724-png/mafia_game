@@ -6,11 +6,10 @@ version: 1.0.0+1
 environment:
   sdk: ">=3.0.0 <4.0.0"
 
-dependencies:
+ dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.6
-  go_router: ^13.0.0   # برای مسیریابی پیشرفته (دیپلاس)
+  go_router: ^13.0.0   # این خط را اضافه کنید 
 
 dev_dependencies:
   flutter_test:
