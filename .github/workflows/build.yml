@@ -25,3 +25,5 @@ git push origin update-build-yml
 # 5. لینک ساخت Pull Request
 echo "✅ لینک ساخت Pull Request:"
 echo "https://github.com/$(git remote get-url origin | sed 's/.*://' | sed 's/\.git//')/compare/main...update-build-yml"
+environment:        # ✅ اول environment میاد
+  sdk: ">=2.12.0 <3.0.0"   # بعدش sdk تعریف میشه
