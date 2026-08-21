@@ -13,9 +13,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      PUB_HOSTED_URL: https://pub.dev
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -31,13 +28,14 @@ jobs:
         with:
           flutter-version: '3.24.0'
           channel: stable
-          cache: true
+          cache: false
 
-      - name: Clear invalid pub credentials
+      - name: Clear pub credentials
         run: |
+          rm -f ~/.config/dart/pub-credentials.json
           unset DART_PUB_TOKEN
           unset PUB_TOKEN
-          dart pub token remove https://pub.dev || true
+          unset PUB_HOSTED_URL
 
       - name: Install dependencies
         run: flutter pub get
