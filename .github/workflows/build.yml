@@ -51,3 +51,10 @@ jobs:
         with:
           name: mafia-radical-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+- name: Build Release
+  run: ./gradlew assembleRelease
+  env:
+    KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+    KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+    KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+    KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
