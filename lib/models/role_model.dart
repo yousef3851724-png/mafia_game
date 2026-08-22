@@ -66,4 +66,40 @@ class RoleModel {
         );
     }
   }
+}class GameHistoryModel {
+  final int id;
+  final List<String> players;
+  final String winner;
+  final int nights;
+  final DateTime timestamp;
+
+  GameHistoryModel({
+    required this.id,
+    required this.players,
+    required this.winner,
+    required this.nights,
+    required this.timestamp,
+  });
+
+  // تبدیل به Map برای ذخیره در دیتابیس
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'players': players.join(','),
+      'winner': winner,
+      'nights': nights,
+      'timestamp': timestamp.millisecondsSinceEpoch,
+    };
+  }
+
+  // تبدیل از Map برای خواندن از دیتابیس
+  factory GameHistoryModel.fromMap(Map<String, dynamic> map) {
+    return GameHistoryModel(
+      id: map['id'],
+      players: (map['players'] as String).split(','),
+      winner: map['winner'],
+      nights: map['nights'],
+      timestamp: DateTime.fromMillisecondsSinceEpoch(map['timestamp']),
+    );
+  }
 }
