@@ -1,57 +1,62 @@
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart' as sqflite; 
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
+import 'dart:convert';
 
-import '../core/constants/app_constants.dart';
-import '../core/errors/exceptions.dart';
-import '../logger/app_logger.dart';
-import 'tables/games_table.dart';
-import 'tables/players_table.dart';
-
-/// نقطه واحد دسترسی به دیتابیس محلی (Singleton)
 class AppDatabase {
+  static final AppDatabase _instance = AppDatabase._internal();
+  factory AppDatabase() => _instance;
   AppDatabase._internal();
-  static final AppDatabase instance = AppDatabase._internal();
 
-  // تغییر ۱: استفاده از sqflite.Database
-  sqflite.Database? _database;
+  static Database? _database;
 
-  // تغییر ۲: استفاده از sqflite.Database
-  Future<sqflite.Database> get database async {
+  Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
   }
 
-  // تغییر ۳: استفاده از sqflite.Database
-  Future<sqflite.Database> _initDatabase() async {
-    try {
-      final docsDir = await getApplicationDocumentsDirectory();
-      final dbPath = p.join(docsDir.path, AppConstants.dbName);
-
-      return await sqflite.openDatabase(
-        dbPath,
-        version: AppConstants.dbVersion,
-        onCreate: (db, version) async {
-          await db.execute(PlayersTable.createTableQuery);
-          await db.execute(GamesTable.createTableQuery);
-          AppLogger.i('دیتابیس با موفقیت ساخته شد (v$version)');
-        },
-        onUpgrade: (db, oldVersion, newVersion) async {
-          AppLogger.i('ارتقای دیتابیس از $oldVersion به $newVersion');
-        },
-      );
-    } catch (e, st) {
-      AppLogger.e('خطا در راه‌اندازی دیتابیس', e, st);
-      throw DatabaseException('امکان راه‌اندازی دیتابیس وجود نداشت');
-    }
+  Future<Database> _initDatabase() async {
+    String path = join(await getDatabasesPath(), 'mafia_game.db');
+    return await openDatabase(
+      path,
+      version: 1,
+      onCreate: (db, version) async {
+        await db.execute('''
+          CREATE TABLE game_history(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            players TEXT NOT NULL,
+            winner TEXT NOT NULL,
+            nights INTEGER NOT NULL,
+            timestamp INTEGER NOT NULL
+          )
+        ''');
+      },
+    );
   }
 
-  Future<void> close() async {
-    final db = _database;
-    if (db != null && db.isOpen) {
-      await db.close();
-      _database = null;
-    }
+  Future<void> saveGameHistory({
+    required List<String> players,
+    required String winner,
+    required int nights,
+  }) async {
+    final db = await database;
+    await db.insert(
+      'game_history',
+      {
+        'players': jsonEncode(players),
+        'winner': winner,
+        'nights': nights,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      },
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getGameHistory() async {
+    final db = await database;
+    return await db.query(
+      'game_history',
+      orderBy: 'timestamp DESC',
+      limit: 50,
+    );
   }
 }
