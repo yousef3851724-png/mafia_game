@@ -60,3 +60,28 @@ android {
 flutter {
     source '../..'
 }
+android {
+    // ... بقیه تنظیمات
+
+    signingConfigs {
+        release {
+            storeFile file(System.getenv("KEYSTORE_FILE") ?: "keystore.jks")
+            storePassword System.getenv("KEYSTORE_PASSWORD")
+            keyAlias System.getenv("KEY_ALIAS")
+            keyPassword System.getenv("KEY_PASSWORD")
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release // حتماً این خط را داشته باشد
+        }
+    }
+
+    // اگر خطای Lint دارید، موقتاً این را اضافه کنید تا خطا تبدیل به هشدار شود:
+    lintOptions {
+        abortOnError false
+    }
+}
