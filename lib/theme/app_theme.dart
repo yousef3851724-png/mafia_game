@@ -1,21 +1,49 @@
 import 'package:flutter/material.dart';
 
-final ThemeData appTheme = ThemeData(
-  useMaterial3: true,
-  brightness: Brightness.dark,
-  colorScheme: const ColorScheme.dark(
-    primary: Color(0xFFBB86FC),
-    secondary: Color(0xFF03DAC6),
-    surface: Color(0xFF1E1E1E),
-    background: Color(0xFF121212),
-  ),
-  textTheme: const TextTheme(
-    headlineLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-    bodyMedium: TextStyle(fontSize: 16),
-  ),
-  appBarTheme: const AppBarTheme(
-    centerTitle: true,
-    backgroundColor: Color(0xFF1E1E1E),
-    elevation: 2,
-  ),
-);
+class AppTheme {
+  static ThemeData lightTheme = ThemeData(
+    useMaterial3: true,
+    primarySwatch: Colors.deepPurple,
+    brightness: Brightness.light,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.deepPurple,
+      foregroundColor: Colors.white,
+      centerTitle: true,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
+        minimumSize: const Size(double.infinity, 50),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    ),
+    cardTheme: CardTheme(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 4,
+    ),
+  );
+
+  static ThemeData darkTheme = ThemeData(
+    useMaterial3: true,
+    primarySwatch: Colors.deepPurple,
+    brightness: Brightness.dark,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.deepPurple,
+      foregroundColor: Colors.white,
+      centerTitle: true,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
+        minimumSize: const Size(double.infinity, 50),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    ),
+    cardTheme: CardTheme(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 4,
+    ),
+  );
+}
