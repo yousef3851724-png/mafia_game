@@ -4,6 +4,7 @@ import 'package:mafia_game/bloc/game_bloc.dart';
 import 'package:mafia_game/bloc/game_event.dart';
 import 'package:mafia_game/bloc/game_state.dart';
 import 'package:mafia_game/models/role_model.dart';
+import 'package:mafia_game/database/app_database.dart';
 
 class GameScreen extends StatefulWidget {
   final List<String> playerNames;
@@ -14,8 +15,6 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  int? selectedPlayerForAction;
-
   @override
   void initState() {
     super.initState();
@@ -299,6 +298,17 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _showGameOverDialog(BuildContext context, String winner) {
+    // ذخیره در دیتابیس
+    final db = AppDatabase();
+    final state = context.read<GameBloc>().state;
+    if (state is GameInProgressState) {
+      db.saveGameHistory(
+        players: widget.playerNames,
+        winner: winner,
+        nights: state.engine.nightCounter,
+      );
+    }
+
     showDialog(
       context: context,
       barrierDismissible: false,
