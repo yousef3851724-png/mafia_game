@@ -85,3 +85,11 @@ android {
         abortOnError false
     }
 }
+android {
+    // ...
+    packagingOptions {
+        resources {
+            excludes += ['AndroidManifest.xml']
+        }
+    }
+}
