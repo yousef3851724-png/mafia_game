@@ -30,3 +30,5 @@ dependencies:
   # NEW: برای اشتراک‌گذاری و تاریخ
   share_plus: ^7.2.1
   intl: ^0.18.1
+environment:
+  sdk: '>=3.5.0 <4.0.0'
