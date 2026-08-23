@@ -1,34 +1,22 @@
+name: mafia_game
+description: A new Flutter project.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+
 dependencies:
   flutter:
     sdk: flutter
-
-  # State Management
-  bloc: ^8.1.2
-  flutter_bloc: ^8.1.3
-
-  # Routing
-  go_router: ^13.0.1
-
-  # Database
-  sqflite: ^2.3.0
-  path_provider: ^2.1.0
-
-  # Storage
-  shared_preferences: ^2.2.2
-  flutter_secure_storage: ^9.0.0
-
-  # Dependency Injection
-  get_it: ^7.6.4
-
-  # Logging
-  logger: ^2.0.2
-
-  # Utils
   equatable: ^2.0.5
   uuid: ^4.3.3
-
-  # NEW: برای اشتراک‌گذاری و تاریخ
   share_plus: ^7.2.1
   intl: ^0.18.1
-environment:
-  sdk: '>=3.5.0 <4.0.0'
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
