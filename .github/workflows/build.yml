@@ -1,60 +1,19 @@
-name: Build Flutter APK
-
+name: Build APK
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
-
+    branches: [ main ]
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
         with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+          channel: 'stable'
+          flutter-version-file: pubspec.yaml
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - uses: actions/upload-artifact@v3
         with:
-          flutter-version: '3.24.0'
-          channel: stable
-          cache: false
-
-      - name: Clear pub credentials
-        run: |
-          rm -f ~/.config/dart/pub-credentials.json
-          unset DART_PUB_TOKEN
-          unset PUB_TOKEN
-          unset PUB_HOSTED_URL
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Analyze project
-        run: flutter analyze
-
-      - name: Build APK
-        run: flutter build apk --release
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: mafia-radical-release-apk
+          name: app-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
-- name: Build Release
-  run: ./gradlew assembleRelease
-  env:
-    KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
-    KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-    KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-    KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
