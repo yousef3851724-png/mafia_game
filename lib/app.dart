@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class MafiaApp extends StatelessWidget {
-  const MafiaApp({super.key});
+import 'router/app_router.dart';
+import 'theme/app_theme.dart';
+
+class MafiaRadicalApp extends ConsumerWidget {
+  const MafiaRadicalApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+
+    return MaterialApp.router(
+      title: 'مافیا رادیکال',
+      theme: AppTheme.darkTheme,
+      routerConfig: router,
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Center(child: Text('مافیا رادیکال', style: TextStyle(fontSize: 30, color: Colors.red))),
-      ),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: const [Locale('fa')],
     );
   }
 }
