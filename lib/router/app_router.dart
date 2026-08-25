@@ -1,11 +1,20 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../features/splash/splash_screen.dart';
-import '../features/home/home_screen.dart';
+import '../presentation/screens/home_screen.dart';
+import '../presentation/screens/game_screen.dart';
 
-final appRouter = GoRouter(
-  initialLocation: '/splash',
-  routes: [
-    GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
-    GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
-  ],
-);
+final routerProvider = Provider<GoRouter>((ref) {
+  return GoRouter(
+    initialLocation: '/',
+    routes: [
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/game',
+        builder: (context, state) => const GameScreen(),
+      ),
+    ],
+  );
+});
