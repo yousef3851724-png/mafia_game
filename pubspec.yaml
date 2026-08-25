@@ -32,13 +32,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/images/
-    - assets/fonts/
-    - assets/sounds/
-  fonts:
-    - family: Vazirmatn
-      fonts:
-        - asset: assets/fonts/Vazirmatn-Regular.ttf
-        - asset: assets/fonts/Vazirmatn-Bold.ttf
-          weight: 700
