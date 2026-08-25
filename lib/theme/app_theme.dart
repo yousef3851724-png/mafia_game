@@ -1,92 +1,46 @@
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
-import 'app_text_styles.dart';
+import 'package:flutter/services.dart';
 
 class AppTheme {
-  AppTheme._();
+  static const Color bloodRed = Color(0xFFB71C1C);
+  static const Color darkGold = Color(0xFFFFD700);
+  static const Color mysticPurple = Color(0xFF4A148C);
+  static const Color backgroundDark = Color(0xFF121212);
+  static const Color surfaceDark = Color(0xFF1E1E1E);
 
-  static ThemeData get darkTheme {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      fontFamily: AppTextStyles.fontFamily,
-      scaffoldBackgroundColor: AppColors.background,
-      colorScheme: const ColorScheme.dark(
-        primary: AppColors.primary,
-        secondary: AppColors.secondary,
-        surface: AppColors.surface,
-        error: AppColors.error,
-        onPrimary: AppColors.textPrimary,
-        onSecondary: AppColors.background,
-        onSurface: AppColors.textPrimary,
+  static final ThemeData darkTheme = ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.dark,
+    colorScheme: const ColorScheme.dark(
+      primary: bloodRed,
+      secondary: darkGold,
+      surface: surfaceDark,
+      background: backgroundDark,
+    ),
+    fontFamily: 'Vazirmatn',
+    scaffoldBackgroundColor: backgroundDark,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: surfaceDark,
+      elevation: 0,
+      systemOverlayStyle: SystemUiOverlayStyle.light,
+      titleTextStyle: TextStyle(
+        color: darkGold,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        fontFamily: 'Vazirmatn',
       ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        centerTitle: true,
-        titleTextStyle: AppTextStyles.title,
-        iconTheme: IconThemeData(color: AppColors.textPrimary),
+    ),
+    textTheme: const TextTheme(
+      headlineLarge: TextStyle(color: darkGold, fontWeight: FontWeight.bold),
+      titleMedium: TextStyle(color: Colors.white70, fontWeight: FontWeight.w500),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: bloodRed,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
       ),
-      textTheme: const TextTheme(
-        displayLarge: AppTextStyles.displayLarge,
-        headlineMedium: AppTextStyles.headline,
-        titleMedium: AppTextStyles.title,
-        bodyLarge: AppTextStyles.body,
-        bodyMedium: AppTextStyles.bodySecondary,
-        labelSmall: AppTextStyles.caption,
-        labelLarge: AppTextStyles.button,
-      ),
-      // 🔥 تغییر اصلی اینجاست: CardThemeData -> CardTheme
-      cardTheme: CardTheme(
-        color: AppColors.surface,
-        elevation: 4,
-        shadowColor: Colors.black.withOpacity(0.4),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16)),
-        ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.textPrimary,
-          minimumSize: const Size.fromHeight(52),
-          textStyle: AppTextStyles.button,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.textPrimary,
-          minimumSize: const Size.fromHeight(52),
-          side: const BorderSide(color: AppColors.divider),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: AppColors.surfaceVariant,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      ),
-      dividerTheme: const DividerThemeData(
-        color: AppColors.divider,
-        thickness: 1,
-      ),
-      snackBarTheme: const SnackBarThemeData(
-        backgroundColor: AppColors.surfaceVariant,
-        contentTextStyle: AppTextStyles.body,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-        ),
-      ),
-    );
-  }
+    ),
+  );
 }
