@@ -12,6 +12,7 @@ class MafiaApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
+        fontFamily: 'Vazirmatn', // استفاده از فونت وزیرمتن
       ),
       routerConfig: appRouter,
     );

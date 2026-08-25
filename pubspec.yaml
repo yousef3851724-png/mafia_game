@@ -1,4 +1,13 @@
-name: mafia_radical
+uses-material-design: true
+assets:
+  - assets/images/
+  - assets/fonts/
+fonts:
+  - family: Vazirmatn
+    fonts:
+      - asset: assets/fonts/Vazirmatn-Regular.ttf
+      - asset: assets/fonts/Vazirmatn-Bold.ttf
+        weight: 700name: mafia_radical
 description: "مافیا رادیکال — اپلیکیشن گرداننده هوشمند بازی مافیا"
 publish_to: 'none'
 version: 1.0.0+1
