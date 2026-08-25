@@ -24,8 +24,8 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.mafia_radical"
-    compileSdk flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    compileSdk 35
+    ndkVersion "27.0.12077973"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -39,7 +39,7 @@ android {
     defaultConfig {
         applicationId "com.example.mafia_radical"
         minSdk flutter.minSdkVersion
-        targetSdk flutter.targetSdkVersion
+        targetSdk 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
