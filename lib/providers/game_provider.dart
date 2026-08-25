@@ -8,9 +8,9 @@ enum GamePhase { waiting, night, day, gameOver }
 class GameState {
   final List<Player> players;
   final GamePhase phase;
-  final int? mafiaVictimId;
-  final int? doctorSaveId;
-  final int? detectiveCheckId;
+  final String? mafiaVictimId; // تغییر به String
+  final String? doctorSaveId;  // تغییر به String
+  final int? detectiveCheckId; // (این یکی فعلا int می‌ماند یا طبق کد شما)
   final String? winner;
 
   GameState({
@@ -25,8 +25,8 @@ class GameState {
   GameState copyWith({
     List<Player>? players,
     GamePhase? phase,
-    int? mafiaVictimId,
-    int? doctorSaveId,
+    String? mafiaVictimId,
+    String? doctorSaveId,
     int? detectiveCheckId,
     String? winner,
   }) {
