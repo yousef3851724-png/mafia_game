@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../providers/player_provider.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
@@ -97,6 +98,18 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                         );
                       },
                     ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: players.isNotEmpty ? () => context.push('/role-reveal') : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.all(16),
+                ),
+                child: const Text('شروع بازی و دیدن نقش‌ها', style: TextStyle(color: Colors.white, fontSize: 18)),
+              ),
             ),
           ],
         ),

@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import '../features/splash/splash_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/setup/setup_screen.dart';
+import '../features/role_reveal/role_reveal_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/splash',
@@ -17,6 +18,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/setup',
       builder: (context, state) => const SetupScreen(),
+    ),
+    GoRoute(
+      path: '/role-reveal',
+      builder: (context, state) => const RoleRevealScreen(),
     ),
   ],
 );
