@@ -7,3 +7,9 @@ void main() {
     const ProviderScope(
       child: MafiaRadicalApp(),
     ),
+import 'package:flutter/material.dart';
+import 'app.dart';
+
+void main() {
+  runApp(const MafiaApp());
+}
