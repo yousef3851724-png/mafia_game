@@ -7,12 +7,14 @@ class MafiaApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Mafia Radical',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
+        fontFamily: 'Vazirmatn', // اگر فونت را اضافه کرده باشید
       ),
       home: const Scaffold(
-        body: Center(child: Text('Hello Mafia!')),
+        body: Center(child: Text('به بازی مافیا خوش آمدید!')),
       ),
     );
   }
