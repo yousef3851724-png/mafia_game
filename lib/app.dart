@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
-import 'features/splash/splash_screen.dart';
+import 'router/app_router.dart';
 
 class MafiaApp extends StatelessWidget {
   const MafiaApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Mafia Radical',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
-      // نمایش صفحه اسپلش به عنوان صفحه اول
-      home: const SplashScreen(),
+      routerConfig: appRouter,
     );
   }
 }
