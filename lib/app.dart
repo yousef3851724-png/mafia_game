@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
-import 'router/app_router.dart';
 
 class MafiaApp extends StatelessWidget {
   const MafiaApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Mafia Radical',
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
-        useMaterial3: true,
-        fontFamily: 'Vazirmatn', // استفاده از فونت وزیرمتن
+      home: Scaffold(
+        body: Center(child: Text('مافیا رادیکال', style: TextStyle(fontSize: 30, color: Colors.red))),
       ),
-      routerConfig: appRouter,
     );
   }
 }
