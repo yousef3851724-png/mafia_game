@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../services/sound_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -9,45 +10,45 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 2),
+  )..forward();
+  late final Animation<double> _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+
   @override
   void initState() {
     super.initState();
-    // بعد از ۲ ثانیه به صفحه بعد (خانه یا ستاپ) می‌رویم
-    Timer(const Duration(seconds: 2), () {
-      if (mounted) {
-        // فعلاً موقتاً از Navigator استفاده می‌کنیم تا GoRouter را در بخش بعدی تنظیم کنیم
-        Navigator.pushReplacementNamed(context, '/home');
-      }
+    SoundService.instance.playNight();
+    Timer(const Duration(seconds: 3), () {
+      if (mounted) context.go('/home');
     });
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFF1A1A1A), // پس‌زمینه تیره مافیایی
+    return Scaffold(
+      backgroundColor: const Color(0xFF1A1A1A),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.local_fire_department, color: Colors.red, size: 80),
-            SizedBox(height: 20),
-            Text(
-              'Mafia Radical',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'در حال آماده‌سازی بازی...',
-              style: TextStyle(color: Colors.grey, fontSize: 16),
-            ),
-            SizedBox(height: 30),
-            CircularProgressIndicator(color: Colors.red),
-          ],
+        child: FadeTransition(
+          opacity: _animation,
+          child: const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.local_fire_department, color: Colors.red, size: 100),
+              SizedBox(height: 20),
+              Text('Mafia Radical', style: TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold)),
+              SizedBox(height: 10),
+              Text('در حال آماده‌سازی بازی...', style: TextStyle(color: Colors.grey, fontSize: 16)),
+            ],
+          ),
         ),
       ),
     );
