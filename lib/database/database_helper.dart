@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import '../models/player.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -27,6 +28,25 @@ class DatabaseHelper {
       role TEXT NOT NULL
     )
     ''');
+  }
+
+  // ذخیره بازیکن در دیتابیس
+  Future<void> insertPlayer(Player player) async {
+    final db = await database;
+    await db.insert('players', player.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  // دریافت لیست بازیکنان از دیتابیس
+  Future<List<Player>> getPlayers() async {
+    final db = await database;
+    final result = await db.query('players');
+    return result.map((e) => Player.fromMap(e)).toList();
+  }
+
+  // پاک کردن همه بازیکنان
+  Future<void> clearPlayers() async {
+    final db = await database;
+    await db.delete('players');
   }
 
   Future<void> close() async {
