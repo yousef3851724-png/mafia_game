@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'features/splash/splash_screen.dart';
 
 class MafiaApp extends StatelessWidget {
   const MafiaApp({super.key});
@@ -11,11 +12,9 @@ class MafiaApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
-        fontFamily: 'Vazirmatn', // اگر فونت را اضافه کرده باشید
       ),
-      home: const Scaffold(
-        body: Center(child: Text('به بازی مافیا خوش آمدید!')),
-      ),
+      // نمایش صفحه اسپلش به عنوان صفحه اول
+      home: const SplashScreen(),
     );
   }
 }
