@@ -1,20 +1,10 @@
-uses-material-design: true
-assets:
-  - assets/images/
-  - assets/fonts/
-fonts:
-  - family: Vazirmatn
-    fonts:
-      - asset: assets/fonts/Vazirmatn-Regular.ttf
-      - asset: assets/fonts/Vazirmatn-Bold.ttf
-        weight: 700name: mafia_radical
-description: "مافیا رادیکال — اپلیکیشن گرداننده هوشمند بازی مافیا"
+name: mafia_radical
+description: "بازی مافیا رادیکال - نسخه‌ی فارسی"
 publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.4.0
-  flutter: ">=3.24.0"
+  sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -31,7 +21,8 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   equatable: ^2.0.5
   logger: ^2.4.0
-  wakelock_plus: ^1.2.5
+  audioplayers: ^6.0.0
+  google_fonts: ^6.2.1
   package_info_plus: ^8.0.0
 
 dev_dependencies:
@@ -43,5 +34,11 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/fonts/
     - assets/sounds/
-    - assets/frames/
+  fonts:
+    - family: Vazirmatn
+      fonts:
+        - asset: assets/fonts/Vazirmatn-Regular.ttf
+        - asset: assets/fonts/Vazirmatn-Bold.ttf
+          weight: 700
