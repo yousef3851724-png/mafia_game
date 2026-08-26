@@ -1,6 +1,3 @@
-cd ~/storage/downloads/mafia_radical
-mkdir -p .github/workflows
-cat > .github/workflows/build.yml << 'EOF'
 name: Build APK
 
 on:
@@ -37,8 +34,3 @@ jobs:
         with:
           name: app-release
           path: build/app/outputs/flutter-apk/app-release.apk
-EOF
-
-git add .github/workflows/build.yml
-git commit -m "Add GitHub Actions workflow"
-git push
