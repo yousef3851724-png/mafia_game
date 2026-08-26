@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+// import 'package:flutter_gen/gen_l10n/app_localizations.dart';  // ← این خط را حذف کنید
 
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
@@ -17,8 +17,8 @@ class MafiaRadicalApp extends ConsumerWidget {
       theme: AppTheme.darkTheme,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: const [Locale('fa')],
+      // localizationsDelegates: AppLocalizations.localizationsDelegates,  // ← کامنت کنید
+      // supportedLocales: const [Locale('fa')],  // ← کامنت کنید
     );
   }
 }
