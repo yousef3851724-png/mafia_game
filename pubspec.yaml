@@ -1,45 +1,50 @@
 name: mafia_radical
-description: "مافیا رادیکال — اپلیکیشن گرداننده هوشمند بازی مافیا"
+description: "Mafia Radical - بازی مافیا رادیکال"
 publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.4.0
-  flutter: ">=3.24.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_localizations:
-    sdk: flutter
-  flutter_riverpod: ^2.5.1
-  go_router: ^14.2.0
-  get_it: ^7.7.0
-  sqflite: ^2.3.3+1
-  path: ^1.9.0
-  path_provider: ^2.1.3
+
+  # UI & Helpers
+  cupertino_icons: ^1.0.6
+  flutter_svg: ^2.0.9
+  google_fonts: ^6.2.1
+
+  # State Management & Routing
+  provider: ^6.1.2
+  go_router: ^14.0.0
+
+  # Database & Storage
+  sqflite: ^2.3.3
   shared_preferences: ^2.2.3
   flutter_secure_storage: ^9.2.2
+
+  # Dependency Injection
+  get_it: ^7.7.0
+
+  # Utilities
+  logger: ^2.2.0
   equatable: ^2.0.5
-  logger: ^2.4.0
-  wakelock_plus: ^1.2.5
-  package_info_plus: ^8.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^3.0.0
 
 flutter:
   uses-material-design: true
+
+  # Assets
   assets:
     - assets/images/
-    - assets/sounds/
-    - assets/frames/
-flutter:
-  uses-material-design: true
-  assets:
-    - assets/images/
+    - assets/fonts/
+
+  # Fonts
   fonts:
     - family: Vazirmatn
       fonts:
