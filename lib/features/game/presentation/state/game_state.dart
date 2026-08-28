@@ -1,35 +1,57 @@
+import 'package:equatable/equatable.dart';
+
 import '../../domain/entities/player.dart';
 
-enum GameStatus { initial, loading, active, voting, night, ended, error }
+enum GameStatus { initial, loading, loaded, error }
 
-class GameState {
+class GameState extends Equatable {
   final GameStatus status;
   final List<Player> players;
-  final String currentPhase;
+  final Map<String, int> votes;
+  final List<String> options;
+  final String currentPlayerId;
+  final String roomId;
   final String? errorMessage;
-  final String? selectedPlayerId;
 
   const GameState({
     this.status = GameStatus.initial,
     this.players = const [],
-    this.currentPhase = 'روز',
+    this.votes = const {},
+    this.options = const ['A', 'B', 'C', 'D'],
+    this.currentPlayerId = '',
+    this.roomId = '',
     this.errorMessage,
-    this.selectedPlayerId,
   });
 
   GameState copyWith({
     GameStatus? status,
     List<Player>? players,
-    String? currentPhase,
+    Map<String, int>? votes,
+    List<String>? options,
+    String? currentPlayerId,
+    String? roomId,
     String? errorMessage,
-    String? selectedPlayerId,
+    bool clearError = false,
   }) {
     return GameState(
       status: status ?? this.status,
       players: players ?? this.players,
-      currentPhase: currentPhase ?? this.currentPhase,
-      errorMessage: errorMessage ?? this.errorMessage,
-      selectedPlayerId: selectedPlayerId ?? this.selectedPlayerId,
+      votes: votes ?? this.votes,
+      options: options ?? this.options,
+      currentPlayerId: currentPlayerId ?? this.currentPlayerId,
+      roomId: roomId ?? this.roomId,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );
   }
+
+  @override
+  List<Object?> get props => [
+        status,
+        players,
+        votes,
+        options,
+        currentPlayerId,
+        roomId,
+        errorMessage,
+      ];
 }
