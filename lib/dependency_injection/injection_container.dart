@@ -1,43 +1,26 @@
 import 'package:get_it/get_it.dart';
-
-import '../database/app_database.dart';
-import '../storage/local_storage_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../database/database_helper.dart';
+import '../storage/shared_prefs_service.dart';
 import '../storage/secure_storage_service.dart';
 
-final GetIt sl = GetIt.instance;
+final getIt = GetIt.instance;
 
-/// راه‌اندازی تمام سرویس‌های سراسری اپ - در main.dart قبل از runApp فراخوانی می‌شود
 Future<void> initDependencies() async {
-  // ---------- Storage ----------
-  await LocalStorageService.instance.init();
-  sl.registerSingleton<LocalStorageService>(LocalStorageService.instance);
-  sl.registerSingleton<SecureStorageService>(SecureStorageService.instance);
+  // Services
+  final sharedPrefs = await SharedPreferences.getInstance();
+  getIt.registerSingleton<SharedPreferences>(sharedPrefs);
+  getIt.registerSingleton<SharedPrefsService>(SharedPrefsService(sharedPrefs));
 
-  // ---------- Database ----------
-  sl.registerSingleton<AppDatabase>(AppDatabase.instance);
-  await sl<AppDatabase>().database; // warm-up: باز کردن اتصال از همان ابتدا
+  const secureStorage = FlutterSecureStorage();
+  getIt.registerSingleton<SecureStorageService>(SecureStorageService(secureStorage));
 
-  // Repository ها و Provider های مربوط به منطق بازی در Section-02 اینجا اضافه می‌شوند
+  // Database
+  final databaseHelper = DatabaseHelper();
+  await databaseHelper.initDatabase();
+  getIt.registerSingleton<DatabaseHelper>(databaseHelper);
+
+  // Repositories
+  // (در بخش‌های بعدی اضافه می‌شوند)
 }
-name: mafia_game
-description: A complete Mafia game with AI
-publish_to: 'none'
-version: 1.0.0+1
-
-environment:
-  sdk: '>=3.0.0 <4.0.0'
-
-dependencies:
-  flutter:
-    sdk: flutter
-  provider: ^6.1.1
-  flutter_animate: ^4.5.0
-  shared_preferences: ^2.2.3
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^3.0.1
-
-flutter:
-  uses-material-design: true
