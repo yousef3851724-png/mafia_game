@@ -3,7 +3,7 @@ import '../repositories/i_game_repository.dart';
 class SubmitVoteUseCase {
   final IGameRepository repository;
 
-  SubmitVoteUseCase(this.repository);
+  const SubmitVoteUseCase(this.repository);
 
   Future<void> call({
     required String roomId,
