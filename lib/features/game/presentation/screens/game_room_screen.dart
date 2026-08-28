@@ -1,119 +1,184 @@
 import 'package:flutter/material.dart';
-import '../../domain/entities/player.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../state/game_bloc.dart';
+import '../state/game_state.dart';
 import '../widgets/player_avatar_card.dart';
 
 class GameRoomScreen extends StatefulWidget {
   final String roomId;
+  final String playerName;
+  final GameBloc bloc;
 
-  const GameRoomScreen({super.key, this.roomId = "ROOM-101"});
+  const GameRoomScreen({
+    super.key,
+    required this.roomId,
+    required this.playerName,
+    required this.bloc,
+  });
 
   @override
   State<GameRoomScreen> createState() => _GameRoomScreenState();
 }
 
 class _GameRoomScreenState extends State<GameRoomScreen> {
-  String? selectedPlayerId;
+  String? selectedOption;
+  bool _joined = false;
 
-  final List<Player> players = const [
-    Player(id: '1', name: 'پدرخوانده', role: 'مافیا'),
-    Player(id: '2', name: 'دکتر لکتر', role: 'مافیا'),
-    Player(id: '3', name: 'کارآگاه', role: 'شهروند'),
-    Player(id: '4', name: 'پزشک', role: 'شهروند'),
-    Player(id: '5', name: 'اسنایپر', role: 'شهروند'),
-    Player(id: '6', name: 'شهروند ساده', role: 'شهروند', isAlive: false),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _joined) return;
+      _joined = true;
+      context.read<GameBloc>().add(
+            JoinRoomRequested(
+              roomId: widget.roomId,
+              playerName: widget.playerName,
+            ),
+          );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('اتاق بازی: ${widget.roomId}'),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () {},
-          )
-        ],
+    return BlocProvider.value(
+      value: widget.bloc,
+      child: BlocConsumer<GameBloc, GameState>(
+        listener: (context, state) {
+          if (state.status == GameStatus.error && state.errorMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.errorMessage!)),
+            );
+          }
+        },
+        builder: (context, state) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('اتاق ${widget.roomId}'),
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  tooltip: 'خروج',
+                  icon: const Icon(Icons.exit_to_app),
+                  onPressed: () {
+                    context.read<GameBloc>().add(const LeaveRoomRequested());
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+            body: _buildBody(context, state),
+          );
+        },
       ),
-      body: Column(
+    );
+  }
+
+  Widget _buildBody(BuildContext context, GameState state) {
+    if (state.status == GameStatus.loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state.status == GameStatus.error && state.players.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, size: 48),
+              const SizedBox(height: 12),
+              Text(state.errorMessage ?? 'خطای ناشناخته'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => context.read<GameBloc>().add(
+                      JoinRoomRequested(
+                        roomId: widget.roomId,
+                        playerName: widget.playerName,
+                      ),
+                    ),
+                child: const Text('تلاش دوباره'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final players = state.players;
+    final hasVoted = players
+        .where((player) => player.id == state.currentPlayerId)
+        .any((player) => player.vote != null);
+
+    return SafeArea(
+      child: Column(
         children: [
-          // نوار وضعیت فاز بازی
           Container(
             width: double.infinity,
             margin: const EdgeInsets.all(12),
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: const Color(0xFF1E1E1E),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: theme.colorScheme.primary.withOpacity(0.4)),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
-                  children: [
-                    Icon(Icons.wb_sunny, color: Colors.amber),
-                    SizedBox(width: 8),
-                    Text('فاز روز: گفت‌وگو و رای‌گیری', style: TextStyle(fontWeight: FontWeight.bold)),
-                  ],
+                const Icon(Icons.wb_sunny, color: Colors.amber),
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Text(
+                    'فاز روز: گفت‌وگو و رأی‌گیری',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
-                Text('00:45', style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 16)),
+                Text('${players.length} بازیکن'),
               ],
             ),
           ),
-
-          // گرید بازیکنان
           Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 1.1,
-              ),
-              itemCount: players.length,
-              itemBuilder: (context, index) {
-                final player = players[index];
-                return PlayerAvatarCard(
-                  player: player,
-                  isSelected: selectedPlayerId == player.id,
-                  onTap: () {
-                    setState(() {
-                      selectedPlayerId = player.id;
-                    });
-                  },
-                );
-              },
-            ),
+            child: players.isEmpty
+                ? const Center(child: Text('هنوز بازیکنی وارد اتاق نشده است.'))
+                : GridView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 1.05,
+                    ),
+                    itemCount: players.length,
+                    itemBuilder: (context, index) {
+                      final player = players[index];
+                      return PlayerAvatarCard(
+                        player: player,
+                        isSelected: selectedOption == player.id,
+                        onTap: () {
+                          if (hasVoted || player.id == state.currentPlayerId) return;
+                          setState(() => selectedOption = player.id);
+                        },
+                      );
+                    },
+                  ),
           ),
-
-          // دکمه اقدام/رای
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             child: SizedBox(
               width: double.infinity,
               height: 52,
               child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                onPressed: selectedPlayerId == null
+                onPressed: selectedOption == null || hasVoted
                     ? null
                     : () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('رای شما به بازیکن $selectedPlayerId ثبت شد!')),
-                        );
+                        final option = selectedOption!;
+                        context.read<GameBloc>().add(VoteRequested(option));
+                        setState(() => selectedOption = null);
                       },
-                icon: const Icon(Icons.how_to_vote, color: Colors.white),
-                label: const Text('ثبت رأی', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                icon: const Icon(Icons.how_to_vote),
+                label: Text(hasVoted ? 'رأی ثبت شده است' : 'ثبت رأی'),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
