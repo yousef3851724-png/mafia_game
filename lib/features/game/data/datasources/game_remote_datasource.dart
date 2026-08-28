@@ -9,8 +9,8 @@ abstract class GameRemoteDataSource {
 
   Future<void> submitVote(
     String roomId,
-    String playerId,
-    String option,
+    String voterId,
+    String targetPlayerId,
   );
 
   Future<void> leaveRoom(String roomId, String playerId);
@@ -18,8 +18,8 @@ abstract class GameRemoteDataSource {
   Future<void> close();
 }
 
-/// Local simulation of a remote game server.
-/// Replace the method bodies with Socket.io/Firebase calls when the backend is ready.
+/// Local simulation of the remote game server.
+/// Replace this implementation with Socket.io/Firebase when the backend is ready.
 class GameRemoteDataSourceImpl implements GameRemoteDataSource {
   final StreamController<GameStateModel> _controller =
       StreamController<GameStateModel>.broadcast();
@@ -52,40 +52,43 @@ class GameRemoteDataSourceImpl implements GameRemoteDataSource {
       isHost: _state.players.isEmpty,
     );
 
-    _publish(_state.copyWith(
-      players: [..._state.players, player],
-    ));
-
+    _publish(_state.copyWith(players: [..._state.players, player]));
     return playerId;
   }
 
   @override
   Future<void> submitVote(
     String roomId,
-    String playerId,
-    String option,
+    String voterId,
+    String targetPlayerId,
   ) async {
     if (_closed) throw StateError('Remote data source is closed.');
-    if (!_state.options.contains(option)) {
-      throw ArgumentError('Invalid vote option: $option');
+    if (targetPlayerId.trim().isEmpty) {
+      throw ArgumentError('Target player is required.');
     }
 
-    final index = _state.players.indexWhere((p) => p.id == playerId);
-    if (index == -1) throw StateError('Player not found.');
+    final voterIndex = _state.players.indexWhere((p) => p.id == voterId);
+    final targetExists = _state.players.any((p) => p.id == targetPlayerId);
 
-    final player = _state.players[index];
-    if (player.vote != null) return;
+    if (voterIndex == -1) throw StateError('Voter not found.');
+    if (!targetExists) throw StateError('Target player not found.');
+
+    final voter = _state.players[voterIndex];
+    if (voter.vote != null) return;
+    if (voter.id == targetPlayerId) {
+      throw StateError('A player cannot vote for themselves.');
+    }
 
     final updatedPlayers = [..._state.players];
-    updatedPlayers[index] = PlayerModel(
-      id: player.id,
-      name: player.name,
-      isHost: player.isHost,
-      vote: option,
+    updatedPlayers[voterIndex] = PlayerModel(
+      id: voter.id,
+      name: voter.name,
+      isHost: voter.isHost,
+      vote: targetPlayerId,
     );
 
     final votes = Map<String, int>.from(_state.votes);
-    votes[option] = (votes[option] ?? 0) + 1;
+    votes[targetPlayerId] = (votes[targetPlayerId] ?? 0) + 1;
 
     _publish(_state.copyWith(
       players: updatedPlayers,
@@ -114,7 +117,16 @@ class GameRemoteDataSourceImpl implements GameRemoteDataSource {
       ];
     }
 
-    _publish(_state.copyWith(players: updatedPlayers));
+    final validIds = updatedPlayers.map((p) => p.id).toSet();
+    final votes = <String, int>{
+      for (final entry in _state.votes.entries)
+        if (validIds.contains(entry.key)) entry.key: entry.value,
+    };
+
+    _publish(_state.copyWith(
+      players: updatedPlayers,
+      votes: votes,
+    ));
   }
 
   @override
