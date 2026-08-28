@@ -204,8 +204,8 @@ class _GameRoomScreenState extends State<GameRoomScreen> {
   }
 }
 
-extension on Iterable<T> {
-  T? firstWhereOrNull<T>(bool Function(T item) test) {
+extension<T> on Iterable<T> {
+  T? firstWhereOrNull(bool Function(T item) test) {
     for (final item in this) {
       if (test(item)) return item;
     }
