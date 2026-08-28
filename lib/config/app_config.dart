@@ -17,3 +17,9 @@ class AppConfig {
   static bool get isProduction => flavor == AppFlavor.production;
   static bool get isDev => flavor == AppFlavor.dev;
 }
+class AppConfig {
+  static const String appVersion = '1.0.0';
+  static const String databaseName = 'game_history.db';
+  static const int databaseVersion = 1;
+  static const String secureStorageKeyToken = 'auth_token';
+}
