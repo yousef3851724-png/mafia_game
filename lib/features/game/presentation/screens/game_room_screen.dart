@@ -22,7 +22,7 @@ class GameRoomScreen extends StatefulWidget {
 }
 
 class _GameRoomScreenState extends State<GameRoomScreen> {
-  String? selectedOption;
+  String? selectedPlayerId;
   bool _joined = false;
 
   @override
@@ -107,9 +107,10 @@ class _GameRoomScreenState extends State<GameRoomScreen> {
     }
 
     final players = state.players;
-    final hasVoted = players
-        .where((player) => player.id == state.currentPlayerId)
-        .any((player) => player.vote != null);
+    final currentPlayer = players.firstWhereOrNull(
+      (player) => player.id == state.currentPlayerId,
+    );
+    final hasVoted = currentPlayer?.vote != null;
 
     return SafeArea(
       child: Column(
@@ -150,13 +151,30 @@ class _GameRoomScreenState extends State<GameRoomScreen> {
                     itemCount: players.length,
                     itemBuilder: (context, index) {
                       final player = players[index];
-                      return PlayerAvatarCard(
-                        player: player,
-                        isSelected: selectedOption == player.id,
-                        onTap: () {
-                          if (hasVoted || player.id == state.currentPlayerId) return;
-                          setState(() => selectedOption = player.id);
-                        },
+                      final voteCount = state.votes[player.id] ?? 0;
+
+                      return Stack(
+                        children: [
+                          Positioned.fill(
+                            child: PlayerAvatarCard(
+                              player: player,
+                              isSelected: selectedPlayerId == player.id,
+                              onTap: () {
+                                if (hasVoted || player.id == state.currentPlayerId) return;
+                                setState(() => selectedPlayerId = player.id);
+                              },
+                            ),
+                          ),
+                          if (voteCount > 0)
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: CircleAvatar(
+                                radius: 13,
+                                child: Text('$voteCount'),
+                              ),
+                            ),
+                        ],
                       );
                     },
                   ),
@@ -167,12 +185,13 @@ class _GameRoomScreenState extends State<GameRoomScreen> {
               width: double.infinity,
               height: 52,
               child: ElevatedButton.icon(
-                onPressed: selectedOption == null || hasVoted
+                onPressed: selectedPlayerId == null || hasVoted
                     ? null
                     : () {
-                        final option = selectedOption!;
-                        context.read<GameBloc>().add(VoteRequested(option));
-                        setState(() => selectedOption = null);
+                        context.read<GameBloc>().add(
+                              VoteRequested(selectedPlayerId!),
+                            );
+                        setState(() => selectedPlayerId = null);
                       },
                 icon: const Icon(Icons.how_to_vote),
                 label: Text(hasVoted ? 'رأی ثبت شده است' : 'ثبت رأی'),
@@ -182,5 +201,14 @@ class _GameRoomScreenState extends State<GameRoomScreen> {
         ],
       ),
     );
+  }
+}
+
+extension on Iterable<T> {
+  T? firstWhereOrNull<T>(bool Function(T item) test) {
+    for (final item in this) {
+      if (test(item)) return item;
+    }
+    return null;
   }
 }
