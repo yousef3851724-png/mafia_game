@@ -175,7 +175,7 @@ class _GameTestScreenState extends State<GameTestScreen> {
                         (assignment) => ListTile(
                           dense: true,
                           leading: Icon(
-                            assignment.role.team == RoleTeam.mafia ? Icons.visibility_off : Icons.shield,
+                            assignment.role.team == Team.mafia ? Icons.visibility_off : Icons.shield,
                           ),
                           title: Text(
                             _session.players
