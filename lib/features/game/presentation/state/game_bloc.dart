@@ -21,9 +21,9 @@ class JoinRoomRequested extends GameEvent {
 }
 
 class VoteRequested extends GameEvent {
-  final String option;
+  final String targetPlayerId;
 
-  const VoteRequested(this.option);
+  const VoteRequested(this.targetPlayerId);
 }
 
 class LeaveRoomRequested extends GameEvent {
@@ -133,14 +133,14 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   ) async {
     if (_roomId.isEmpty || _currentPlayerId.isEmpty) return;
 
-    final me = _players.where((p) => p.id == _currentPlayerId).firstOrNull;
+    final me = _players.firstWhereOrNull((p) => p.id == _currentPlayerId);
     if (me == null || me.vote != null) return;
 
     try {
       await submitVoteUseCase(
         roomId: _roomId,
         voterId: _currentPlayerId,
-        targetPlayerId: event.option,
+        targetPlayerId: event.targetPlayerId,
       );
     } catch (e) {
       emit(state.copyWith(
@@ -170,10 +170,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     }
   }
 
-  void _onPlayersUpdated(
-    _PlayersUpdated event,
-    Emitter<GameState> emit,
-  ) {
+  void _onPlayersUpdated(_PlayersUpdated event, Emitter<GameState> emit) {
     emit(state.copyWith(
       status: state.status == GameStatus.loading
           ? GameStatus.loading
@@ -185,10 +182,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     ));
   }
 
-  void _onVotesUpdated(
-    _VotesUpdated event,
-    Emitter<GameState> emit,
-  ) {
+  void _onVotesUpdated(_VotesUpdated event, Emitter<GameState> emit) {
     emit(state.copyWith(
       status: state.status == GameStatus.loading
           ? GameStatus.loading
@@ -209,6 +203,11 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   }
 }
 
-extension _FirstOrNull<T> on Iterable<T> {
-  T? get firstOrNull => isEmpty ? null : first;
+extension on Iterable<Player> {
+  Player? firstWhereOrNull(bool Function(Player player) test) {
+    for (final player in this) {
+      if (test(player)) return player;
+    }
+    return null;
+  }
 }
