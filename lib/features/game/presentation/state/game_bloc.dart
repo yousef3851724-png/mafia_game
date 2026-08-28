@@ -30,6 +30,16 @@ class LeaveRoomRequested extends GameEvent {
   const LeaveRoomRequested();
 }
 
+class _PlayersUpdated extends GameEvent {
+  final List<Player> players;
+  const _PlayersUpdated(this.players);
+}
+
+class _VotesUpdated extends GameEvent {
+  final Map<String, int> votes;
+  const _VotesUpdated(this.votes);
+}
+
 class GameBloc extends Bloc<GameEvent, GameState> {
   final JoinRoomUseCase joinRoomUseCase;
   final SubmitVoteUseCase submitVoteUseCase;
@@ -53,6 +63,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<JoinRoomRequested>(_onJoinRoom);
     on<VoteRequested>(_onVote);
     on<LeaveRoomRequested>(_onLeaveRoom);
+    on<_PlayersUpdated>(_onPlayersUpdated);
+    on<_VotesUpdated>(_onVotesUpdated);
   }
 
   Future<void> _subscribeToGame() async {
@@ -61,14 +73,12 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
     _playersSubscription = repository.watchPlayers().listen((players) {
       _players = List.unmodifiable(players);
-      if (isClosed) return;
-      add(_InternalPlayersUpdated(_players));
+      if (!isClosed) add(_PlayersUpdated(_players));
     });
 
     _votesSubscription = repository.watchVotes().listen((votes) {
       _votes = Map.unmodifiable(votes);
-      if (isClosed) return;
-      add(_InternalVotesUpdated(_votes));
+      if (!isClosed) add(_VotesUpdated(_votes));
     });
   }
 
@@ -76,18 +86,29 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     JoinRoomRequested event,
     Emitter<GameState> emit,
   ) async {
+    final roomId = event.roomId.trim();
+    final playerName = event.playerName.trim();
+
+    if (roomId.isEmpty || playerName.isEmpty) {
+      emit(state.copyWith(
+        status: GameStatus.error,
+        errorMessage: 'شناسه اتاق و نام بازیکن الزامی است.',
+      ));
+      return;
+    }
+
     emit(state.copyWith(
       status: GameStatus.loading,
-      roomId: event.roomId.trim(),
+      roomId: roomId,
       clearError: true,
     ));
 
     try {
-      _roomId = event.roomId.trim();
+      _roomId = roomId;
       await _subscribeToGame();
       _currentPlayerId = await joinRoomUseCase(
-        roomId: _roomId,
-        playerName: event.playerName,
+        roomId: roomId,
+        playerName: playerName,
       );
 
       emit(state.copyWith(
@@ -111,8 +132,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     Emitter<GameState> emit,
   ) async {
     if (_roomId.isEmpty || _currentPlayerId.isEmpty) return;
-    if (!_players.any((p) => p.id == _currentPlayerId)) return;
-    if (!_players.any((p) => p.vote == null && p.id == _currentPlayerId)) return;
+
+    final me = _players.where((p) => p.id == _currentPlayerId).firstOrNull;
+    if (me == null || me.vote != null) return;
 
     try {
       await submitVoteUseCase(
@@ -148,6 +170,36 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     }
   }
 
+  void _onPlayersUpdated(
+    _PlayersUpdated event,
+    Emitter<GameState> emit,
+  ) {
+    emit(state.copyWith(
+      status: state.status == GameStatus.loading
+          ? GameStatus.loading
+          : GameStatus.loaded,
+      players: event.players,
+      currentPlayerId: _currentPlayerId,
+      roomId: _roomId,
+      clearError: true,
+    ));
+  }
+
+  void _onVotesUpdated(
+    _VotesUpdated event,
+    Emitter<GameState> emit,
+  ) {
+    emit(state.copyWith(
+      status: state.status == GameStatus.loading
+          ? GameStatus.loading
+          : GameStatus.loaded,
+      votes: event.votes,
+      currentPlayerId: _currentPlayerId,
+      roomId: _roomId,
+      clearError: true,
+    ));
+  }
+
   @override
   Future<void> close() async {
     await _playersSubscription?.cancel();
@@ -157,12 +209,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   }
 }
 
-class _InternalPlayersUpdated extends GameEvent {
-  final List<Player> players;
-  const _InternalPlayersUpdated(this.players);
-}
-
-class _InternalVotesUpdated extends GameEvent {
-  final Map<String, int> votes;
-  const _InternalVotesUpdated(this.votes);
+extension _FirstOrNull<T> on Iterable<T> {
+  T? get firstOrNull => isEmpty ? null : first;
 }
