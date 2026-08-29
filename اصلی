@@ -1,0 +1,610 @@
+cat << 'EOF' > setup_game_feature.sh
+#!/bin/bash
+set -e
+
+echo "🚀 در حال ساخت ساختار و فایل‌های کامل فیچر Game..."
+
+# ساخت تمام پوشه‌های لایه‌های Data, Domain, Presentation
+mkdir -p lib/features/game/data/datasources
+mkdir -p lib/features/game/data/models
+mkdir -p lib/features/game/data/repositories
+mkdir -p lib/features/game/domain/entities
+mkdir -p lib/features/game/domain/repositories
+mkdir -p lib/features/game/domain/usecases
+mkdir -p lib/features/game/presentation/state
+mkdir -p lib/features/game/presentation/screens
+mkdir -p lib/features/game/presentation/widgets
+
+# ==========================================
+# 1. DOMAIN LAYER (Pure Dart Entities & Contracts)
+# ==========================================
+
+# 1.1 Player Entity
+cat << 'FILE' > lib/features/game/domain/entities/player.dart
+class Player {
+  final String id;
+  final String name;
+  final String role;
+  final bool isAlive;
+  final int votesReceived;
+
+  const Player({
+    required this.id,
+    required this.name,
+    required this.role,
+    this.isAlive = true,
+    this.votesReceived = 0,
+  });
+
+  Player copyWith({
+    String? id,
+    String? name,
+    String? role,
+    bool? isAlive,
+    int? votesReceived,
+  }) {
+    return Player(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      role: role ?? this.role,
+      isAlive: isAlive ?? this.isAlive,
+      votesReceived: votesReceived ?? this.votesReceived,
+    );
+  }
+}
+FILE
+
+# 1.2 Game Repository Interface
+cat << 'FILE' > lib/features/game/domain/repositories/i_game_repository.dart
+import '../entities/player.dart';
+
+abstract class IGameRepository {
+  Future<void> connectToGame(String roomId, String playerId);
+  Stream<List<Player>> get playersStream;
+  Stream<String> get phaseStream;
+  Future<void> joinRoom(String roomId, String playerName);
+  Future<void> submitVote(String roomId, String voterId, String targetPlayerId);
+  Future<void> disconnect();
+}
+FILE
+
+# 1.3 Join Room UseCase
+cat << 'FILE' > lib/features/game/domain/usecases/join_room_usecase.dart
+import '../repositories/i_game_repository.dart';
+
+class JoinRoomUseCase {
+  final IGameRepository repository;
+
+  JoinRoomUseCase(this.repository);
+
+  Future<void> call({required String roomId, required String playerName}) {
+    return repository.joinRoom(roomId, playerName);
+  }
+}
+FILE
+
+# 1.4 Submit Vote UseCase
+cat << 'FILE' > lib/features/game/domain/usecases/submit_vote_usecase.dart
+import '../repositories/i_game_repository.dart';
+
+class SubmitVoteUseCase {
+  final IGameRepository repository;
+
+  SubmitVoteUseCase(this.repository);
+
+  Future<void> call({
+    required String roomId,
+    required String voterId,
+    required String targetPlayerId,
+  }) {
+    return repository.submitVote(roomId, voterId, targetPlayerId);
+  }
+}
+FILE
+
+# ==========================================
+# 2. DATA LAYER (Models, DataSources, Impl)
+# ==========================================
+
+# 2.1 Game State Model / Player Model DTO
+cat << 'FILE' > lib/features/game/data/models/game_state_model.dart
+import '../../domain/entities/player.dart';
+
+class PlayerModel extends Player {
+  const PlayerModel({
+    required super.id,
+    required super.name,
+    required super.role,
+    super.isAlive,
+    super.votesReceived,
+  });
+
+  factory PlayerModel.fromJson(Map<String, dynamic> json) {
+    return PlayerModel(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      role: json['role'] as String? ?? 'نامشخص',
+      isAlive: json['is_alive'] as bool? ?? true,
+      votesReceived: json['votes_received'] as int? ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'role': role,
+      'is_alive': isAlive,
+      'votes_received': votesReceived,
+    };
+  }
+}
+FILE
+
+# 2.2 Remote Data Source (Socket / Network)
+cat << 'FILE' > lib/features/game/data/datasources/game_remote_datasource.dart
+import 'dart:async';
+import '../models/game_state_model.dart';
+
+abstract class GameRemoteDataSource {
+  Future<void> initSocket(String roomId, String playerId);
+  Stream<List<PlayerModel>> get onPlayersUpdated;
+  Stream<String> get onPhaseChanged;
+  Future<void> emitJoinRoom(String roomId, String playerName);
+  Future<void> emitVote(String roomId, String voterId, String targetPlayerId);
+  Future<void> closeSocket();
+}
+
+class GameRemoteDataSourceImpl implements GameRemoteDataSource {
+  final _playersController = StreamController<List<PlayerModel>>.broadcast();
+  final _phaseController = StreamController<String>.broadcast();
+
+  @override
+  Future<void> initSocket(String roomId, String playerId) async {
+    // پیاده‌سازی اتصال Socket.io و لیسنرها
+  }
+
+  @override
+  Stream<List<PlayerModel>> get onPlayersUpdated => _playersController.stream;
+
+  @override
+  Stream<String> get onPhaseChanged => _phaseController.stream;
+
+  @override
+  Future<void> emitJoinRoom(String roomId, String playerName) async {
+    // ارسال اونت join_room به سوکت
+  }
+
+  @override
+  Future<void> emitVote(String roomId, String voterId, String targetPlayerId) async {
+    // ارسال اونت submit_vote به سوکت
+  }
+
+  @override
+  Future<void> closeSocket() async {
+    await _playersController.close();
+    await _phaseController.close();
+  }
+}
+FILE
+
+# 2.3 Local Data Source (Cache / Offline)
+cat << 'FILE' > lib/features/game/data/datasources/game_local_datasource.dart
+import '../models/game_state_model.dart';
+
+abstract class GameLocalDataSource {
+  Future<void> cacheLastGameState(List<PlayerModel> players);
+  Future<List<PlayerModel>> getLastCachedGameState();
+}
+
+class GameLocalDataSourceImpl implements GameLocalDataSource {
+  List<PlayerModel> _cachedPlayers = [];
+
+  @override
+  Future<void> cacheLastGameState(List<PlayerModel> players) async {
+    _cachedPlayers = players;
+  }
+
+  @override
+  Future<List<PlayerModel>> getLastCachedGameState() async {
+    return _cachedPlayers;
+  }
+}
+FILE
+
+# 2.4 Repository Implementation
+cat << 'FILE' > lib/features/game/data/repositories/game_repository_impl.dart
+import '../../domain/entities/player.dart';
+import '../../domain/repositories/i_game_repository.dart';
+import '../datasources/game_remote_datasource.dart';
+import '../datasources/game_local_datasource.dart';
+
+class GameRepositoryImpl implements IGameRepository {
+  final GameRemoteDataSource remoteDataSource;
+  final GameLocalDataSource localDataSource;
+
+  GameRepositoryImpl({
+    required this.remoteDataSource,
+    required this.localDataSource,
+  });
+
+  @override
+  Future<void> connectToGame(String roomId, String playerId) async {
+    await remoteDataSource.initSocket(roomId, playerId);
+  }
+
+  @override
+  Stream<List<Player>> get playersStream => remoteDataSource.onPlayersUpdated;
+
+  @override
+  Stream<String> get phaseStream => remoteDataSource.onPhaseChanged;
+
+  @override
+  Future<void> joinRoom(String roomId, String playerName) async {
+    await remoteDataSource.emitJoinRoom(roomId, playerName);
+  }
+
+  @override
+  Future<void> submitVote(String roomId, String voterId, String targetPlayerId) async {
+    await remoteDataSource.emitVote(roomId, voterId, targetPlayerId);
+  }
+
+  @override
+  Future<void> disconnect() async {
+    await remoteDataSource.closeSocket();
+  }
+}
+FILE
+
+# ==========================================
+# 3. PRESENTATION LAYER (State, Widgets, Screen)
+# ==========================================
+
+# 3.1 Game State
+cat << 'FILE' > lib/features/game/presentation/state/game_state.dart
+import '../../domain/entities/player.dart';
+
+enum GameStatus { initial, loading, active, voting, night, ended, error }
+
+class GameState {
+  final GameStatus status;
+  final List<Player> players;
+  final String currentPhase;
+  final String? errorMessage;
+  final String? selectedPlayerId;
+
+  const GameState({
+    this.status = GameStatus.initial,
+    this.players = const [],
+    this.currentPhase = 'روز',
+    this.errorMessage,
+    this.selectedPlayerId,
+  });
+
+  GameState copyWith({
+    GameStatus? status,
+    List<Player>? players,
+    String? currentPhase,
+    String? errorMessage,
+    String? selectedPlayerId,
+  }) {
+    return GameState(
+      status: status ?? this.status,
+      players: players ?? this.players,
+      currentPhase: currentPhase ?? this.currentPhase,
+      errorMessage: errorMessage ?? this.errorMessage,
+      selectedPlayerId: selectedPlayerId ?? this.selectedPlayerId,
+    );
+  }
+}
+FILE
+
+# 3.2 Game Bloc / Cubit
+cat << 'FILE' > lib/features/game/presentation/state/game_bloc.dart
+import 'dart:async';
+import 'game_state.dart';
+import '../../domain/entities/player.dart';
+import '../../domain/usecases/join_room_usecase.dart';
+import '../../domain/usecases/submit_vote_usecase.dart';
+
+class GameBloc {
+  final JoinRoomUseCase joinRoomUseCase;
+  final SubmitVoteUseCase submitVoteUseCase;
+
+  final _stateController = StreamController<GameState>.broadcast();
+  GameState _state = const GameState();
+
+  GameBloc({
+    required this.joinRoomUseCase,
+    required this.submitVoteUseCase,
+  }) {
+    _stateController.add(_state);
+  }
+
+  Stream<GameState> get stateStream => _stateController.stream;
+  GameState get state => _state;
+
+  void _emit(GameState newState) {
+    _state = newState;
+    _stateController.add(_state);
+  }
+
+  Future<void> joinGame(String roomId, String playerName) async {
+    _emit(_state.copyWith(status: GameStatus.loading));
+    try {
+      await joinRoomUseCase(roomId: roomId, playerName: playerName);
+      // شبیه‌سازی بازیکنان اولیه
+      final mockPlayers = [
+        const Player(id: '1', name: 'پدرخوانده', role: 'مافیا'),
+        const Player(id: '2', name: 'کارآگاه', role: 'شهروند'),
+        const Player(id: '3', name: 'دکتر', role: 'شهروند'),
+        const Player(id: '4', name: 'تک تیرانداز', role: 'شهروند'),
+      ];
+      _emit(_state.copyWith(status: GameStatus.active, players: mockPlayers));
+    } catch (e) {
+      _emit(_state.copyWith(status: GameStatus.error, errorMessage: e.toString()));
+    }
+  }
+
+  void selectPlayer(String playerId) {
+    _emit(_state.copyWith(selectedPlayerId: playerId));
+  }
+
+  Future<void> vote(String roomId, String voterId, String targetId) async {
+    await submitVoteUseCase(
+      roomId: roomId,
+      voterId: voterId,
+      targetPlayerId: targetId,
+    );
+  }
+
+  void dispose() {
+    _stateController.close();
+  }
+}
+FILE
+
+# 3.3 Player Avatar Card Widget
+cat << 'FILE' > lib/features/game/presentation/widgets/player_avatar_card.dart
+import 'package:flutter/material.dart';
+import '../../domain/entities/player.dart';
+
+class PlayerAvatarCard extends StatelessWidget {
+  final Player player;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const PlayerAvatarCard({
+    super.key,
+    required this.player,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return GestureDetector(
+      onTap: player.isAlive ? onTap : null,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        decoration: BoxDecoration(
+          color: player.isAlive
+              ? (isSelected ? theme.colorScheme.primary.withOpacity(0.2) : const Color(0xFF1E1E1E))
+              : Colors.black45,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? theme.colorScheme.primary : Colors.white12,
+            width: isSelected ? 2.5 : 1,
+          ),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundColor: player.isAlive ? Colors.redAccent.shade700 : Colors.grey.shade800,
+                  child: Text(
+                    player.name.isNotEmpty ? player.name[0] : '?',
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ),
+                if (!player.isAlive)
+                  const Icon(Icons.close, color: Colors.red, size: 40),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              player.name,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+                color: player.isAlive ? Colors.white : Colors.grey,
+                decoration: player.isAlive ? null : TextDecoration.lineThrough,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              player.role,
+              style: TextStyle(
+                fontSize: 12,
+                color: theme.colorScheme.secondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+FILE
+
+# 3.4 Game Room Screen
+cat << 'FILE' > lib/features/game/presentation/screens/game_room_screen.dart
+import 'package:flutter/material.dart';
+import '../../domain/entities/player.dart';
+import '../widgets/player_avatar_card.dart';
+
+class GameRoomScreen extends StatefulWidget {
+  final String roomId;
+
+  const GameRoomScreen({super.key, this.roomId = "ROOM-101"});
+
+  @override
+  State<GameRoomScreen> createState() => _GameRoomScreenState();
+}
+
+class _GameRoomScreenState extends State<GameRoomScreen> {
+  String? selectedPlayerId;
+
+  final List<Player> players = const [
+    Player(id: '1', name: 'پدرخوانده', role: 'مافیا'),
+    Player(id: '2', name: 'دکتر لکتر', role: 'مافیا'),
+    Player(id: '3', name: 'کارآگاه', role: 'شهروند'),
+    Player(id: '4', name: 'پزشک', role: 'شهروند'),
+    Player(id: '5', name: 'اسنایپر', role: 'شهروند'),
+    Player(id: '6', name: 'شهروند ساده', role: 'شهروند', isAlive: false),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('اتاق بازی: ${widget.roomId}'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: () {},
+          )
+        ],
+      ),
+      body: Column(
+        children: [
+          // نوار وضعیت فاز بازی
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E1E),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: theme.colorScheme.primary.withOpacity(0.4)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Row(
+                  children: [
+                    Icon(Icons.wb_sunny, color: Colors.amber),
+                    SizedBox(width: 8),
+                    Text('فاز روز: گفت‌وگو و رای‌گیری', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                Text('00:45', style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ),
+          ),
+
+          // گرید بازیکنان
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.1,
+              ),
+              itemCount: players.length,
+              itemBuilder: (context, index) {
+                final player = players[index];
+                return PlayerAvatarCard(
+                  player: player,
+                  isSelected: selectedPlayerId == player.id,
+                  onTap: () {
+                    setState(() {
+                      selectedPlayerId = player.id;
+                    });
+                  },
+                );
+              },
+            ),
+          ),
+
+          // دکمه اقدام/رای
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: selectedPlayerId == null
+                    ? null
+                    : () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('رای شما به بازیکن $selectedPlayerId ثبت شد!')),
+                        );
+                      },
+                icon: const Icon(Icons.how_to_vote, color: Colors.white),
+                label: const Text('ثبت رأی', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+FILE
+
+# ==========================================
+# 4. آپدیت کردن مسیر GoRouter به GameRoomScreen
+# ==========================================
+cat << 'FILE' > lib/router/app_router.dart
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../features/game/presentation/screens/game_room_screen.dart';
+
+class AppRouter {
+  static const String initial = '/';
+  static const String game = '/game';
+
+  static final GoRouter router = GoRouter(
+    initialLocation: initial,
+    routes: [
+      GoRoute(
+        path: initial,
+        builder: (context, state) => const GameRoomScreen(),
+      ),
+      GoRoute(
+        path: game,
+        builder: (context, state) => const GameRoomScreen(),
+      ),
+    ],
+    errorBuilder: (context, state) => Scaffold(
+      body: Center(
+        child: Text('صفحه یافت نشد: ${state.uri.toString()}'),
+      ),
+    ),
+  );
+}
+FILE
+
+echo "✅ تمام لایه‌ها، فایل‌ها و ویجت‌های فیچر Game دقیقاً طبق ساختار ساخته شدند!"
+EOF
+
+chmod +x setup_game_feature.sh && ./setup_game_feature.sh && rm setup_game_feature.sh
