@@ -1,10 +1,6 @@
-// Extended Mock implementation of IGameRepository with auto-play (bots) and scenarios.
-// Features:
-// - Keeps per-voter mapping so votes can be updated/removed
-// - Phase stream (روز/شب)
-// - Helpers: reset, addBotPlayer, removePlayer
-// - Auto-play: startAutoPlay/stopAutoPlay, configurable interval and behavior
-// - Pre-defined scenarios: quickPlay, drama
+// Extended Mock implementation of IGameRepository for local simulation / UI testing.
+// Adds: per-voter mapping, phase stream (روز/شب), helpers: reset, addBotPlayer, removePlayer
+// Adds: auto-play/robot simulation with scenarios and control methods.
 
 import 'dart:async';
 import 'dart:math';
@@ -24,7 +20,7 @@ class GameRepositoryMock implements IGameRepository {
   final StreamController<Map<String, int>> _votesController =
       StreamController<Map<String, int>>.broadcast();
 
-  // Phase stream: emits 'روز' / 'شب'
+  // Phase stream: emits 'روز' / 'شب' (Persian labels) or any custom phases
   final StreamController<String> _phaseController =
       StreamController<String>.broadcast();
   String _currentPhase = 'روز';
@@ -32,26 +28,12 @@ class GameRepositoryMock implements IGameRepository {
   // Optional: simulate network latency (milliseconds)
   final int latencyMs;
 
-  // Auto-play (bots)
+  // Auto-play / bots
+  final Map<String, Timer> _botTimers = {}; // botId -> Timer
   bool _autoPlayRunning = false;
-  Timer? _autoPlayTimer;
-  final List<String> _botIds = [];
-  final Random _random = Random();
+  final Random _rnd = Random();
 
-  // Auto-play configuration
-  int autoPlayIntervalMs;
-  double autoPlayJoinChance; // chance a bot will join if not joined
-  double autoPlayLeaveChance; // chance a bot leaves on action
-  double autoPlayVoteChance; // chance a bot will vote on its turn
-
-  GameRepositoryMock({
-    this.latencyMs = 200,
-    List<Player>? seedPlayers,
-    this.autoPlayIntervalMs = 1500,
-    this.autoPlayJoinChance = 0.6,
-    this.autoPlayLeaveChance = 0.05,
-    this.autoPlayVoteChance = 0.8,
-  }) {
+  GameRepositoryMock({this.latencyMs = 200, List<Player>? seedPlayers}) {
     // seed with provided players or a default host
     if (seedPlayers != null && seedPlayers.isNotEmpty) {
       _players.addAll(seedPlayers);
@@ -86,7 +68,7 @@ class GameRepositoryMock implements IGameRepository {
 
   // Generates a simple unique id (ok for mock / dev use)
   String _generateId() => DateTime.now().millisecondsSinceEpoch.toString() +
-      _random.nextInt(9999).toString();
+      _rnd.nextInt(9999).toString();
 
   // Public utility methods for testing / simulator UI
   /// Toggle or set phase. If [phase] is null, toggles between 'روز' and 'شب'.
@@ -101,10 +83,9 @@ class GameRepositoryMock implements IGameRepository {
 
   /// Adds a bot player with optional name
   String addBotPlayer({String name = 'Bot'}) {
-    final id = _generateId();
+    final id = 'bot_' + _generateId();
     final p = Player(id: id, name: name, isHost: false);
     _players.add(p);
-    _botIds.add(id);
     _emitPlayers();
     return id;
   }
@@ -123,7 +104,8 @@ class GameRepositoryMock implements IGameRepository {
       }
     }
 
-    _botIds.remove(playerId);
+    // stop and remove any bot timer
+    _botTimers.remove(playerId)?.cancel();
 
     _emitPlayers();
     _emitVotes();
@@ -131,10 +113,12 @@ class GameRepositoryMock implements IGameRepository {
 
   /// Resets mock to initial state (keeps host)
   void reset({bool keepHost = true}) {
+    // stop bots
+    stopAutoPlay();
+
     _players.clear();
     _votes.clear();
     _voterChoice.clear();
-    _botIds.clear();
     if (keepHost) {
       _players.add(Player(id: 'host', name: 'Host', isHost: true));
     }
@@ -206,104 +190,102 @@ class GameRepositoryMock implements IGameRepository {
     removePlayer(playerId);
   }
 
-  // =========================
+  // =====================
   // Auto-play / Bots
-  // =========================
+  // =====================
 
-  /// Start auto-play: bots will randomly join/vote/leave based on configured chances.
-  void startAutoPlay({int? intervalMs}) {
+  /// Start auto-play with given [scenario]. If scenario is null, default quickPlay is used.
+  /// [botCount] controls how many bots to create if there are not enough players.
+  /// [actionIntervalMs] controls action frequency for each bot (default 1500ms).
+  void startAutoPlay({String scenario = 'quick', int botCount = 5, int actionIntervalMs = 1500}) {
     if (_autoPlayRunning) return;
     _autoPlayRunning = true;
-    if (intervalMs != null) autoPlayIntervalMs = intervalMs;
 
-    _autoPlayTimer = Timer.periodic(Duration(milliseconds: autoPlayIntervalMs), (_) {
-      // For each bot slot, decide an action
-      // If bot is not in players list, possibly join
-      if (_botIds.length < 1) {
-        // ensure at least one bot in the system to act on
-        addBotPlayer(name: 'Bot-${_generateId().substring(0, 4)}');
-        return;
-      }
+    // ensure desired number of bots exist (do not remove human players)
+    final existingBots = _players.where((p) => p.id.startsWith('bot_')).toList();
+    for (int i = existingBots.length; i < botCount; i++) {
+      final id = 'bot_' + _generateId();
+      _players.add(Player(id: id, name: 'Bot${i + 1}', isHost: false));
+    }
+    _emitPlayers();
 
-      // iterate copy of bots to avoid concurrent modification
-      final bots = List<String>.from(_botIds);
-      for (final botId in bots) {
-        // if bot not present (might have been removed), maybe join
-        final present = _players.any((p) => p.id == botId);
-        if (!present) {
-          if (_random.nextDouble() < autoPlayJoinChance) {
-            addBotPlayer(name: 'Bot-${_generateId().substring(0, 4)}');
-          }
-          continue;
-        }
-
-        final actionRoll = _random.nextDouble();
-        if (actionRoll < autoPlayLeaveChance) {
-          // leave
-          removePlayer(botId);
-          continue;
-        }
-
-        if (actionRoll < (autoPlayLeaveChance + autoPlayVoteChance)) {
-          // vote: pick a random target (not self)
-          final targets = _players.where((p) => p.id != botId).toList();
-          if (targets.isNotEmpty) {
-            final target = targets[_random.nextInt(targets.length)];
-            submitVote('auto', botId, target.id);
-          }
-        }
-        // else do nothing this tick
-      }
-    });
-  }
-
-  /// Stop auto-play
-  void stopAutoPlay() {
-    _autoPlayTimer?.cancel();
-    _autoPlayTimer = null;
-    _autoPlayRunning = false;
-  }
-
-  bool get isAutoPlayRunning => _autoPlayRunning;
-
-  // =========================
-  // Pre-defined scenarios
-  // =========================
-
-  /// QuickPlay: adds [botCount] bots quickly, they join then vote immediately
-  Future<void> quickPlay({int botCount = 3, int joinDelayMs = 300}) async {
-    for (int i = 0; i < botCount; i++) {
-      final id = addBotPlayer(name: 'QuickBot-${i + 1}');
-      await Future.delayed(Duration(milliseconds: joinDelayMs));
-      // Immediately vote for random existing player (not self)
-      final targets = _players.where((p) => p.id != id).toList();
-      if (targets.isNotEmpty) {
-        final target = targets[_random.nextInt(targets.length)];
-        await submitVote('scenario', id, target.id);
-      }
+    // start timers per bot
+    for (final p in _players.where((p) => p.id.startsWith('bot_'))) {
+      // if already has timer, skip
+      if (_botTimers.containsKey(p.id)) continue;
+      _botTimers[p.id] = Timer.periodic(Duration(milliseconds: actionIntervalMs), (_) async {
+        if (!_autoPlayRunning) return;
+        await _performBotAction(p.id, scenario);
+      });
     }
   }
 
-  /// Drama: bots join slowly, sometimes leave, and vote with longer gaps
-  Future<void> drama({int botCount = 5}) async {
-    for (int i = 0; i < botCount; i++) {
-      final id = addBotPlayer(name: 'DramaBot-${i + 1}');
-      await Future.delayed(Duration(milliseconds: 800 + _random.nextInt(800)));
-      // maybe vote
-      if (_random.nextBool()) {
-        final targets = _players.where((p) => p.id != id).toList();
+  Future<void> _performBotAction(String botId, String scenario) async {
+    // if bot was removed, cancel
+    if (!_players.any((p) => p.id == botId)) {
+      _botTimers.remove(botId)?.cancel();
+      return;
+    }
+
+    // choose action based on scenario
+    final choice = _rnd.nextDouble();
+    if (scenario == 'quick') {
+      // quick: mostly vote, sometimes change phase
+      if (choice < 0.75) {
+        // vote for a random other player
+        final targets = _players.where((p) => p.id != botId).toList();
         if (targets.isNotEmpty) {
-          final target = targets[_random.nextInt(targets.length)];
-          await submitVote('scenario', id, target.id);
+          final target = targets[_rnd.nextInt(targets.length)];
+          await submitVote('sim', botId, target.id);
         }
+      } else if (choice < 0.9) {
+        simulatePhaseChange();
+      } else {
+        // small chance to leave
+        removePlayer(botId);
       }
-      // maybe leave later
-      if (_random.nextDouble() < 0.25) {
-        await Future.delayed(Duration(milliseconds: 400 + _random.nextInt(1000)));
-        removePlayer(id);
+    } else if (scenario == 'drama') {
+      // drama: more joins/leaves and phase changes
+      if (choice < 0.4) {
+        final targets = _players.where((p) => p.id != botId).toList();
+        if (targets.isNotEmpty) {
+          final target = targets[_rnd.nextInt(targets.length)];
+          await submitVote('sim', botId, target.id);
+        }
+      } else if (choice < 0.7) {
+        simulatePhaseChange();
+      } else if (choice < 0.9) {
+        // leave and rejoin after short delay
+        removePlayer(botId);
+        // re-add after random delay
+        Future.delayed(Duration(milliseconds: 500 + _rnd.nextInt(1500)), () => addBotPlayer(name: 'Bot'));
+      } else {
+        // do nothing
+      }
+    } else {
+      // default behaviour: random vote or no-op
+      if (choice < 0.6) {
+        final targets = _players.where((p) => p.id != botId).toList();
+        if (targets.isNotEmpty) {
+          final target = targets[_rnd.nextInt(targets.length)];
+          await submitVote('sim', botId, target.id);
+        }
       }
     }
   }
+
+  /// Stop auto-play and cancel bot timers.
+  void stopAutoPlay() {
+    if (!_autoPlayRunning) return;
+    _autoPlayRunning = false;
+    for (final t in _botTimers.values) {
+      t.cancel();
+    }
+    _botTimers.clear();
+  }
+
+  /// Returns whether auto-play is currently running.
+  bool get isAutoPlayRunning => _autoPlayRunning;
 
   @override
   Future<void> dispose() async {
