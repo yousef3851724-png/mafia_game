@@ -1,0 +1,8 @@
+[33m32c8dfb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: Branch: renamed refs/heads/main to refs/heads/main
+[33m32c8dfb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{2}: Branch: renamed refs/heads/feature/complete-game-architecture to refs/heads/main
+[33m32c8dfb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{4}: rebase (abort): returning to refs/heads/feature/complete-game-architecture
+[33m2dd7001[m HEAD@{5}: pull origin main --rebase (start): checkout 2dd7001f06ec1ca728b6f85c9420d17165a7400f
+[33m32c8dfb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{6}: commit: Add corrected GitHub Actions workflow for APK build
+[33m90893f7[m[33m ([m[1;31morigin/feature/complete-game-architecture[m[33m)[m HEAD@{7}: commit: اضافه کردن اسپلش، لابی و بازی کامل
+[33ma7b9617[m[33m ([m[1;31morigin/add/diagrams-and-render-workflow[m[33m)[m HEAD@{8}: checkout: moving from main to feature/complete-game-architecture
+[33mfd6e44b[m HEAD@{9}: clone: from https://github.com/yousef3851724-png/mafia_game.git
