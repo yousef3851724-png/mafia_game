@@ -1,0 +1,188 @@
+import 'dart:async';
+import 'dart:math';
+import 'package:flutter/material.dart';
+
+class AvatarLiveWidget extends StatefulWidget {
+  final ImageProvider imageProvider;
+  final double size;
+  final Rect? eyeRegion;
+  final Color frameColor;
+  final Widget? frameOverlay;
+  final bool isAlive;
+
+  const AvatarLiveWidget({
+    super.key,
+    required this.imageProvider,
+    this.size = 96,
+    this.eyeRegion,
+    this.frameColor = const Color(0xFFD4AF37),
+    this.frameOverlay,
+    this.isAlive = true,
+  });
+
+  @override
+  State<AvatarLiveWidget> createState() => _AvatarLiveWidgetState();
+}
+
+class _AvatarLiveWidgetState extends State<AvatarLiveWidget>
+    with TickerProviderStateMixin {
+  late final AnimationController _breathController;
+  late final Animation<double> _breathAnimation;
+
+  late final AnimationController _blinkController;
+  Timer? _blinkTimer;
+  final Random _random = Random();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _breathController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2600),
+    )..repeat(reverse: true);
+
+    _breathAnimation = Tween<double>(begin: 0.985, end: 1.015).animate(
+      CurvedAnimation(parent: _breathController, curve: Curves.easeInOut),
+    );
+
+    _blinkController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 160),
+    );
+
+    if (widget.isAlive && widget.eyeRegion != null) {
+      _scheduleNextBlink();
+    }
+  }
+
+  void _scheduleNextBlink() {
+    final delaySeconds = 2.5 + _random.nextDouble() * 3.5;
+    _blinkTimer = Timer(Duration(milliseconds: (delaySeconds * 1000).round()), () async {
+      if (!mounted) return;
+      await _blinkController.forward();
+      if (!mounted) return;
+      await _blinkController.reverse();
+      if (!mounted) return;
+      _scheduleNextBlink();
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant AvatarLiveWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isAlive && !widget.isAlive) {
+      _blinkTimer?.cancel();
+      _breathController.stop();
+    } else if (!oldWidget.isAlive && widget.isAlive) {
+      _breathController.repeat(reverse: true);
+      if (widget.eyeRegion != null) _scheduleNextBlink();
+    }
+  }
+
+  @override
+  void dispose() {
+    _blinkTimer?.cancel();
+    _breathController.dispose();
+    _blinkController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final content = ClipOval(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image(
+            image: widget.imageProvider,
+            fit: BoxFit.cover,
+            color: widget.isAlive ? null : Colors.black.withOpacity(0.55),
+            colorBlendMode: widget.isAlive ? null : BlendMode.darken,
+          ),
+          if (widget.eyeRegion != null)
+            AnimatedBuilder(
+              animation: _blinkController,
+              builder: (context, _) {
+                final opacity = _blinkController.value;
+                if (opacity == 0) return const SizedBox.shrink();
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    final region = widget.eyeRegion!;
+                    return Positioned(
+                      left: region.left * constraints.maxWidth,
+                      top: region.top * constraints.maxHeight,
+                      width: region.width * constraints.maxWidth,
+                      height: region.height * constraints.maxHeight,
+                      child: Opacity(
+                        opacity: opacity,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                              region.height * constraints.maxHeight,
+                            ),
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.black.withOpacity(0.0),
+                                Colors.black.withOpacity(0.92),
+                                Colors.black.withOpacity(0.0),
+                              ],
+                              stops: const [0.0, 0.5, 1.0],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+        ],
+      ),
+    );
+
+    return SizedBox(
+      width: widget.size,
+      height: widget.size,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          AnimatedBuilder(
+            animation: _breathAnimation,
+            builder: (context, child) {
+              return Transform.scale(
+                scale: widget.isAlive ? _breathAnimation.value : 1.0,
+                child: child,
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: widget.frameColor, width: 2.5),
+                boxShadow: widget.isAlive
+                    ? [
+                        BoxShadow(
+                          color: widget.frameColor.withOpacity(0.45),
+                          blurRadius: 14,
+                          spreadRadius: 1,
+                        ),
+                      ]
+                    : [],
+              ),
+              child: content,
+            ),
+          ),
+          if (widget.frameOverlay != null)
+            IgnorePointer(
+              child: SizedBox(
+                width: widget.size * 1.35,
+                height: widget.size * 1.35,
+                child: widget.frameOverlay,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
