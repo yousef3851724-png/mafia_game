@@ -1,4 +1,4 @@
-import 'avatar_frame_models.dart';
+import '../../domain/entities/avatar_frame_models.dart';
 
 class CosmeticShopController {
   final List<CosmeticItem> items;
