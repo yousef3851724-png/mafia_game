@@ -2,11 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MafiaRadicalApp());
+  runApp(const MafiaRadicalCompleteApp());
 }
 
-class MafiaRadicalApp extends StatelessWidget {
-  const MafiaRadicalApp({super.key});
+class MafiaRadicalCompleteApp extends StatelessWidget {
+  const MafiaRadicalCompleteApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,277 +14,486 @@ class MafiaRadicalApp extends StatelessWidget {
       title: 'مافیا رادیکال',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF121217),
+        scaffoldBackgroundColor: const Color(0xFF0F0F14),
         primaryColor: const Color(0xFFE53935),
         colorScheme: const ColorScheme.dark(
           primary: Color(0xFFE53935),
           secondary: Color(0xFFFF5252),
-          surface: Color(0xFF1E1E26),
+          surface: Color(0xFF181822),
         ),
-        cardColor: const Color(0xFF1E1E26),
-        textTheme: const TextTheme(
-          bodyMedium: TextStyle(fontFamily: 'Vazirmatn', color: Colors.white),
+        cardColor: const Color(0xFF1E1E2A),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF181822),
+          elevation: 0,
+          centerTitle: true,
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Color(0xFF14141C),
+          selectedItemColor: Color(0xFFE53935),
+          unselectedItemColor: Colors.white54,
+          type: BottomNavigationBarType.fixed,
         ),
       ),
-      home: const MainGameFlow(),
+      home: const RootNavigationScreen(),
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// MODELS & ENUMS
+// GLOBAL STATE & USER PROFILE
 // ---------------------------------------------------------------------------
-
-enum Role { godfather, mafia, doctor, detective, sniper, citizen }
-enum Team { mafia, citizen }
-enum GamePhase { setup, roleReveal, night, morningReport, dayDiscussion, voting, gameOver }
-
-class Player {
-  final String id;
-  final String name;
-  final Role role;
-  bool isAlive;
-  bool isProtected;
-  int votesReceived;
-
-  Player({
-    required this.id,
-    required this.name,
-    required this.role,
-    this.isAlive = true,
-    this.isProtected = false,
-    this.votesReceived = 0,
-  });
-
-  Team get team => (role == Role.godfather || role == Role.mafia) ? Team.mafia : Team.citizen;
-
-  String get roleNameFa {
-    switch (role) {
-      case Role.godfather:
-        return 'پدرخوانده';
-      case Role.mafia:
-        return 'مافیا ساده';
-      case Role.doctor:
-        return 'دکتر';
-      case Role.detective:
-        return 'کارآگاه';
-      case Role.sniper:
-        return 'اسنایپر (تک‌تیرانداز)';
-      case Role.citizen:
-        return 'شهروند ساده';
-    }
-  }
-
-  IconData get roleIcon {
-    switch (role) {
-      case Role.godfather:
-      case Role.mafia:
-        return Icons.local_fire_department;
-      case Role.doctor:
-        return Icons.medical_services_outlined;
-      case Role.detective:
-        return Icons.search;
-      case Role.sniper:
-        return Icons.my_location;
-      case Role.citizen:
-        return Icons.person_outline;
-    }
-  }
+class UserProfile {
+  static String name = "امیرعلی";
+  static int level = 24;
+  static int coins = 14500;
+  static int gems = 120;
+  static int trophies = 3420;
+  static int totalGames = 158;
+  static int winRate = 68; // درصد
+  static String rankTitle = "گرند مستر (Grandmaster)";
 }
 
 // ---------------------------------------------------------------------------
-// MAIN GAME CONTROLLER & UI
+// ROOT NAVIGATION (BOTTOM BAR)
 // ---------------------------------------------------------------------------
-
-class MainGameFlow extends StatefulWidget {
-  const MainGameFlow({super.key});
+class RootNavigationScreen extends StatefulWidget {
+  const RootNavigationScreen({super.key});
 
   @override
-  State<MainGameFlow> createState() => _MainGameFlowState();
+  State<RootNavigationScreen> createState() => _RootNavigationScreenState();
 }
 
-class _MainGameFlowState extends State<MainGameFlow> {
-  GamePhase currentPhase = GamePhase.setup;
+class _RootNavigationScreenState extends State<RootNavigationScreen> {
+  int _currentIndex = 0;
 
-  // Setup State
-  final List<TextEditingController> _playerControllers = [
-    TextEditingController(text: 'بازیکن ۱'),
-    TextEditingController(text: 'بازیکن ۲'),
-    TextEditingController(text: 'بازیکن ۳'),
-    TextEditingController(text: 'بازیکن ۴'),
-    TextEditingController(text: 'بازیکن ۵'),
-    TextEditingController(text: 'بازیکن ۶'),
+  final List<Widget> _pages = [
+    const HomeScreen(),
+    const LobbyListScreen(),
+    const LeaderboardScreen(),
+    const ShopScreen(),
+    const ProfileScreen(),
   ];
 
-  Map<Role, int> roleCounts = {
-    Role.godfather: 1,
-    Role.mafia: 1,
-    Role.doctor: 1,
-    Role.detective: 1,
-    Role.sniper: 0,
-    Role.citizen: 2,
-  };
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        body: IndexedStack(
+          index: _currentIndex,
+          children: _pages,
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) => setState(() => _currentIndex = index),
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'خانه'),
+            BottomNavigationBarItem(icon: Icon(Icons.meeting_room), label: 'لابی‌ها'),
+            BottomNavigationBarItem(icon: Icon(Icons.leaderboard), label: 'رنکینگ'),
+            BottomNavigationBarItem(icon: Icon(Icons.storefront), label: 'فروشگاه'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'پروفایل'),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-  // Game Engine State
-  List<Player> players = [];
-  int dayNumber = 1;
-  int currentRevealIndex = 0;
-  bool isCardRevealed = false;
-
-  // Night State
-  int nightStep = 0; // 0: Mafia Kill, 1: Doctor Heal, 2: Detective Check, 3: Sniper Shot
-  Player? mafiaTarget;
-  Player? doctorTarget;
-  Player? sniperTarget;
-  String? detectiveInquiryResult;
-  List<String> nightReport = [];
-
-  // Discussion & Timer
-  Timer? _gameTimer;
-  int _remainingSeconds = 45;
-  bool _isTimerRunning = false;
-  int currentSpeakerIndex = 0;
-
-  // Winner State
-  String winnerMessage = '';
+// ---------------------------------------------------------------------------
+// 1. HOME SCREEN (داشبورد اصلی)
+// ---------------------------------------------------------------------------
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
-  void dispose() {
-    _gameTimer?.cancel();
-    for (var c in _playerControllers) {
-      c.dispose();
-    }
-    super.dispose();
-  }
-
-  void _startGame() {
-    int totalRoles = roleCounts.values.fold(0, (a, b) => a + b);
-    if (totalRoles != _playerControllers.length) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('تعداد نقش‌ها ($totalRoles) با تعداد بازیکنان (${_playerControllers.length}) برابر نیست!'),
-          backgroundColor: Colors.redAccent,
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Icon(Icons.local_fire_department, color: Color(0xFFE53935), size: 28),
+            SizedBox(width: 8),
+            Text('مافیا رادیکال', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
+          ],
         ),
-      );
-      return;
-    }
+        actions: [
+          _buildCurrencyBadge(Icons.monetization_on, '${UserProfile.coins}', Colors.amber),
+          _buildCurrencyBadge(Icons.diamond, '${UserProfile.gems}', Colors.cyanAccent),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // کارت وضعیت کاربری
+            _buildUserSummaryCard(context),
+            const SizedBox(height: 20),
 
-    List<Role> roleDeck = [];
-    roleCounts.forEach((role, count) {
-      for (int i = 0; i < count; i++) {
-        roleDeck.add(role);
-      }
-    });
-    roleDeck.shuffle();
+            // بنر ایونت / گردونه شانس
+            _buildEventBanner(context),
+            const SizedBox(height: 24),
 
-    players = List.generate(_playerControllers.length, (index) {
-      return Player(
-        id: 'p_$index',
-        name: _playerControllers[index].text.trim().isEmpty
-            ? 'بازیکن ${index + 1}'
-            : _playerControllers[index].text.trim(),
-        role: roleDeck[index],
-      );
-    });
+            const Text('حالت‌های بازی', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
 
-    setState(() {
-      currentRevealIndex = 0;
-      isCardRevealed = false;
-      currentPhase = GamePhase.roleReveal;
-    });
+            // مودهای مختلف بازی
+            _buildGameModeCard(
+              context,
+              title: 'بازی امتیازی (Ranked)',
+              subtitle: 'رقابت نفس‌گیر برای افزایش کاپ و رتبه در فصل',
+              icon: Icons.military_tech,
+              gradient: const [Color(0xFF8E0E00), Color(0xFF1F1C18)],
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MatchmakingScreen(mode: 'امتیازی (Ranked)'))),
+            ),
+            const SizedBox(height: 12),
+            _buildGameModeCard(
+              context,
+              title: 'اتاق دوستانه (Custom Lobby)',
+              subtitle: 'ساخت اتاق با قوانین دلخواه و دعوت دوستان با کد',
+              icon: Icons.group_add,
+              gradient: const [Color(0xFF1D2671), Color(0xFFC33764)],
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LobbyListScreen())),
+            ),
+            const SizedBox(height: 12),
+            _buildGameModeCard(
+              context,
+              title: 'بازی دورهمی حضوری (Pass & Play)',
+              subtitle: 'گرداننده خودکار برای بازی با دوستان در یک گوشی',
+              icon: Icons.phonelink_setup,
+              gradient: const [Color(0xFF134E5E), Color(0xFF71B280)],
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('ورود به بخش گرداننده حضوری...')),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  void _checkGameOver() {
-    int aliveMafia = players.where((p) => p.isAlive && p.team == Team.mafia).length;
-    int aliveCitizens = players.where((p) => p.isAlive && p.team == Team.citizen).length;
-
-    if (aliveMafia == 0) {
-      setState(() {
-        winnerMessage = '🏆 شهروندان پیروز شدند! تمام مافیاها حذف شدند.';
-        currentPhase = GamePhase.gameOver;
-      });
-    } else if (aliveMafia >= aliveCitizens) {
-      setState(() {
-        winnerMessage = '🔥 مافیا پیروز شد! کنترل شهر در دست مافیا قرار گرفت.';
-        currentPhase = GamePhase.gameOver;
-      });
-    }
+  Widget _buildUserSummaryCard(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E2A),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 30,
+            backgroundColor: const Color(0xFFE53935),
+            child: const Icon(Icons.person, size: 36, color: Colors.white),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(UserProfile.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                Text(UserProfile.rankTitle, style: const TextStyle(color: Colors.amber, fontSize: 13, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 6),
+                LinearProgressIndicator(
+                  value: 0.65,
+                  backgroundColor: Colors.white12,
+                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFE53935)),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            children: [
+              const Icon(Icons.emoji_events, color: Colors.amber, size: 24),
+              const SizedBox(height: 2),
+              Text('${UserProfile.trophies}', style: const TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          )
+        ],
+      ),
+    );
   }
 
-  void _processNightResults() {
-    nightReport.clear();
-    List<Player> killedTonight = [];
-
-    // Doctor Protection
-    if (doctorTarget != null) {
-      doctorTarget!.isProtected = true;
-    }
-
-    // Mafia Attack
-    if (mafiaTarget != null) {
-      if (mafiaTarget != doctorTarget) {
-        killedTonight.add(mafiaTarget!);
-      }
-    }
-
-    // Sniper Shot
-    if (sniperTarget != null) {
-      if (sniperTarget!.team == Team.mafia) {
-        killedTonight.add(sniperTarget!);
-      } else {
-        // Sniper penalty: dies if shoots citizen
-        final sniper = players.firstWhere((p) => p.role == Role.sniper, orElse: () => players.first);
-        if (sniper.role == Role.sniper) killedTonight.add(sniper);
-      }
-    }
-
-    // Apply deaths
-    for (var victim in killedTonight) {
-      victim.isAlive = false;
-    }
-
-    if (killedTonight.isEmpty) {
-      nightReport.add('شب آرامی بود و خوشبختانه هیچ‌کس کشته نشد!');
-    } else {
-      for (var victim in killedTonight.toSet()) {
-        nightReport.add('متأسفانه ${victim.name} در طول شب از بازی حذف شد.');
-      }
-    }
-
-    // Reset night flags
-    for (var p in players) {
-      p.isProtected = false;
-    }
-    mafiaTarget = null;
-    doctorTarget = null;
-    sniperTarget = null;
-    detectiveInquiryResult = null;
-    nightStep = 0;
-
-    _checkGameOver();
-    if (currentPhase != GamePhase.gameOver) {
-      setState(() {
-        currentPhase = GamePhase.morningReport;
-      });
-    }
+  Widget _buildEventBanner(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [Color(0xFF4A148C), Color(0xFF880E4F)]),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.casino, size: 48, color: Colors.amberAccent),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text('گردونه شانس روزانه', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                SizedBox(height: 4),
+                Text('یک چرخش رایگان برای دریافت سکه و اسکین!', style: TextStyle(fontSize: 12, color: Colors.white70)),
+              ],
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber, foregroundColor: Colors.black),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('شما 500 سکه جایزه روزانه بردید! 🎉')));
+            },
+            child: const Text('چرخش'),
+          )
+        ],
+      ),
+    );
   }
 
-  void _startTimer(int seconds) {
-    _gameTimer?.cancel();
-    setState(() {
-      _remainingSeconds = seconds;
-      _isTimerRunning = true;
-    });
-
-    _gameTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_remainingSeconds > 0) {
-        setState(() => _remainingSeconds--);
-      } else {
-        timer.cancel();
-        setState(() => _isTimerRunning = false);
-      }
-    });
+  Widget _buildGameModeCard(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required List<Color> gradient,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: gradient, begin: Alignment.topRight, end: Alignment.bottomLeft),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: gradient.first.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(12)),
+              child: Icon(icon, size: 32, color: Colors.white),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.white70)),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white70),
+          ],
+        ),
+      ),
+    );
   }
+
+  Widget _buildCurrencyBadge(IconData icon, String value, Color color) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(color: Colors.black38, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.white10)),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 4),
+          Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 2. LOBBY & ROOM LIST SCREEN (لابی‌ها و لیست اتاق‌ها)
+// ---------------------------------------------------------------------------
+class LobbyListScreen extends StatefulWidget {
+  const LobbyListScreen({super.key});
+
+  @override
+  State<LobbyListScreen> createState() => _LobbyListScreenState();
+}
+
+class _LobbyListScreenState extends State<LobbyListScreen> {
+  final List<Map<String, dynamic>> _lobbies = [
+    {"id": "101", "name": "اتاق حرفه‌ای‌ها (سناریو بازپرس)", "players": 8, "max": 10, "hasPassword": false, "host": "کوروش"},
+    {"id": "102", "name": "مافیا شب‌های مافیا 🔥", "players": 10, "max": 12, "hasPassword": true, "host": "سارا"},
+    {"id": "103", "name": "دوستانه با ویس چت 🎙️", "players": 4, "max": 8, "hasPassword": false, "host": "رضا"},
+    {"id": "104", "name": "اتاق اختصاصی کلن Radical", "players": 9, "max": 10, "hasPassword": true, "host": "امید"},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('لیست لابی‌های فعال'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('لیست اتاق‌ها بروزرسانی شد.')));
+            },
+          )
+        ],
+      ),
+      body: Column(
+        children: [
+          // بخش فیلتر و جستجو
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'جستجوی نام یا آیدی اتاق...',
+                      prefixIcon: const Icon(Icons.search, size: 20),
+                      filled: true,
+                      fillColor: const Color(0xFF1E1E2A),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFE53935),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  ),
+                  icon: const Icon(Icons.add),
+                  label: const Text('ساخت اتاق'),
+                  onPressed: () => _showCreateRoomDialog(context),
+                )
+              ],
+            ),
+          ),
+          // لیست لابی‌ها
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.all(12),
+              itemCount: _lobbies.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              itemBuilder: (context, index) {
+                final lobby = _lobbies[index];
+                return Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF181822),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white10),
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: const Color(0xFFE53935).withOpacity(0.2),
+                        child: Icon(lobby["hasPassword"] ? Icons.lock : Icons.lock_open, color: const Color(0xFFE53935), size: 20),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(lobby["name"], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                            const SizedBox(height: 4),
+                            Text('میزبان: ${lobby["host"]} | کد: #${lobby["id"]}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text('${lobby["players"]}/${lobby["max"]} نفر', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.amber)),
+                          const SizedBox(height: 6),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFE53935),
+                              minimumSize: const Size(70, 32),
+                              padding: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => WaitingRoomScreen(roomName: lobby["name"], roomId: lobby["id"]),
+                                ),
+                              );
+                            },
+                            child: const Text('ورود', style: TextStyle(fontSize: 12)),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCreateRoomDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          backgroundColor: const Color(0xFF1E1E2A),
+          title: const Text('ساخت اتاق اختصاصی', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(decoration: InputDecoration(hintText: 'نام اتاق', filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)))),
+              const SizedBox(height: 12),
+              TextField(decoration: InputDecoration(hintText: 'رمز عبور (اختیاری)', filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)))),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<int>(
+                value: 10,
+                decoration: InputDecoration(filled: true, fillColor: Colors.black26, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
+                items: [8, 10, 12].map((e) => DropdownMenuItem(value: e, child: Text('$e نفره'))).toList(),
+                onChanged: (_) {},
+              )
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('انصراف', style: TextStyle(color: Colors.white54))),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE53935)),
+              onPressed: () {
+                Navigator.pop(ctx);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const WaitingRoomScreen(roomName: 'اتاق جدید من', roomId: '999')));
+              },
+              child: const Text('ایجاد و ورود'),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 3. WAITING ROOM SCREEN (اتاق انتظار قبل از شروع)
+// ---------------------------------------------------------------------------
+class WaitingRoomScreen extends StatelessWidget {
+  final String roomName;
+  final String roomId;
+
+  const WaitingRoomScreen({super.key, required this.roomName, required this.roomId});
 
   @override
   Widget build(BuildContext context) {
@@ -292,261 +501,280 @@ class _MainGameFlowState extends State<MainGameFlow> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color(0xFF1E1E26),
-          elevation: 0,
-          centerTitle: true,
-          title: Text(
-            _getAppBarTitle(),
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          ),
+          title: Text(roomName),
           actions: [
-            if (currentPhase != GamePhase.setup)
-              IconButton(
-                icon: const Icon(Icons.refresh, color: Colors.redAccent),
-                tooltip: 'شروع مجدد',
-                onPressed: () {
-                  setState(() {
-                    currentPhase = GamePhase.setup;
-                    dayNumber = 1;
-                  });
-                },
-              )
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Center(child: Text('کد: #$roomId', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.amber))),
+            )
           ],
         ),
-        body: SafeArea(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: _buildCurrentPhaseWidget(),
-          ),
+        body: Column(
+          children: [
+            // اسلات‌های بازیکنان
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.all(16),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 2.2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: 10,
+                itemBuilder: (context, index) {
+                  final isFilled = index < 6;
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: isFilled ? const Color(0xFF1E1E2A) : Colors.white.withOpacity(0.04),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: isFilled ? Colors.redAccent.withOpacity(0.3) : Colors.white10),
+                    ),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: isFilled ? const Color(0xFFE53935) : Colors.white12,
+                          child: Icon(isFilled ? Icons.person : Icons.add, color: Colors.white, size: 20),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            isFilled ? (index == 0 ? '${UserProfile.name} (میزبان)' : 'بازیکن ${index + 1}') : 'جای خالی',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isFilled ? Colors.white : Colors.white38),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+            // نوار اکشن شروع
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(color: Color(0xFF181822), borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.mic, color: Colors.greenAccent),
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.chat_bubble_outline),
+                    onPressed: () {},
+                  ),
+                  const Spacer(),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFE53935),
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('بازی در حال شروع است...')));
+                    },
+                    child: const Text('شروع بازی 🔥', style: TextStyle(fontWeight: FontWeight.bold)),
+                  )
+                ],
+              ),
+            )
+          ],
         ),
       ),
     );
   }
+}
 
-  String _getAppBarTitle() {
-    switch (currentPhase) {
-      case GamePhase.setup:
-        return 'مافیا رادیکال | تنظیمات بازی';
-      case GamePhase.roleReveal:
-        return 'توزیع کارت‌ها';
-      case GamePhase.night:
-        return 'فاز شب $dayNumber 🌙';
-      case GamePhase.morningReport:
-        return 'گزارش صبح روز $dayNumber ☀️';
-      case GamePhase.dayDiscussion:
-        return 'گفت‌وگو و نوبت روز $dayNumber 🗣️';
-      case GamePhase.voting:
-        return 'دادگاه و رأی‌گیری ⚖️';
-      case GamePhase.gameOver:
-        return 'پایان بازی 🏁';
-    }
-  }
+// ---------------------------------------------------------------------------
+// 4. LEADERBOARD SCREEN (رده‌بندی و لیگ‌ها)
+// ---------------------------------------------------------------------------
+class LeaderboardScreen extends StatelessWidget {
+  const LeaderboardScreen({super.key});
 
-  Widget _buildCurrentPhaseWidget() {
-    switch (currentPhase) {
-      case GamePhase.setup:
-        return _buildSetupView();
-      case GamePhase.roleReveal:
-        return _buildRoleRevealView();
-      case GamePhase.night:
-        return _buildNightView();
-      case GamePhase.morningReport:
-        return _buildMorningReportView();
-      case GamePhase.dayDiscussion:
-        return _buildDayDiscussionView();
-      case GamePhase.voting:
-        return _buildVotingView();
-      case GamePhase.gameOver:
-        return _buildGameOverView();
-    }
-  }
+  @override
+  Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> topPlayers = [
+      {"rank": 1, "name": "آریا گرگینه", "trophies": 5820, "winRate": "84%", "badge": "🥇"},
+      {"rank": 2, "name": "نابودگر شب", "trophies": 5340, "winRate": "79%", "badge": "🥈"},
+      {"rank": 3, "name": "دکتر مرموز", "trophies": 4990, "winRate": "75%", "badge": "🥉"},
+      {"rank": 4, "name": "سایلنت کیلر", "trophies": 4200, "winRate": "71%", "badge": ""},
+      {"rank": 5, "name": "کارآگاه زبل", "trophies": 3950, "winRate": "69%", "badge": ""},
+      {"rank": 6, "name": UserProfile.name, "trophies": UserProfile.trophies, "winRate": "${UserProfile.winRate}%", "badge": "⭐"},
+    ];
 
-  // ---------------------------------------------------------------------------
-  // 1. SETUP VIEW
-  // ---------------------------------------------------------------------------
-  Widget _buildSetupView() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Scaffold(
+      appBar: AppBar(title: const Text('برترین‌های فصل (Leaderboard)')),
+      body: Column(
         children: [
-          _buildCard(
-            title: 'بازیکنان (${_playerControllers.length} نفر)',
-            trailing: IconButton(
-              icon: const Icon(Icons.person_add, color: Color(0xFFE53935)),
-              onPressed: () {
-                setState(() {
-                  _playerControllers.add(TextEditingController(text: 'بازیکن ${_playerControllers.length + 1}'));
-                });
-              },
+          // سکوی نفرات اول تا سوم
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(colors: [Color(0xFF200122), Color(0xFF6F0000)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
             ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                _buildPodiumSpot(name: topPlayers[1]["name"], score: '${topPlayers[1]["trophies"]}', place: '2', height: 90, color: Colors.grey.shade400),
+                _buildPodiumSpot(name: topPlayers[0]["name"], score: '${topPlayers[0]["trophies"]}', place: '1', height: 120, color: Colors.amber),
+                _buildPodiumSpot(name: topPlayers[2]["name"], score: '${topPlayers[2]["trophies"]}', place: '3', height: 75, color: Colors.brown.shade300),
+              ],
+            ),
+          ),
+          // لیست سایر نفرات
+          Expanded(
             child: ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _playerControllers.length,
+              padding: const EdgeInsets.all(12),
+              itemCount: topPlayers.length,
               separatorBuilder: (_, __) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
-                return Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: Colors.white10,
-                      child: Text('${index + 1}', style: const TextStyle(color: Colors.white)),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextField(
-                        controller: _playerControllers[index],
-                        decoration: InputDecoration(
-                          hintText: 'نام بازیکن',
-                          filled: true,
-                          fillColor: const Color(0xFF14141A),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                final p = topPlayers[index];
+                final isMe = p["name"] == UserProfile.name;
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isMe ? const Color(0xFFE53935).withOpacity(0.2) : const Color(0xFF1E1E2A),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: isMe ? const Color(0xFFE53935) : Colors.transparent),
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 32,
+                        child: Text(
+                          p["badge"].isNotEmpty ? p["badge"] : '#${p["rank"]}',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                       ),
-                    ),
-                    if (_playerControllers.length > 4)
-                      IconButton(
-                        icon: const Icon(Icons.remove_circle_outline, color: Colors.grey),
-                        onPressed: () {
-                          setState(() {
-                            _playerControllers.removeAt(index);
-                          });
-                        },
+                      const SizedBox(width: 8),
+                      const CircleAvatar(radius: 18, backgroundColor: Colors.white12, child: Icon(Icons.person, size: 20)),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(p["name"], style: TextStyle(fontWeight: FontWeight.bold, color: isMe ? Colors.redAccent : Colors.white)),
+                            Text('وین‌ریت: ${p["winRate"]}', style: const TextStyle(fontSize: 11, color: Colors.white54)),
+                          ],
+                        ),
                       ),
-                  ],
+                      Row(
+                        children: [
+                          const Icon(Icons.emoji_events, color: Colors.amber, size: 18),
+                          const SizedBox(width: 4),
+                          Text('${p["trophies"]}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        ],
+                      )
+                    ],
+                  ),
                 );
               },
             ),
-          ),
-          const SizedBox(height: 16),
-          _buildCard(
-            title: 'چینش نقش‌ها',
-            child: Column(
-              children: roleCounts.keys.map((role) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(_getRoleIcon(role), color: Colors.redAccent, size: 20),
-                        const SizedBox(width: 8),
-                        Text(_getRoleTitle(role)),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove),
-                          onPressed: roleCounts[role]! > 0
-                              ? () => setState(() => roleCounts[role] = roleCounts[role]! - 1)
-                              : null,
-                        ),
-                        Text('${roleCounts[role]}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        IconButton(
-                          icon: const Icon(Icons.add),
-                          onPressed: () => setState(() => roleCounts[role] = roleCounts[role]! + 1),
-                        ),
-                      ],
-                    )
-                  ],
-                );
-              }).toList(),
-            ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE53935),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            onPressed: _startGame,
-            child: const Text('شروع و پخش کارت‌ها', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-          ),
+          )
         ],
       ),
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // 2. ROLE REVEAL VIEW (PASS & PLAY)
-  // ---------------------------------------------------------------------------
-  Widget _buildRoleRevealView() {
-    final player = players[currentRevealIndex];
+  Widget _buildPodiumSpot({required String name, required String score, required String place, required double height, required Color color}) {
+    return Column(
+      children: [
+        CircleAvatar(radius: 24, backgroundColor: color, child: Text(place, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18))),
+        const SizedBox(height: 6),
+        Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+        Text('$score کاپ', style: const TextStyle(fontSize: 11, color: Colors.white70)),
+        const SizedBox(height: 6),
+        Container(
+          width: 70,
+          height: height,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.3),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+            border: Border.all(color: color),
+          ),
+          child: Center(child: Text('#$place', style: TextStyle(fontWeight: FontWeight.bold, color: color, fontSize: 20))),
+        )
+      ],
+    );
+  }
+}
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
+// ---------------------------------------------------------------------------
+// 5. SHOP SCREEN (فروشگاه، خرید سکه و اسکین)
+// ---------------------------------------------------------------------------
+class ShopScreen extends StatelessWidget {
+  const ShopScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('فروشگاه مافیا رادیکال 🛒')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('گوشی را به دست بدهید به:', style: TextStyle(color: Colors.grey[400], fontSize: 16)),
-            const SizedBox(height: 8),
-            Text(player.name, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-            const SizedBox(height: 32),
-            GestureDetector(
-              onTap: () => setState(() => isCardRevealed = !isCardRevealed),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 350),
-                height: 300,
-                width: 220,
-                decoration: BoxDecoration(
-                  color: isCardRevealed ? const Color(0xFF1E1E26) : const Color(0xFFE53935),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: (isCardRevealed ? Colors.black : Colors.red).withOpacity(0.4),
-                      blurRadius: 16,
-                      spreadRadius: 2,
-                    )
-                  ],
-                  border: Border.all(color: Colors.white24, width: 2),
-                ),
-                child: Center(
-                  child: isCardRevealed
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(player.roleIcon, size: 72, color: player.team == Team.mafia ? Colors.redAccent : Colors.lightBlueAccent),
-                            const SizedBox(height: 16),
-                            Text(player.roleNameFa, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 8),
-                            Text(player.team == Team.mafia ? 'تیم مافیا' : 'تیم شهروند', style: TextStyle(color: Colors.grey[400])),
-                          ],
-                        )
-                      : const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.touch_app, size: 60, color: Colors.white),
-                            SizedBox(height: 12),
-                            Text('لمس برای مشاهده نقش', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                          ],
-                        ),
-                ),
+            // کارت اشتراک ویژه
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(colors: [Color(0xFFFF8008), Color(0xFFFFC837)]),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.workspace_premium, size: 48, color: Colors.black),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text('اشتراک مافیا پلاس (Mafia Plus)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                        SizedBox(height: 4),
+                        Text('قاب طلایی، چت صوتی نامحدود، ضریب ۲ برابر سکه', style: TextStyle(fontSize: 11, color: Colors.black87)),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.amber),
+                    onPressed: () {},
+                    child: const Text('خرید'),
+                  )
+                ],
               ),
             ),
-            const SizedBox(height: 36),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white12,
-                minimumSize: const Size(200, 50),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              onPressed: () {
-                if (currentRevealIndex < players.length - 1) {
-                  setState(() {
-                    currentRevealIndex++;
-                    isCardRevealed = false;
-                  });
-                } else {
-                  setState(() {
-                    currentPhase = GamePhase.night;
-                    nightStep = 0;
-                  });
-                }
-              },
-              child: Text(currentRevealIndex < players.length - 1 ? 'نفر بعدی ❯' : 'ورود به شب اول 🌙'),
+            const SizedBox(height: 24),
+
+            const Text('بسته‌های سکه و الماس', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.1,
+              children: [
+                _buildShopItem('کیسه سکه کوچک', '۵,۰۰۰ سکه', '۲۵,۰۰۰ ت', Icons.monetization_on, Colors.amber),
+                _buildShopItem('صندوقچه سکه طلایی', '۲۵,۰۰۰ سکه', '۹۰,۰۰۰ ت', Icons.savings, Colors.amber),
+                _buildShopItem('بسته جم الماس', '۱۵۰ الماس', '۴۵,۰۰۰ ت', Icons.diamond, Colors.cyanAccent),
+                _buildShopItem('خزانه مافیا', '۱,۰۰۰ الماس', '۱۹۰,۰۰۰ ت', Icons.diamond_outlined, Colors.cyanAccent),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            const Text('اسکین و پشت‌کارت‌های اختصاصی', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            ListView(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                _buildSkinItem('پشت کارت آتشین پدرخوانده', 'آیتم لجندری', '۳۰۰ الماس', Icons.style, Colors.redAccent),
+                _buildSkinItem('فریم کارآگاه کلاسیک', 'آیتم اپیک', '۱۵۰ الماس', Icons.crop_portrait, Colors.blueAccent),
+              ],
             )
           ],
         ),
@@ -554,258 +782,205 @@ class _MainGameFlowState extends State<MainGameFlow> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // 3. NIGHT VIEW
-  // ---------------------------------------------------------------------------
-  Widget _buildNightView() {
-    List<Player> alivePlayers = players.where((p) => p.isAlive).toList();
-
-    String title = '';
-    String instruction = '';
-    Player? selectedTarget;
-    Function(Player)? onSelect;
-
-    if (nightStep == 0) {
-      title = '🔥 نوبت شلیک مافیا';
-      instruction = 'تیم مافیا یک نفر را برای شلیک انتخاب کند:';
-      selectedTarget = mafiaTarget;
-      onSelect = (p) => setState(() => mafiaTarget = p);
-    } else if (nightStep == 1) {
-      title = '💉 نوبت دکتر';
-      instruction = 'دکتر یک نفر را برای نجات انتخاب کند:';
-      selectedTarget = doctorTarget;
-      onSelect = (p) => setState(() => doctorTarget = p);
-    } else if (nightStep == 2) {
-      title = '🔍 استعلام کارآگاه';
-      instruction = 'کارآگاه استعلام یک نفر را می‌گیرد:';
-      selectedTarget = null;
-      onSelect = (p) {
-        setState(() {
-          // Godfather returns negative/citizen inquiry
-          detectiveInquiryResult = (p.role == Role.mafia) ? 'مثبت (مافیا است!) 🚨' : 'منفی (شهروند/پاک) ✅';
-        });
-      };
-    } else if (nightStep == 3) {
-      title = '🎯 شلیک اسنایپر';
-      instruction = 'تک‌تیرانداز می‌تواند شلیک کند (یا رد شود):';
-      selectedTarget = sniperTarget;
-      onSelect = (p) => setState(() => sniperTarget = p);
-    }
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
+  Widget _buildShopItem(String title, String amount, String price, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: const Color(0xFF1E1E2A), borderRadius: BorderRadius.circular(14), border: Border.all(color: Colors.white10)),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.redAccent)),
+          Icon(icon, size: 36, color: color),
+          const SizedBox(height: 6),
+          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+          Text(amount, style: TextStyle(fontSize: 11, color: color)),
           const SizedBox(height: 8),
-          Text(instruction, style: TextStyle(color: Colors.grey[300])),
-          const SizedBox(height: 16),
-          if (detectiveInquiryResult != null && nightStep == 2)
-            Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(10)),
-              child: Text('نتیجه استعلام: $detectiveInquiryResult', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: alivePlayers.length,
-              itemBuilder: (context, index) {
-                final p = alivePlayers[index];
-                final isSelected = selectedTarget == p;
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected ? Colors.redAccent.withOpacity(0.3) : const Color(0xFF1E1E26),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: isSelected ? Colors.redAccent : Colors.transparent),
-                  ),
-                  child: ListTile(
-                    title: Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.redAccent) : null,
-                    onTap: () => onSelect?.call(p),
-                  ),
-                );
-              },
-            ),
-          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFE53935),
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              minimumSize: const Size(double.infinity, 30),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            onPressed: () {
-              if (nightStep < 3) {
-                setState(() => nightStep++);
-              } else {
-                _processNightResults();
-              }
-            },
-            child: Text(nightStep < 3 ? 'گام بعدی شب ❯' : 'طلوع آفتاب و گزارش صبح ☀️'),
+            onPressed: () {},
+            child: Text(price, style: const TextStyle(fontSize: 12)),
           )
         ],
       ),
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // 4. MORNING REPORT VIEW
-  // ---------------------------------------------------------------------------
-  Widget _buildMorningReportView() {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+  Widget _buildSkinItem(String title, String type, String price, IconData icon, Color color) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: const Color(0xFF1E1E2A), borderRadius: BorderRadius.circular(12)),
+      child: Row(
         children: [
-          const Icon(Icons.wb_sunny_rounded, size: 80, color: Colors.amber),
-          const SizedBox(height: 20),
-          Text('وقایع رخ داده در شب $dayNumber:', textAlign: TextAlign.center, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 20),
-          ...nightReport.map((rep) => Container(
-                padding: const EdgeInsets.all(12),
-                margin: const EdgeInsets.only(bottom: 8),
-                decoration: BoxDecoration(color: const Color(0xFF1E1E26), borderRadius: BorderRadius.circular(8)),
-                child: Text(rep, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16)),
-              )),
-          const SizedBox(height: 30),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE53935), padding: const EdgeInsets.symmetric(vertical: 14)),
-            onPressed: () {
-              setState(() {
-                currentPhase = GamePhase.dayDiscussion;
-                currentSpeakerIndex = 0;
-                _startTimer(45);
-              });
-            },
-            child: const Text('آغاز صحبت‌های روز 🗣️'),
-          )
-        ],
-      ),
-    );
-  }
-
-  // ---------------------------------------------------------------------------
-  // 5. DAY DISCUSSION & TIMERS
-  // ---------------------------------------------------------------------------
-  Widget _buildDayDiscussionView() {
-    List<Player> alivePlayers = players.where((p) => p.isAlive).toList();
-    final currentSpeaker = alivePlayers[currentSpeakerIndex % alivePlayers.length];
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          _buildCard(
-            title: 'نوبت صحبت فعلی',
+          Icon(icon, size: 32, color: color),
+          const SizedBox(width: 14),
+          Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(currentSpeaker.name, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.amber)),
-                const SizedBox(height: 16),
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox(
-                      height: 110,
-                      width: 110,
-                      child: CircularProgressIndicator(
-                        value: _remainingSeconds / 45,
-                        strokeWidth: 8,
-                        backgroundColor: Colors.white10,
-                        valueColor: AlwaysStoppedAnimation<Color>(_remainingSeconds < 10 ? Colors.red : Colors.green),
-                      ),
-                    ),
-                    Text('$_remainingSeconds', style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-                  ],
+                Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(type, style: TextStyle(color: color, fontSize: 11)),
+              ],
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.white12),
+            onPressed: () {},
+            child: Text(price, style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 6. PROFILE SCREEN (پروفایل و آمار)
+// ---------------------------------------------------------------------------
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('پروفایل کاربری')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Center(
+              child: Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  CircleAvatar(radius: 46, backgroundColor: const Color(0xFFE53935), child: const Icon(Icons.person, size: 54, color: Colors.white)),
+                  CircleAvatar(radius: 14, backgroundColor: Colors.amber, child: const Icon(Icons.edit, size: 16, color: Colors.black)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(UserProfile.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text('لول ${UserProfile.level} | ${UserProfile.rankTitle}', style: const TextStyle(color: Colors.white54, fontSize: 13)),
+            const SizedBox(height: 24),
+
+            // آمار بازی‌ها
+            Row(
+              children: [
+                _buildStatBox('تعداد بازی‌ها', '${UserProfile.totalGames}', Icons.games),
+                const SizedBox(width: 10),
+                _buildStatBox('درصد پیروزی', '${UserProfile.winRate}%', Icons.trending_up),
+                const SizedBox(width: 10),
+                _buildStatBox('کاپ فصلی', '${UserProfile.trophies}', Icons.emoji_events),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // لیست گزینه‌های تنظیمات و اکانت
+            _buildProfileOption(Icons.history, 'تاریخچه بازی‌های اخیر', () {}),
+            _buildProfileOption(Icons.security, 'امنیت و تغییر رمز عبور', () {}),
+            _buildProfileOption(Icons.volume_up, 'تنظیمات صدا و افکت‌ها', () {}),
+            _buildProfileOption(Icons.help_outline, 'قوانین و راهنمای سناریوها', () {}),
+            _buildProfileOption(Icons.exit_to_app, 'خروج از حساب', () {}, isDestructive: true),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatBox(String title, String value, IconData icon) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(color: const Color(0xFF1E1E2A), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white10)),
+        child: Column(
+          children: [
+            Icon(icon, color: const Color(0xFFE53935), size: 22),
+            const SizedBox(height: 6),
+            Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 2),
+            Text(title, style: const TextStyle(fontSize: 11, color: Colors.white54)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileOption(IconData icon, String title, VoidCallback onTap, {bool isDestructive = false}) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(color: const Color(0xFF181822), borderRadius: BorderRadius.circular(10)),
+      child: ListTile(
+        leading: Icon(icon, color: isDestructive ? Colors.redAccent : Colors.white70),
+        title: Text(title, style: TextStyle(color: isDestructive ? Colors.redAccent : Colors.white, fontSize: 14)),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white24),
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 7. MATCHMAKING SCREEN (صفحه انتظار بازی آنلاین امتیازی)
+// ---------------------------------------------------------------------------
+class MatchmakingScreen extends StatefulWidget {
+  final String mode;
+  const MatchmakingScreen({super.key, required this.mode});
+
+  @override
+  State<MatchmakingScreen> createState() => _MatchmakingScreenState();
+}
+
+class _MatchmakingScreenState extends State<MatchmakingScreen> {
+  int _seconds = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() => _seconds++);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: CircularProgressIndicator(strokeWidth: 4, valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFE53935))),
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton.icon(
-                      icon: Icon(_isTimerRunning ? Icons.pause : Icons.play_arrow),
-                      label: Text(_isTimerRunning ? 'توقف' : 'شروع'),
-                      onPressed: () {
-                        if (_isTimerRunning) {
-                          _gameTimer?.cancel();
-                          setState(() => _isTimerRunning = false);
-                        } else {
-                          _startTimer(_remainingSeconds);
-                        }
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.rotate_right),
-                      label: const Text('+15 ثانیه چالش'),
-                      onPressed: () => _startTimer(15),
-                    ),
-                  ],
+                const SizedBox(height: 32),
+                Text('در حال یافتن بازیکنان برای مود ${widget.mode}...', textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                Text('زمان سپری شده: 00:${_seconds.toString().padLeft(2, '0')}', style: const TextStyle(fontSize: 16, color: Colors.amber)),
+                const SizedBox(height: 48),
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.white38)),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('انصراف و بازگشت'),
                 )
               ],
             ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    setState(() {
-                      currentSpeakerIndex = (currentSpeakerIndex + 1) % alivePlayers.length;
-                      _startTimer(45);
-                    });
-                  },
-                  child: const Text('نفر بعدی ❯'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE53935)),
-                  onPressed: () {
-                    _gameTimer?.cancel();
-                    for (var p in players) {
-                      p.votesReceived = 0;
-                    }
-                    setState(() => currentPhase = GamePhase.voting);
-                  },
-                  child: const Text('ورود به دادگاه ⚖️'),
-                ),
-              )
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }
-
-  // ---------------------------------------------------------------------------
-  // 6. VOTING VIEW
-  // ---------------------------------------------------------------------------
-  Widget _buildVotingView() {
-    List<Player> alivePlayers = players.where((p) => p.isAlive).toList();
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text('ثبت آرا برای خروج از بازی', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
-          Expanded(
-            child: ListView.builder(
-              itemCount: alivePlayers.length,
-              itemBuilder: (context, index) {
-                final p = alivePlayers[index];
-                return Card(
-                  child: ListTile(
-                    title: Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove),
-                          onPressed: p.votesReceived > 0 ? () => setState(() => p.votesReceived--) : null,
-                        ),
+}
