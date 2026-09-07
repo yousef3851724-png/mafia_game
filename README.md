@@ -17,3 +17,7 @@ cat << 'EOF' > README.md
 ---
 
 ## 🏗️ جریان منطقی بازی (Game Flow)
+
+👤 توسعه‌دهنده: امیرعلی — Mobile Developer (Flutter / Android / Unity)
+
+EOF
