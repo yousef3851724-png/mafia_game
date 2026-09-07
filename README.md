@@ -21,19 +21,4 @@ cat << 'EOF' > README.md
 
 بخش	فناوری
 کلاینت موبایل	Flutter (Dart)
-مدیریت مسیرها و وضعیت	GoRouter + GetIt + SharedPreferences
-سرور بلادرنگ	Node.js + Socket.io
-هاستینگ / بک‌اند	Firebase / Docker / FastAPI# دریافت مخزن
-git clone https://github.com/yousef3851724-png/mafia_game.git
-
-# ورود به پوشه
-cd mafia_game
-
-# دریافت وابستگی‌ها
-flutter pub get
-
-# اجرای پروژه
-flutter run
-👤 توسعه‌دهنده: امیرعلی — Mobile Developer (Flutter / Android / Unity)
-
-EOF
+مدیریت مسیرها و وضعیت	
