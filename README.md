@@ -17,8 +17,3 @@ cat << 'EOF' > README.md
 ---
 
 ## 🏗️ جریان منطقی بازی (Game Flow)
-```mermaid
-
-بخش	فناوری
-کلاینت موبایل	Flutter (Dart)
-مدیریت مسیرها و وضعیت	
