@@ -20,4 +20,3 @@ cat << 'EOF' > README.md
 
 👤 توسعه‌دهنده: امیرعلی — Mobile Developer (Flutter / Android / Unity)
 
-EOF
