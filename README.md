@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 cd ~/mafia_game && cat << 'EOF' > README.md
 # 🎭 Mafia Radical (AI-Powered)
 
@@ -116,3 +117,5 @@ EOF
 git add README.md
 git commit -m "docs: add full mermaid flowchart, role map and project tree structure"
 git push origin main
+=======
+>>>>>>> 3fb420d (Complete Part A: Offline Pass and Play core gameplay loop)
