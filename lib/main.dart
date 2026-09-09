@@ -1,149 +1,143 @@
 import 'package:flutter/material.dart';
 
-import 'core/constants/app_theme.dart';
-import 'core/models/game_models.dart';
-import 'features/setup/setup_screen.dart';
-import 'features/pass_and_play/role_reveal_screen.dart';
-import 'features/gameplay/gameplay_screen.dart';
-import 'features/victory/victory_screen.dart';
+void main() => runApp(const MafiaLobby());
 
-void main() {
-  runApp(const MafiaRadicalApp());
-}
-
-class MafiaRadicalApp extends StatelessWidget {
-  const MafiaRadicalApp({super.key});
+class MafiaLobby extends StatelessWidget {
+  const MafiaLobby({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Mafia Radical',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: AppColors.background,
-        colorScheme: ColorScheme.dark(
-          primary: AppColors.primaryRed,
-          secondary: AppColors.accentCyan,
-          surface: AppColors.surface,
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: AppColors.surface,
-          foregroundColor: Colors.white,
-          centerTitle: true,
-          elevation: 0,
-        ),
-        cardTheme: CardTheme(
-          color: AppColors.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-          ),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: AppColors.surfaceLight,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Colors.white12),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.accentCyan),
-          ),
-          labelStyle: const TextStyle(color: Colors.white70),
-          hintStyle: const TextStyle(color: Colors.white38),
-        ),
+      title: 'مایفا رادیکال',
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: const Color(0xFF0a0e14),
+        primaryColor: const Color(0xFFd4af87),
       ),
-      home: const MainCoordinator(),
+      home: const LobbyScreen(),
     );
   }
 }
 
-enum AppStage {
-  setup,
-  roleReveal,
-  gameplay,
-  victory,
-}
-
-class MainCoordinator extends StatefulWidget {
-  const MainCoordinator({super.key});
+class LobbyScreen extends StatefulWidget {
+  const LobbyScreen({super.key});
 
   @override
-  State<MainCoordinator> createState() => _MainCoordinatorState();
+  State<LobbyScreen> createState() => _LobbyScreenState();
 }
 
-class _MainCoordinatorState extends State<MainCoordinator> {
-  AppStage _stage = AppStage.setup;
-  List<Player> _players = [];
-  Team? _winner;
-
-  void _startGame(List<Player> players) {
-    setState(() {
-      _players = players;
-      _stage = AppStage.roleReveal;
-    });
-  }
-
-  void _goToGameplay() {
-    setState(() {
-      _stage = AppStage.gameplay;
-    });
-  }
-
-  void _endGame(Team winner) {
-    setState(() {
-      _winner = winner;
-      _stage = AppStage.victory;
-    });
-  }
-
-  void _restartGame() {
-    setState(() {
-      _players = [];
-      _winner = null;
-      _stage = AppStage.setup;
-    });
-  }
+class _LobbyScreenState extends State<LobbyScreen> {
+  String selectedRole = 'citizen';
+  final List<Map<String, dynamic>> roles = [
+    {'label': '👤 شهروند', 'value': 'citizen'},
+    {'label': '💉 دکتر', 'value': 'doctor'},
+    {'label': '🔍 کارآگاه', 'value': 'detective'},
+    {'label': '🔪 مافیا', 'value': 'mafia'},
+  ];
 
   @override
   Widget build(BuildContext context) {
-    switch (_stage) {
-      case AppStage.setup:
-        return SetupScreen(
-          onStart: _startGame,
-        );
-
-      case AppStage.roleReveal:
-        return RoleRevealScreen(
-          players: _players,
-          onFinished: _goToGameplay,
-        );
-
-      case AppStage.gameplay:
-        return GameplayScreen(
-          players: _players,
-          onGameOver: _endGame,
-        );
-
-      case AppStage.victory:
-        return VictoryScreen(
-          winner: _winner ?? Team.citizen,
-          players: _players,
-          onRestart: _restartGame,
-        );
-    }
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // برچسب VPN
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.green[700],
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: const Text(
+                  '🔒 ۱۰۰٪ VPN',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // عنوان
+              const Text(
+                'مایفا رادیکال',
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFFd4af87),
+                ),
+              ),
+              const Text(
+                'به بازی مافیا خوش آمدید!',
+                style: TextStyle(fontSize: 18, color: Color(0xFFaab)),
+              ),
+              const SizedBox(height: 30),
+              // انتخاب نقش
+              const Text(
+                '🎭 نقش خود را انتخاب کنید',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFFd4af87)),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: roles.map((role) {
+                  return ChoiceChip(
+                    label: Text(role['label']!),
+                    selected: selectedRole == role['value'],
+                    onSelected: (sel) {
+                      setState(() {
+                        selectedRole = role['value']!;
+                      });
+                    },
+                    backgroundColor: const Color(0xFF2a3448),
+                    selectedColor: const Color(0xFFd4af87),
+                    labelStyle: TextStyle(
+                      color: selectedRole == role['value'] ? Colors.black : Colors.white,
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 30),
+              // دکمه شروع
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // فعلاً پیغام بده
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('شروع بازی با نقش ${selectedRole}'),
+                        backgroundColor: const Color(0xFFd4af87),
+                      ),
+                    );
+                    // بعداً می‌تونی منطق بازی رو اینجا اضافه کنی
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFd4af87),
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(60),
+                    ),
+                    textStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  child: const Text('▶ شروع بازی'),
+                ),
+              ),
+              const SizedBox(height: 20),
+              // وضعیت نمایشی (فعلاً خالی)
+              const Expanded(
+                child: Center(
+                  child: Text(
+                    '⏳ منتظر شروع بازی...',
+                    style: TextStyle(color: Color(0xFF8892a8)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
