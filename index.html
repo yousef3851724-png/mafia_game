@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مایفا رادیکال</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: #0a0e14;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .game-container {
+            max-width: 750px;
+            width: 100%;
+            background: #141a24;
+            border-radius: 28px;
+            padding: 30px 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            border: 1px solid #2a3344;
+        }
+        .vpn-badge {
+            display: inline-block;
+            background: #00c853;
+            color: #000;
+            font-weight: 900;
+            font-size: 14px;
+            padding: 4px 14px;
+            border-radius: 30px;
+            margin-bottom: 15px;
+        }
+        .game-title {
+            font-size: 36px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #f5e6d3, #d4af87);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+        .sub-welcome {
+            font-size: 18px;
+            color: #aab;
+            margin-bottom: 25px;
+            border-right: 3px solid #d4af87;
+            padding-right: 12px;
+        }
+        .section-box {
+            background: #1e2634;
+            border-radius: 18px;
+            padding: 18px 20px;
+            margin-bottom: 20px;
+            border: 1px solid #2f3a4e;
+        }
+        .section-title {
+            font-weight: 700;
+            font-size: 16px;
+            color: #d4af87;
+            margin-bottom: 12px;
+        }
+        .role-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 10px 0 5px;
+        }
+        .role-btn {
+            background: #2a3448;
+            border: 2px solid #3f4b62;
+            color: #ccc;
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            flex: 1 0 auto;
+        }
+        .role-btn.active {
+            border-color: #d4af87;
+            background: #2a3448;
+            color: #f5e6d3;
+            box-shadow: 0 0 20px #d4af8740;
+        }
+        .start-btn {
+            width: 100%;
+            background: linear-gradient(145deg, #d4af87, #b88b62);
+            color: #0a0e14;
+            font-weight: 900;
+            font-size: 22px;
+            padding: 16px;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #7a5f44;
+            letter-spacing: 3px;
+        }
+        .start-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #7a5f44;
+        }
+        .game-status {
+            background: #0f151e;
+            border-radius: 16px;
+            padding: 18px;
+            min-height: 100px;
+            max-height: 220px;
+            overflow-y: auto;
+            font-size: 15px;
+            line-height: 1.8;
+            border: 1px solid #293242;
+            margin-top: 18px;
+            white-space: pre-wrap;
+            color: #d0d8e8;
+        }
+        .game-status .highlight { color: #f7c948; font-weight: bold; }
+        .game-status .death { color: #ff5e6b; }
+        .game-status .info { color: #6fc3ff; }
+        .players-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 8px 0 5px;
+        }
+        .player-chip {
+            background: #222c3e;
+            padding: 6px 16px;
+            border-radius: 40px;
+            border: 1px solid #3f4b62;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .player-chip.dead {
+            opacity: 0.35;
+            text-decoration: line-through;
+            border-color: #5a2a2a;
+        }
+        .action-btn {
+            background: #2a3448;
+            border: 1px solid #4a5a78;
+            color: #ddd;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .action-btn:hover {
+            border-color: #d4af87;
+        }
+        .text-muted {
+            color: #8892a8;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <div class="vpn-badge">🔒 ۱۰۰٪ VPN</div>
+    <div class="game-title">مایفا رادیکال</div>
+    <div class="sub-welcome">به بازی مافیا خوش آمدید!</div>
+
+    <div class="section-box">
+        <div class="section-title">🎭 نقش خود را انتخاب کنید</div>
+        <div class="role-selector" id="roleSelector">
+            <button class="role-btn active" data-role="citizen">👤 شهروند</button>
+            <button class="role-btn" data-role="doctor">💉 دکتر</button>
+            <button class="role-btn" data-role="detective">🔍 کارآگاه</button>
+            <button class="role-btn" data-role="mafia">🔪 مافیا</button>
+        </div>
+    </div>
+
+    <button class="start-btn" id="startBtn">▶ شروع بازی</button>
+
+    <div class="section-box" style="margin-top:20px;">
+        <div class="section-title">📋 وضعیت بازی</div>
+        <div class="players-grid" id="playersList"></div>
+    </div>
+
+    <div class="section-box" id="actionBox" style="display:none;">
+        <div class="section-title">⚡ اقدامات</div>
+        <div id="actionContent"></div>
+    </div>
+
+    <div class="game-status" id="gameLog">⏳ منتظر شروع بازی...</div>
+</div>
+<script>
+    const ROLES = { MAFIA: 'mafia', DOCTOR: 'doctor', DETECTIVE: 'detective', CITIZEN: 'citizen' };
+    const ROLE_NAMES = { mafia: '🔪 مافیا', doctor: '💉 دکتر', detective: '🔍 کارآگاه', citizen: '👤 شهروند' };
+
+    let game = null;
+    let selectedRole = 'citizen';
+
+    document.querySelectorAll('.role-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            selectedRole = this.dataset.role;
+        });
+    });
+
+    class MafiaGame {
+        constructor(userRole) {
+            this.userRole = userRole;
+            this.phase = 'idle';
+            this.day = 1;
+            this.players = [];
+            this.userId = 0;
+            this.logs = [];
+            this.nightActions = { kill: null, heal: null, investigate: null };
+            this.votes = {};
+            this.isProcessing = false;
+            this.initPlayers();
+        }
+
+        initPlayers() {
+            const names = ['شما', 'ربات آرین', 'ربات سارا', 'ربات کیان', 'ربات لیلا', 'ربات امیر', 'ربات ندا', 'ربات پویا'];
+            let roles = ['citizen', 'citizen', 'citizen', 'citizen', 'mafia', 'mafia', 'doctor', 'detective'];
+            for (let i = roles.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [roles[i], roles[j]] = [roles[j], roles[i]];
+            }
+            this.players = names.map((name, i) => ({
+                id: i,
+                name: name,
+                role: roles[i],
+                isAlive: true,
+                isUser: i === 0,
+            }));
+            this.players[0].role = this.userRole;
+            this.rebalanceRoles();
+            this.userId = 0;
+        }
+
+        rebalanceRoles() {
+            const bots = this.players.filter(p => p.id !== 0);
+            const need = { mafia: 2, doctor: 1, detective: 1, citizen: 4 };
+            need[this.userRole]--;
+            let target = [];
+            for (let r of Object.keys(need)) {
+                for (let i = 0; i < need[r]; i++) target.push(r);
+            }
+            for (let i = target.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [target[i], target[j]] = [target[j], target[i]];
+            }
+            for (let i = 0; i < bots.length; i++) {
+                bots[i].role = target[i] || 'citizen';
+            }
+        }
+
+        get alive() { return this.players.filter(p => p.isAlive); }
+        get mafiaAlive() { return this.players.filter(p => p.isAlive && p.role === 'mafia'); }
+        get townAlive() { return this.players.filter(p => p.isAlive && p.role !== 'mafia'); }
+        get user() { return this.players[0]; }
+
+        startNewDay() {
+            if (this.checkGameOver()) return;
+            this.phase = 'day';
+            this.votes = {};
+            this.addLog(`--- روز ${this.day} ---`, 'info');
+            this.renderAll();
+            if (!this.user.isAlive) {
+                this.addLog('💀 شما مرده‌اید.', 'death');
+                setTimeout(() => this.aiVoteAndExecute(), 1500);
+                return;
+            }
+            this.addLog('👤 روی نام یک بازیکن کلیک کنید تا رای دهید.', '');
+            this.renderAll(true);
+        }
+
+        startNight() {
+            if (this.checkGameOver()) return;
+            this.phase = 'night';
+            this.nightActions = { kill: null, heal: null, investigate: null };
+            this.addLog(`--- شب ${this.day} ---`, 'info');
+            if (!this.user.isAlive) {
+                this.doAIActions();
+                setTimeout(() => this.resolveNight(), 1000);
+                return;
+            }
+            const role = this.user.role;
+            if (role === 'mafia') this.addLog('🔪 روی نام یک نفر کلیک کنید تا بکشید.', '');
+            else if (role === 'doctor') this.addLog('💉 روی نام یک نفر کلیک کنید تا نجات دهید.', '');
+            else if (role === 'detective') this.addLog('🔍 روی نام یک نفر کلیک کنید تا بررسی کنید.', '');
+            else this.addLog('👤 شب شد، شما می‌خوابید...', '');
+            this.renderAll(true);
+            if (role === 'citizen') {
+                this.doAIActions();
+                setTimeout(() => this.resolveNight(), 1200);
+            }
+        }
+
+        selectTarget(id) {
+            if (this.isProcessing) return;
+            const target = this.players.find(p => p.id === id);
+            if (!target || !target.isAlive || target.id === this.userId) return;
+
+            if (this.phase === 'day') {
+                this.votes[this.userId] = id;
+                this.addLog(`🗳️ شما به ${target.name} رای دادید.`, '');
+                this.aiVoteAndExecute();
+                return;
+            }
+            if (this.phase === 'night') {
+                const role = this.user.role;
+                if (role === 'mafia') this.nightActions.kill = id;
+                else if (role === 'doctor') this.nightActions.heal = id;
+                else if (role === 'detective') {
+                    this.nightActions.investigate = id;
+                    this.addLog(`🔍 ${target.name} → ${ROLE_NAMES[target.role]}`, 'highlight');
+                }
+                this.doAIActions();
+                setTimeout(() => this.resolveNight(), 1200);
+                this.renderAll(false);
+            }
+        }
+
+        doAIActions() {
+            const alive = this.alive;
+            const mafias = this.mafiaAlive;
+            if (mafias.length > 0 && !this.nightActions.kill) {
+                const targets = alive.filter(p => p.role !== 'mafia');
+                if (targets.length) this.nightActions.kill = targets[Math.floor(Math.random() * targets.length)].id;
+            }
+            const docs = this.players.filter(p => p.isAlive && p.role === 'doctor' && !p.isUser);
+            if (docs.length > 0 && !this.nightActions.heal) {
+                const targets = alive.filter(p => p.role !== 'doctor');
+                if (targets.length) this.nightActions.heal = targets[Math.floor(Math.random() * targets.length)].id;
+            }
+            const dets = this.players.filter(p => p.isAlive && p.role === 'detective' && !p.isUser);
+            if (dets.length > 0 && !this.nightActions.investigate) {
+                const targets = alive.filter(p => p.role === 'mafia' || p.role === 'detective');
+                if (targets.length) {
+                    const t = targets[Math.floor(Math.random() * targets.length)];
+                    this.nightActions.investigate = t.id;
+                }
+            }
+        }
+
+        resolveNight() {
+            if (this.isProcessing) return;
+            this.isProcessing = true;
+            const killId = this.nightActions.kill;
+            const healId = this.nightActions.heal;
+            if (killId !== null) {
+                const target = this.players.find(p => p.id === killId);
+                if (target && target.isAlive) {
+                    if (healId === killId) {
+                        this.addLog(`🛡️ ${target.name} توسط دکتر نجات یافت!`, 'info');
+                    } else {
+                        target.isAlive = false;
+                        this.addLog(`💀 ${target.name} (${ROLE_NAMES[target.role]}) کشته شد.`, 'death');
+                    }
+                }
+            } else this.addLog('🌙 شب آرام بود.', '');
+            if (this.checkGameOver()) { this.isProcessing = false; return; }
+            this.day++;
+            this.isProcessing = false;
+            this.startNewDay();
+        }
+
+        aiVoteAndExecute() {
+            if (this.isProcessing) return;
+            this.isProcessing = true;
+            const alive = this.alive;
+            for (let p of alive) {
+                if (p.isUser) continue;
+                const targets = alive.filter(t => t.id !== p.id);
+                if (targets.length) this.votes[p.id] = targets[Math.floor(Math.random() * targets.length)].id;
+            }
+            const count = {};
+            for (let v of Object.values(this.votes)) count[v] = (count[v] || 0) + 1;
+            let max = 0, eliminated = null;
+            for (let id in count) {
+                if (count[id] > max) { max = count[id]; eliminated = parseInt(id); }
+            }
+            if (eliminated !== null) {
+                const p = this.players.find(p => p.id === eliminated);
+                if (p && p.isAlive) {
+                    p.isAlive = false;
+                    this.addLog(`⚖️ ${p.name} (${ROLE_NAMES[p.role]}) اخراج شد.`, 'death');
+                }
+            } else this.addLog('🤝 هیچکس اخراج نشد.', '');
+            if (this.checkGameOver()) { this.isProcessing = false; return; }
+            this.isProcessing = false;
+            this.renderAll(false);
+            setTimeout(() => this.startNight(), 1800);
+        }
+
+        checkGameOver() {
+            const m = this.mafiaAlive.length;
+            const t = this.townAlive.length;
+            if (m === 0) { this.phase = 'gameover'; this.addLog('🎉 شهروندان پیروز شدند!', 'highlight'); this.renderAll(); return true; }
+            if (m >= t) { this.phase = 'gameover'; this.addLog('💀 مافیاها پیروز شدند!', 'death'); this.renderAll(); return true; }
+            return false;
+        }
+
+        addLog(msg, type = '') { this.logs.push({ msg, type }); this.renderLog(); }
+        renderLog() {
+            const el = document.getElementById('gameLog');
+            if (!el) return;
+            el.innerHTML = this.logs.slice(-30).map(e => `<div class="${e.type}">${e.msg}</div>`).join('');
+            el.scrollTop = el.scrollHeight;
+        }
+        renderAll(clickable = false) {
+            const container = document.getElementById('playersList');
+            if (!container) return;
+            let html = '';
+            for (let p of this.players) {
+                let name = p.isUser ? '⭐ ' + p.name : p.name;
+                if (!p.isAlive || this.phase === 'gameover') name += ` (${ROLE_NAMES[p.role]})`;
+                const dead = !p.isAlive ? 'dead' : '';
+                const click = (clickable && p.isAlive && !p.isUser && this.user.isAlive) ? 
+                    `style="cursor:pointer;border-color:#d4af87;" onclick="window.game.selectTarget(${p.id})"` : '';
+                html += `<span class="player-chip ${dead}" ${click}>${name}</span>`;
+            }
+            container.innerHTML = html;
+            const box = document.getElementById('actionBox');
+            const content = document.getElementById('actionContent');
+            if (this.phase === 'idle' || this.phase === 'gameover') { box.style.display = 'none'; return; }
+            box.style.display = 'block';
+            if (this.phase === 'day') content.innerHTML = this.user.isAlive ? '✅ روی یک بازیکن زنده کلیک کنید.' : '⏳ در حال رای‌گیری...';
+            else content.innerHTML = '🌙 شب در جریان است...';
+        }
+    }
+
+    document.getElementById('startBtn').addEventListener('click', function() {
+        if (game && game.phase !== 'gameover' && game.phase !== 'idle') {
+            if (!confirm('بازی در جریان است، از نو شروع شود؟')) return;
+        }
+        game = new MafiaGame(selectedRole);
+        window.game = game;
+        game.addLog(`🎭 شما نقش ${ROLE_NAMES[selectedRole]} را دارید.`, 'highlight');
+        game.renderAll(false);
+        setTimeout(() => game.startNewDay(), 500);
+    });
+</script>
+</body>
+</html>
