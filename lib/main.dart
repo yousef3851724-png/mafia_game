@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'core/widgets/branding/game_logo_widget.dart';
-import 'features/game/presentation/screens/game_table_screen.dart';
-import 'features/cosmetics/presentation/screens/frame_showcase_screen.dart';
+
+import 'core/constants/app_theme.dart';
+import 'core/models/game_models.dart';
+import 'features/setup/setup_screen.dart';
+import 'features/pass_and_play/role_reveal_screen.dart';
+import 'features/gameplay/gameplay_screen.dart';
+import 'features/victory/victory_screen.dart';
 
 void main() {
   runApp(const MafiaRadicalApp());
@@ -13,90 +17,133 @@ class MafiaRadicalApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mafia Radical',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF0C0C10),
-        primaryColor: Colors.redAccent,
+      title: 'Mafia Radical',
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: AppColors.background,
+        colorScheme: ColorScheme.dark(
+          primary: AppColors.primaryRed,
+          secondary: AppColors.accentCyan,
+          surface: AppColors.surface,
+        ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.transparent,
+          backgroundColor: AppColors.surface,
+          foregroundColor: Colors.white,
+          centerTitle: true,
           elevation: 0,
         ),
+        cardTheme: CardTheme(
+          color: AppColors.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: AppColors.surfaceLight,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.white12),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: AppColors.accentCyan),
+          ),
+          labelStyle: const TextStyle(color: Colors.white70),
+          hintStyle: const TextStyle(color: Colors.white38),
+        ),
       ),
-      home: const MainHomeScreen(),
+      home: const MainCoordinator(),
     );
   }
 }
 
-class MainHomeScreen extends StatelessWidget {
-  const MainHomeScreen({super.key});
+enum AppStage {
+  setup,
+  roleReveal,
+  gameplay,
+  victory,
+}
+
+class MainCoordinator extends StatefulWidget {
+  const MainCoordinator({super.key});
+
+  @override
+  State<MainCoordinator> createState() => _MainCoordinatorState();
+}
+
+class _MainCoordinatorState extends State<MainCoordinator> {
+  AppStage _stage = AppStage.setup;
+  List<Player> _players = [];
+  Team? _winner;
+
+  void _startGame(List<Player> players) {
+    setState(() {
+      _players = players;
+      _stage = AppStage.roleReveal;
+    });
+  }
+
+  void _goToGameplay() {
+    setState(() {
+      _stage = AppStage.gameplay;
+    });
+  }
+
+  void _endGame(Team winner) {
+    setState(() {
+      _winner = winner;
+      _stage = AppStage.victory;
+    });
+  }
+
+  void _restartGame() {
+    setState(() {
+      _players = [];
+      _winner = null;
+      _stage = AppStage.setup;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Center(child: MafiaRadicalLogo(size: 130)),
-              const SizedBox(height: 24),
-              const Text(
-                'مافیا رادیکال',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 34,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.2,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 6),
-              const Text(
-                'پلتفرم حرفه‌ای و مولتی‌پلیر بازی مافیا',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: Colors.white54),
-              ),
-              const SizedBox(height: 44),
-              ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const GameTableScreen()),
-                  );
-                },
-                icon: const Icon(Icons.play_arrow_rounded, size: 26),
-                label: const Text('ورود به میز بازی (شبیه‌ساز)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFD32F2F),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  elevation: 6,
-                ),
-              ),
-              const SizedBox(height: 14),
-              OutlinedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const FrameShowcaseScreen()),
-                  );
-                },
-                icon: const Icon(Icons.style_rounded, color: Colors.amber),
-                label: const Text('ویترین فریم‌های متحرک', style: TextStyle(fontSize: 15, color: Colors.amber)),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.amber, width: 1.5),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    switch (_stage) {
+      case AppStage.setup:
+        return SetupScreen(
+          onStart: _startGame,
+        );
+
+      case AppStage.roleReveal:
+        return RoleRevealScreen(
+          players: _players,
+          onFinished: _goToGameplay,
+        );
+
+      case AppStage.gameplay:
+        return GameplayScreen(
+          players: _players,
+          onGameOver: _endGame,
+        );
+
+      case AppStage.victory:
+        return VictoryScreen(
+          winner: _winner ?? Team.citizen,
+          players: _players,
+          onRestart: _restartGame,
+        );
+    }
   }
 }
