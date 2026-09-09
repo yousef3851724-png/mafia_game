@@ -27,9 +27,6 @@ class MafiaGame extends StatelessWidget {
   }
 }
 
-// ============================================================
-// ۱. مدیریت سکه‌ها
-// ============================================================
 class CoinManager {
   static const String _coinsKey = 'user_coins';
   static int _coins = 100;
@@ -66,9 +63,6 @@ class CoinManager {
   }
 }
 
-// ============================================================
-// ۲. مدیریت امتیاز فصلی و رتبه‌بندی
-// ============================================================
 class SeasonalRanking {
   static const String _seasonKey = 'current_season';
   static const String _pointsKey = 'seasonal_points';
@@ -143,9 +137,6 @@ class SeasonalRanking {
   static int get lotteryChances => _seasonalPoints;
 }
 
-// ============================================================
-// ۳. صفحه لابی
-// ============================================================
 class LobbyScreen extends StatefulWidget {
   const LobbyScreen({super.key});
 
@@ -316,9 +307,6 @@ class _LobbyScreenState extends State<LobbyScreen> {
   }
 }
 
-// ============================================================
-// ۴. صفحه بازی
-// ============================================================
 class GameScreen extends StatefulWidget {
   final String userRole;
   final bool isRanked;
@@ -543,9 +531,6 @@ class _GameScreenState extends State<GameScreen> {
   }
 }
 
-// ============================================================
-// ۵. موتور بازی
-// ============================================================
 class Player {
   int id;
   String name;
@@ -825,9 +810,6 @@ class GameEngine {
   }
 }
 
-// ============================================================
-// ۶. صفحه رتبه‌بندی
-// ============================================================
 class RankingScreen extends StatelessWidget {
   const RankingScreen({super.key});
 
