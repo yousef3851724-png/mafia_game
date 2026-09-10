@@ -894,3 +894,4 @@ class RankingScreen extends StatelessWidget {
     );
   }
 }
+}
