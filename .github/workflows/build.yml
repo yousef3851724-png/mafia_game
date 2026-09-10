@@ -1,0 +1,29 @@
+name: Build APK
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version-file: pubspec.yaml
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+dependencies:
+  flutter:
+    sdk: flutter
+  equatable: ^2.0.5
+  uuid: ^4.3.3
+  share_plus: ^7.2.1
+  intl: ^0.18.1
+  bloc: ^8.1.2
+  flutter_bloc: ^8.1.3
+  go_router: ^12.0.0
