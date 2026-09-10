@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+sed -i '$ d' lib/main.dart
+tail -5 lib/main.dartimport 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math';
 
@@ -893,5 +894,4 @@ class RankingScreen extends StatelessWidget {
       ),
     );
   }
-}
 }
