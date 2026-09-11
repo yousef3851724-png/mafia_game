@@ -10,9 +10,15 @@ jobs:
         with:
           channel: stable
           cache: false
-      - run: flutter pub get
-      - run: flutter build apk --release --no-tree-shake-icons
-      - uses: actions/upload-artifact@v4
+      - name: Install dependencies
+        run: |
+          flutter pub upgrade
+          flutter clean
+          flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+
         with:
           name: mafia-game-apk
           path: build/app/outputs/flutter-apk/app-release.apk
