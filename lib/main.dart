@@ -318,6 +318,22 @@ class _LobbyScreenState extends State<LobbyScreen> {
   }
 }
 
+class Player {
+  final String name;
+  final String role;
+  final bool isUser;
+  bool isAlive;
+
+  Player({
+    required this.name,
+    required this.role,
+    required this.isUser,
+    this.isAlive = true,
+  });
+}
+
+enum GamePhase { night, nightResult, day, dayResult, ended }
+
 class GameScreen extends StatefulWidget {
   final String userRole;
   final bool isRanked;
@@ -333,26 +349,207 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  String statusMessage = 'در حال بازی...';
+  final Random _rng = Random();
+  late List<Player> players;
+  GamePhase phase = GamePhase.night;
+  int round = 1;
 
-  void handleAction(String role) {
-    setState(() {
-      if (role == 'mafia') {
-        statusMessage = '🔪 Click on a player to kill.';
-      } else if (role == 'doctor') {
-        statusMessage = '💉 Click on a player to heal.';
-      } else if (role == 'detective') {
-        statusMessage = '🔍 Click on a player to investigate.';
-      } else {
-        statusMessage = '👤 Citizen phase.';
-      }
-    });
-  }
+  String? nightTargetName;
+  String nightResultText = '';
+  String? detectiveResultText;
+
+  String? dayVoteTarget;
+  String dayResultText = '';
+
+  bool gameOver = false;
+  String? winnerTeam;
+
+  static const List<String> _botNames = [
+    'آرش',
+    'سارا',
+    'بابک',
+    'نگار',
+    'کیان',
+    'مهسا',
+    'رضا',
+    'الناز',
+  ];
 
   @override
   void initState() {
     super.initState();
-    handleAction(widget.userRole);
+    _setupPlayers();
+  }
+
+  void _setupPlayers() {
+    const totalPlayers = 6;
+    final roleDeck = <String>['mafia', 'doctor', 'detective'];
+    while (roleDeck.length < totalPlayers) {
+      roleDeck.add('citizen');
+    }
+
+    roleDeck.remove(widget.userRole);
+    roleDeck.shuffle(_rng);
+
+    final shuffledBotNames = List<String>.from(_botNames)..shuffle(_rng);
+    final botNames = shuffledBotNames.take(totalPlayers - 1).toList();
+
+    players = [
+      Player(name: 'شما', role: widget.userRole, isUser: true),
+      for (int i = 0; i < botNames.length; i++)
+        Player(name: botNames[i], role: roleDeck[i], isUser: false),
+    ];
+  }
+
+  List<Player> get alivePlayers => players.where((p) => p.isAlive).toList();
+  Player get userPlayer => players.firstWhere((p) => p.isUser);
+
+  void _confirmNightAction() {
+    String? mafiaTarget;
+    String? doctorHeal;
+
+    final aliveMafia = alivePlayers.where((p) => p.role == 'mafia').toList();
+    final aliveDoctor = alivePlayers.where((p) => p.role == 'doctor').toList();
+
+    if (userPlayer.role == 'mafia' && userPlayer.isAlive) {
+      mafiaTarget = nightTargetName;
+    } else if (aliveMafia.isNotEmpty) {
+      final candidates = alivePlayers.where((p) => p.role != 'mafia').toList();
+      if (candidates.isNotEmpty) {
+        mafiaTarget = candidates[_rng.nextInt(candidates.length)].name;
+      }
+    }
+
+    if (userPlayer.role == 'doctor' && userPlayer.isAlive) {
+      doctorHeal = nightTargetName;
+    } else if (aliveDoctor.isNotEmpty) {
+      doctorHeal = alivePlayers[_rng.nextInt(alivePlayers.length)].name;
+    }
+
+    if (userPlayer.role == 'detective' && userPlayer.isAlive && nightTargetName != null) {
+      final target = players.firstWhere((p) => p.name == nightTargetName);
+      detectiveResultText = target.role == 'mafia'
+          ? '🔍 نتیجه: ${target.name} مافیاست!'
+          : '🔍 نتیجه: ${target.name} بی‌گناه است.';
+    } else {
+      detectiveResultText = null;
+    }
+
+    String resultMsg;
+    if (mafiaTarget != null && mafiaTarget != doctorHeal) {
+      final victim = players.firstWhere((p) => p.name == mafiaTarget);
+      victim.isAlive = false;
+      resultMsg = '🌙 شب به پایان رسید. ${victim.name} کشته شد.';
+    } else if (mafiaTarget != null && mafiaTarget == doctorHeal) {
+      resultMsg = '🌙 شب به پایان رسید. دکتر جان یک نفر را نجات داد!';
+    } else {
+      resultMsg = '🌙 شب به پایان رسید. هیچ‌کس کشته نشد.';
+    }
+
+    setState(() {
+      nightResultText = resultMsg;
+      nightTargetName = null;
+      phase = GamePhase.nightResult;
+    });
+
+    _checkWinCondition();
+  }
+
+  void _confirmDayVote() {
+    final Map<String, int> voteCount = {};
+
+    void castVote(String targetName) {
+      voteCount[targetName] = (voteCount[targetName] ?? 0) + 1;
+    }
+
+    if (userPlayer.isAlive && dayVoteTarget != null) {
+      castVote(dayVoteTarget!);
+    }
+
+    for (final bot in alivePlayers.where((p) => !p.isUser)) {
+      final candidates = alivePlayers.where((p) => p.name != bot.name).toList();
+      if (candidates.isNotEmpty) {
+        final target = candidates[_rng.nextInt(candidates.length)];
+        castVote(target.name);
+      }
+    }
+
+    String resultMsg;
+    if (voteCount.isEmpty) {
+      resultMsg = '☀️ رأی‌گیری بدون نتیجه ماند. کسی حذف نشد.';
+    } else {
+      final maxVotes = voteCount.values.reduce(max);
+      final topCandidates =
+          voteCount.entries.where((e) => e.value == maxVotes).map((e) => e.key).toList();
+      if (topCandidates.length > 1) {
+        resultMsg = '☀️ رأی‌ها مساوی شد. امروز کسی حذف نشد.';
+      } else {
+        final eliminatedName = topCandidates.first;
+        final eliminated = players.firstWhere((p) => p.name == eliminatedName);
+        eliminated.isAlive = false;
+        resultMsg =
+            '☀️ $eliminatedName با رأی جمع از بازی حذف شد (نقش: ${_roleLabel(eliminated.role)}).';
+      }
+    }
+
+    setState(() {
+      dayResultText = resultMsg;
+      dayVoteTarget = null;
+      phase = GamePhase.dayResult;
+    });
+
+    _checkWinCondition();
+  }
+
+  String _roleLabel(String role) {
+    switch (role) {
+      case 'mafia':
+        return '🔪 مافیا';
+      case 'doctor':
+        return '💉 دکتر';
+      case 'detective':
+        return '🔍 کارآگاه';
+      default:
+        return '👤 شهروند';
+    }
+  }
+
+  void _checkWinCondition() {
+    final aliveMafiaCount = alivePlayers.where((p) => p.role == 'mafia').length;
+    final aliveCitizenCount = alivePlayers.where((p) => p.role != 'mafia').length;
+
+    if (aliveMafiaCount == 0) {
+      setState(() {
+        gameOver = true;
+        winnerTeam = 'citizens';
+        phase = GamePhase.ended;
+      });
+    } else if (aliveMafiaCount >= aliveCitizenCount) {
+      setState(() {
+        gameOver = true;
+        winnerTeam = 'mafia';
+        phase = GamePhase.ended;
+      });
+    }
+  }
+
+  void _proceedToDay() {
+    setState(() {
+      phase = GamePhase.day;
+    });
+  }
+
+  void _proceedToNight() {
+    setState(() {
+      round += 1;
+      phase = GamePhase.night;
+    });
+  }
+
+  bool get _userWon {
+    if (winnerTeam == null) return false;
+    final userTeam = userPlayer.role == 'mafia' ? 'mafia' : 'citizens';
+    return userTeam == winnerTeam;
   }
 
   @override
@@ -362,32 +559,274 @@ class _GameScreenState extends State<GameScreen> {
         title: Text(widget.isRanked ? '🏆 Ranked Match' : '🎮 Friendly Match'),
         backgroundColor: const Color(0xFF161f2e),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('نقش شما: ${widget.userRole}',
-                style: const TextStyle(fontSize: 22, color: Color(0xFFd4af87))),
-            const SizedBox(height: 20),
-            Text(statusMessage, style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () async {
-                if (widget.isRanked) {
-                  await SeasonalRanking.addWin();
-                  await CoinManager.addCoins(150);
-                }
-                if (!mounted) return;
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber[800],
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-              ),
-              child: const Text('پایان بازی و بازگشت'),
-            )
-          ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: _buildPhaseBody(),
         ),
+      ),
+    );
+  }
+
+  Widget _buildPhaseBody() {
+    switch (phase) {
+      case GamePhase.night:
+        return _buildNightPhase();
+      case GamePhase.nightResult:
+        return _buildNightResult();
+      case GamePhase.day:
+        return _buildDayPhase();
+      case GamePhase.dayResult:
+        return _buildDayResult();
+      case GamePhase.ended:
+        return _buildEndScreen();
+    }
+  }
+
+  Widget _header() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('نقش شما: ${_roleLabel(userPlayer.role)}',
+            style: const TextStyle(fontSize: 20, color: Color(0xFFd4af87))),
+        const SizedBox(height: 4),
+        Text('دور $round', style: const TextStyle(fontSize: 14, color: Colors.grey)),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _buildNightPhase() {
+    final aliveOthers = alivePlayers.where((p) => !p.isUser).toList();
+    final userAlive = userPlayer.isAlive;
+
+    String instruction;
+    List<Player> selectable;
+    switch (userPlayer.role) {
+      case 'mafia':
+        instruction = '🔪 یک نفر را برای حذف انتخاب کنید:';
+        selectable = aliveOthers;
+        break;
+      case 'doctor':
+        instruction = '💉 یک نفر را برای نجات انتخاب کنید:';
+        selectable = alivePlayers;
+        break;
+      case 'detective':
+        instruction = '🔍 یک نفر را برای تحقیق انتخاب کنید:';
+        selectable = aliveOthers;
+        break;
+      default:
+        instruction = '👤 شب است. منتظر بمانید...';
+        selectable = [];
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _header(),
+        if (!userAlive)
+          const Expanded(
+            child: Center(
+              child: Text('💀 شما از بازی حذف شده‌اید.\nمنتظر پایان بازی بمانید.',
+                  textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+            ),
+          )
+        else ...[
+          Text(instruction, style: const TextStyle(fontSize: 16)),
+          const SizedBox(height: 12),
+          if (selectable.isNotEmpty)
+            Expanded(
+              child: ListView(
+                children: selectable.map((p) {
+                  final isSelected = nightTargetName == p.name;
+                  return Card(
+                    color: isSelected ? const Color(0xFFd4af87) : const Color(0xFF2a3448),
+                    child: ListTile(
+                      title: Text(p.name,
+                          style: TextStyle(
+                              color: isSelected ? Colors.black : Colors.white)),
+                      onTap: () {
+                        setState(() {
+                          nightTargetName = p.name;
+                        });
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
+            )
+          else
+            const Expanded(child: Center(child: Text('صبر کنید...'))),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: (selectable.isEmpty || nightTargetName != null)
+                  ? _confirmNightAction
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFd4af87),
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: const Text('تایید و پایان شب'),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildNightResult() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _header(),
+        Text(nightResultText, style: const TextStyle(fontSize: 18)),
+        if (detectiveResultText != null) ...[
+          const SizedBox(height: 12),
+          Text(detectiveResultText!,
+              style: const TextStyle(fontSize: 16, color: Color(0xFFd4af87))),
+        ],
+        const Spacer(),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _proceedToDay,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.amber[800],
+              padding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+            child: const Text('ادامه به روز ☀️'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDayPhase() {
+    final voteCandidates = alivePlayers.where((p) => p.name != userPlayer.name).toList();
+    final userAlive = userPlayer.isAlive;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _header(),
+        const Text('🗣️ زمان بحث و رأی‌گیری است.', style: TextStyle(fontSize: 16)),
+        const SizedBox(height: 8),
+        Text('بازیکنان زنده: ${alivePlayers.map((p) => p.name).join('، ')}',
+            style: const TextStyle(fontSize: 13, color: Colors.grey)),
+        const SizedBox(height: 12),
+        if (!userAlive)
+          const Expanded(
+            child: Center(
+              child: Text('💀 شما از بازی حذف شده‌اید.\nمنتظر پایان بازی بمانید.',
+                  textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+            ),
+          )
+        else ...[
+          const Text('به چه کسی رأی می‌دهید؟', style: TextStyle(fontSize: 15)),
+          const SizedBox(height: 8),
+          Expanded(
+            child: ListView(
+              children: voteCandidates.map((p) {
+                final isSelected = dayVoteTarget == p.name;
+                return Card(
+                  color: isSelected ? const Color(0xFFd4af87) : const Color(0xFF2a3448),
+                  child: ListTile(
+                    title: Text(p.name,
+                        style: TextStyle(color: isSelected ? Colors.black : Colors.white)),
+                    onTap: () {
+                      setState(() {
+                        dayVoteTarget = p.name;
+                      });
+                    },
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: dayVoteTarget != null ? _confirmDayVote : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFd4af87),
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: const Text('ثبت رأی'),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildDayResult() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _header(),
+        Text(dayResultText, style: const TextStyle(fontSize: 18)),
+        const Spacer(),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _proceedToNight,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.indigo[700],
+              padding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+            child: const Text('ادامه به شب بعد 🌙'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEndScreen() {
+    final won = _userWon;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            winnerTeam == 'citizens' ? '🎉 پیروزی شهروندان!' : '🔪 پیروزی مافیا!',
+            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            won ? 'شما بردید! 🏆' : 'شما باختید.',
+            style: TextStyle(
+                fontSize: 20, color: won ? Colors.greenAccent : Colors.redAccent),
+          ),
+          const SizedBox(height: 20),
+          ...players.map((p) => Text(
+                '${p.isAlive ? "✅" : "☠️"} ${p.name} — ${_roleLabel(p.role)}',
+                style: const TextStyle(fontSize: 14),
+              )),
+          const SizedBox(height: 32),
+          ElevatedButton(
+            onPressed: () async {
+              if (won && widget.isRanked) {
+                await SeasonalRanking.addWin();
+                await CoinManager.addCoins(150);
+              } else if (won && !widget.isRanked) {
+                await CoinManager.addCoins(30);
+              }
+              if (!mounted) return;
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.amber[800],
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+            ),
+            child: const Text('پایان بازی و بازگشت'),
+          ),
+        ],
       ),
     );
   }
@@ -424,5 +863,3 @@ class RankingScreen extends StatelessWidget {
     );
   }
 }
-
-
