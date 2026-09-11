@@ -1,5 +1,5 @@
 name: mafia_game
-description: Mafia Radical Game
+description: "A new Flutter project."
 publish_to: 'none'
 version: 1.0.0+2
 
@@ -13,6 +13,8 @@ dependencies:
   flutter_bloc: ^9.1.1
   equatable: ^2.0.5
   shared_preferences: ^2.5.5
+  provider: ^6.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -20,5 +22,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
-
