@@ -95,6 +95,16 @@ class CustomScenarioStore {
     await prefs.setStringList(_key, raw);
   }
 
+  static Future<void> remove(String scenarioId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getStringList(_key) ?? <String>[];
+    raw.removeWhere((item) {
+      final data = jsonDecode(item) as Map<String, dynamic>;
+      return data['id'] == scenarioId;
+    });
+    await prefs.setStringList(_key, raw);
+  }
+
   static Future<bool> create({
     required String ownerId,
     required String name,
@@ -110,11 +120,10 @@ class CustomScenarioStore {
     if (cleanName.isEmpty ||
         playerCount < 6 ||
         playerCount > 20 ||
-        cleanRoles.length != playerCount) {
+        cleanRoles.length != playerCount ||
+        !DiamondManager.canCreateCustomScenario()) {
       return false;
     }
-
-    if (!DiamondManager.canCreateCustomScenario()) return false;
 
     final scenario = CustomScenario(
       id: '${ownerId}_${DateTime.now().microsecondsSinceEpoch}',
@@ -128,9 +137,12 @@ class CustomScenarioStore {
     try {
       await save(scenario);
       final charged = await DiamondManager.chargeForCustomScenario();
-      if (!charged) return false;
-      return true;
+      if (charged) return true;
+
+      await remove(scenario.id);
+      return false;
     } catch (_) {
+      await remove(scenario.id);
       return false;
     }
   }
