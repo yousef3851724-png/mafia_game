@@ -16,6 +16,6 @@ void main() {
     expect(find.byType(MaterialApp), findsOneWidget);
     expect(find.text('انتخاب سناریو و ساخت لابی'), findsOneWidget);
     expect(find.text('سناریوها'), findsOneWidget);
-    expect(find.text('ساخت لابی و شروع بازی'), findsOneWidget);
+    expect(find.byIcon(Icons.play_arrow), findsOneWidget);
   });
 }
