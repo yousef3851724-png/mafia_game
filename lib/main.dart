@@ -814,9 +814,9 @@ class _GameScreenState extends State<GameScreen> {
             onPressed: () async {
               if (won && widget.isRanked) {
                 await SeasonalRanking.addWin();
-                await CoinManager.addCoins(150);
+                await CoinManager.addCoins(20);
               } else if (won && !widget.isRanked) {
-                await CoinManager.addCoins(30);
+                
               }
               if (!mounted) return;
               Navigator.pop(context);
