@@ -1,7 +1,7 @@
 /// کاتالوگ رسمی سناریوهای مافیا رادیکال.
 ///
-/// قوانین ظرفیت و حالت بازی در همین لایه مشخص می‌شوند تا لابی نتواند
-/// سناریوی ۲۰ نفره را به امتیازی تبدیل کند.
+/// سه سناریوی امتیازی ۱۰ نفره در دوستانه هم قابل اجرا هستند، اما
+/// فقط در حالت Ranked امتیازدهی می‌شوند. سناریوی دست‌ساز فقط دوستانه است.
 enum ScenarioFamily { classic, advanced, modern, custom }
 
 enum ScenarioMode { friendly, ranked }
@@ -100,37 +100,37 @@ class ScenarioCatalog {
     ScenarioDefinition(
       id: 'investigator_10',
       title: 'بازپرس',
-      description: 'سناریوی امتیازی استاندارد برای لابی ۱۰ نفره.',
+      description: 'سناریوی ۱۰ نفره که در دوستانه و امتیازی قابل اجراست.',
       family: ScenarioFamily.advanced,
       minPlayers: 10,
       maxPlayers: 10,
       roles: ['مافیا', 'شهروند', 'بازپرس', 'دکتر', 'کارآگاه'],
-      allowedModes: {ScenarioMode.ranked},
+      allowedModes: {ScenarioMode.friendly, ScenarioMode.ranked},
     ),
     ScenarioDefinition(
       id: 'commando_10',
       title: 'تکاور',
-      description: 'سناریوی امتیازی ۱۰ نفره با نقش تکاور.',
+      description: 'سناریوی ۱۰ نفره که در دوستانه و امتیازی قابل اجراست.',
       family: ScenarioFamily.advanced,
       minPlayers: 10,
       maxPlayers: 10,
       roles: ['مافیا', 'شهروند', 'تکاور', 'دکتر', 'کارآگاه'],
-      allowedModes: {ScenarioMode.ranked},
+      allowedModes: {ScenarioMode.friendly, ScenarioMode.ranked},
     ),
     ScenarioDefinition(
       id: 'negotiator_10',
       title: 'مذاکره',
-      description: 'سناریوی امتیازی ۱۰ نفره با تمرکز بر مذاکره.',
+      description: 'سناریوی ۱۰ نفره که در دوستانه و امتیازی قابل اجراست.',
       family: ScenarioFamily.modern,
       minPlayers: 10,
       maxPlayers: 10,
       roles: ['مافیا', 'شهروند', 'مذاکره', 'دکتر', 'کارآگاه'],
-      allowedModes: {ScenarioMode.ranked},
+      allowedModes: {ScenarioMode.friendly, ScenarioMode.ranked},
     ),
     ScenarioDefinition(
       id: 'custom',
       title: 'سناریوی دست‌ساز',
-      description: 'ساخت Deck اختصاصی توسط سازنده لابی؛ به‌صورت پیش‌فرض دوستانه.',
+      description: 'Deck اختصاصی سازنده لابی؛ فقط دوستانه و با هزینه ۵۰ الماس.',
       family: ScenarioFamily.custom,
       minPlayers: 6,
       maxPlayers: 20,
