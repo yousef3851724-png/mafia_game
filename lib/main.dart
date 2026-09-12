@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'features/lobby/round_lobby.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'features/scenarios/scenario_lobby_screen.dart';
 import 'dart:math';
@@ -144,6 +145,8 @@ class LobbyScreen extends StatefulWidget {
 
 class _LobbyScreenState extends State<LobbyScreen> {
   String selectedRole = 'citizen';
+  String selectedGameMode = 'friendly';
+
   final List<Map<String, String>> roles = const [
     {'label': '👤 شهروند', 'value': 'citizen'},
     {'label': '💉 دکتر', 'value': 'doctor'},
@@ -309,6 +312,88 @@ class _LobbyScreenState extends State<LobbyScreen> {
                   ),
                   child: const Text('🏅 Seasonal Ranking',
                       style: TextStyle(fontSize: 16)),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              const Text(
+                '🎮 حالت بازی',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFd4af87),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: ChoiceChip(
+                      label: const Text('🎮 دوستانه'),
+                      selected: selectedGameMode == 'friendly',
+                      onSelected: (selected) {
+                        if (selected) {
+                          setState(() {
+                            selectedGameMode = 'friendly';
+                          });
+                        }
+                      },
+                      backgroundColor: const Color(0xFF2a3448),
+                      selectedColor: const Color(0xFFd4af87),
+                      labelStyle: TextStyle(
+                        color: selectedGameMode == 'friendly'
+                            ? Colors.black
+                            : Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ChoiceChip(
+                      label: const Text('🏆 امتیازی • 100 🪙'),
+                      selected: selectedGameMode == 'ranked',
+                      onSelected: (selected) {
+                        if (selected) {
+                          if (!CoinManager.canPlayRanked()) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'برای ورود به حالت امتیازی حداقل 100 سکه لازم است.',
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
+                          setState(() {
+                            selectedGameMode = 'ranked';
+                          });
+                        }
+                      },
+                      backgroundColor: const Color(0xFF2a3448),
+                      selectedColor: const Color(0xFFd4af87),
+                      labelStyle: TextStyle(
+                        color: selectedGameMode == 'ranked'
+                            ? Colors.black
+                            : Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 8),
+
+              Text(
+                selectedGameMode == 'friendly'
+                    ? 'رایگان • بدون پاداش سکه'
+                    : 'ورود: 100 🪙 • برد: +20 🪙',
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 13,
                 ),
               ),
             ],
@@ -860,6 +945,76 @@ class RankingScreen extends StatelessWidget {
                 style: const TextStyle(fontSize: 18)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+
+class RoundLobbyTestScreen extends StatefulWidget {
+  const RoundLobbyTestScreen({super.key});
+
+  @override
+  State<RoundLobbyTestScreen> createState() => _RoundLobbyTestScreenState();
+}
+
+class _RoundLobbyTestScreenState extends State<RoundLobbyTestScreen> {
+  LobbyGameMode selectedMode = LobbyGameMode.friendly;
+
+  final List<LobbyPlayer> players = const [
+    LobbyPlayer(id: '1', name: 'یوسف', isReady: true),
+    LobbyPlayer(id: '2', name: 'آرش', isReady: true),
+    LobbyPlayer(id: '3', name: 'سینا', isReady: true),
+    LobbyPlayer(id: '4', name: 'نیما'),
+    LobbyPlayer(id: '5', name: 'امیر', isReady: true),
+    LobbyPlayer(id: '6', name: 'رضا'),
+    LobbyPlayer(id: '7', name: 'ماهان', isReady: true),
+    LobbyPlayer(id: '8', name: 'سام'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: RoundLobby(
+        players: players,
+        maxPlayers: 20,
+        gameMode: selectedMode,
+        creatorId: '1',
+        managerId: '2',
+        isCurrentUserCreator: true,
+        isCurrentUserManager: false,
+        onLeaveLobby: () {
+          Navigator.of(context).maybePop();
+        },
+        onStartGame: () {
+          final ranked = selectedMode == LobbyGameMode.ranked;
+
+          if (ranked && !CoinManager.canPlayRanked()) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('برای بازی امتیازی ۱۰۰ سکه لازم است'),
+              ),
+            );
+            return;
+          }
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                ranked
+                    ? 'لابی امتیازی آماده شروع است'
+                    : 'لابی دوستانه آماده شروع است',
+              ),
+            ),
+          );
+        },
+        onSeatTap: (index) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('صندلی شماره ${index + 1}'),
+            ),
+          );
+        },
       ),
     );
   }

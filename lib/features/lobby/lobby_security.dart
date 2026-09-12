@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 /// مدل‌های دسترسی و ناظر هوشمند لابی مافیا رادیکال.
 ///
 /// این لایه عمداً اختیار محدود دارد: ناظر هوشمند فقط تحلیل و پیشنهاد می‌دهد
 /// و تصمیم‌های مدیریتی نهایی در اختیار نقش‌های انسانی مجاز است.
+=======
+/// قوانین امنیتی و مدیریت لابی Mafia Radical.
+///
+/// این لایه مستقل از UI است تا بعداً بتوان آن را به سرور واقعی متصل کرد.
+
+>>>>>>> 508b1ca (fix: upgrade AGP to 8.11.1 and Gradle to 8.13)
 enum LobbyMemberRole {
   creator,
   manager,
@@ -46,8 +53,13 @@ class LobbyModerationResult {
 
 /// ناظر هوشمند محلی.
 ///
+<<<<<<< HEAD
 /// بدون اینترنت و API Key کار می‌کند و فقط نتیجه تحلیل را برمی‌گرداند.
 /// اتصال به سرویس AI سمت سرور می‌تواند بعداً پشت همین قرارداد انجام شود.
+=======
+/// این نسخه بدون اینترنت و بدون API Key کار می‌کند.
+/// بعداً می‌توان همین interface را به سرویس AI سمت سرور متصل کرد.
+>>>>>>> 508b1ca (fix: upgrade AGP to 8.11.1 and Gradle to 8.13)
 class LobbyAiModerator {
   LobbyAiModerator._();
 
@@ -101,6 +113,10 @@ class LobbyAiModerator {
   }
 }
 
+<<<<<<< HEAD
+=======
+/// کنترل دسترسی اعضای لابی.
+>>>>>>> 508b1ca (fix: upgrade AGP to 8.11.1 and Gradle to 8.13)
 class LobbyPermission {
   LobbyPermission._();
 
@@ -109,11 +125,26 @@ class LobbyPermission {
     required String creatorId,
     required String managerId,
   }) {
+<<<<<<< HEAD
     if (playerId == creatorId) return LobbyMemberRole.creator;
     if (playerId == managerId) return LobbyMemberRole.manager;
     return LobbyMemberRole.player;
   }
 
+=======
+    if (playerId == creatorId) {
+      return LobbyMemberRole.creator;
+    }
+
+    if (playerId == managerId) {
+      return LobbyMemberRole.manager;
+    }
+
+    return LobbyMemberRole.player;
+  }
+
+  /// آیا این شخص می‌تواند شخص دیگری را اخراج کند؟
+>>>>>>> 508b1ca (fix: upgrade AGP to 8.11.1 and Gradle to 8.13)
   static bool canKick({
     required String actorId,
     required String targetId,
@@ -125,23 +156,54 @@ class LobbyPermission {
       creatorId: creatorId,
       managerId: managerId,
     );
+<<<<<<< HEAD
+=======
+
+>>>>>>> 508b1ca (fix: upgrade AGP to 8.11.1 and Gradle to 8.13)
     final targetRole = roleOf(
       playerId: targetId,
       creatorId: creatorId,
       managerId: managerId,
     );
 
+<<<<<<< HEAD
     if (targetRole == LobbyMemberRole.creator) return false;
+=======
+    // هیچ‌کس سازنده را نمی‌تواند اخراج کند.
+    if (targetRole == LobbyMemberRole.creator) {
+      return false;
+    }
+
+    // بازیکن عادی نمی‌تواند مدیر را اخراج کند.
+>>>>>>> 508b1ca (fix: upgrade AGP to 8.11.1 and Gradle to 8.13)
     if (targetRole == LobbyMemberRole.manager &&
         actorRole != LobbyMemberRole.creator) {
       return false;
     }
 
+<<<<<<< HEAD
     return actorRole == LobbyMemberRole.creator ||
         (actorRole == LobbyMemberRole.manager &&
             targetRole == LobbyMemberRole.player);
   }
 
+=======
+    // مدیر می‌تواند بازیکن عادی را مدیریت کند.
+    if (actorRole == LobbyMemberRole.manager &&
+        targetRole == LobbyMemberRole.player) {
+      return true;
+    }
+
+    // سازنده اختیار کامل مدیریت اعضا را دارد.
+    if (actorRole == LobbyMemberRole.creator) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /// آیا این شخص می‌تواند هدف را بن کند؟
+>>>>>>> 508b1ca (fix: upgrade AGP to 8.11.1 and Gradle to 8.13)
   static bool canBan({
     required String actorId,
     required String targetId,
@@ -156,6 +218,10 @@ class LobbyPermission {
     );
   }
 
+<<<<<<< HEAD
+=======
+  /// فقط سازنده می‌تواند مدیر جدید تعیین کند.
+>>>>>>> 508b1ca (fix: upgrade AGP to 8.11.1 and Gradle to 8.13)
   static bool canChangeManager({
     required String actorId,
     required String creatorId,
