@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'custom_scenario_system.dart';
 import 'scenario_catalog.dart';
+import 'scenario_game_screen.dart';
 
 class ScenarioLobbyScreen extends StatefulWidget {
   final String ownerId;
@@ -18,6 +19,7 @@ class ScenarioLobbyScreen extends StatefulWidget {
 class _ScenarioLobbyScreenState extends State<ScenarioLobbyScreen> {
   ScenarioMode _mode = ScenarioMode.friendly;
   String? _selectedScenarioId = 'classic';
+  String? _selectedCustomId;
   int _playerCount = 10;
   List<CustomScenario> _customScenarios = const [];
 
@@ -31,23 +33,26 @@ class _ScenarioLobbyScreenState extends State<ScenarioLobbyScreen> {
     await DiamondManager.load();
     final items = await CustomScenarioStore.loadForOwner(widget.ownerId);
     if (!mounted) return;
-    setState(() {
-      _customScenarios = items;
-    });
+    setState(() => _customScenarios = items);
   }
 
   List<ScenarioDefinition> get _availableScenarios =>
       ScenarioCatalog.forMode(_mode);
 
   ScenarioDefinition? get _selectedScenario =>
-      ScenarioCatalog.byId(_selectedScenarioId ?? '');
+      _selectedScenarioId == null ? null : ScenarioCatalog.byId(_selectedScenarioId!);
+
+  CustomScenario? get _selectedCustom => _selectedCustomId == null
+      ? null
+      : _customScenarios.where((item) => item.id == _selectedCustomId).firstOrNull;
 
   void _changeMode(ScenarioMode mode) {
     setState(() {
       _mode = mode;
+      _selectedCustomId = null;
       final scenarios = ScenarioCatalog.forMode(mode);
       _selectedScenarioId = scenarios.isEmpty ? null : scenarios.first.id;
-      if (_selectedScenario?.minPlayers != null) {
+      if (_selectedScenario != null) {
         _playerCount = _selectedScenario!.minPlayers;
       }
     });
@@ -64,38 +69,75 @@ class _ScenarioLobbyScreenState extends State<ScenarioLobbyScreen> {
     await _loadCustomScenarios();
     setState(() {
       _mode = ScenarioMode.friendly;
-      _selectedScenarioId = 'custom_${created.id}';
+      _selectedScenarioId = null;
+      _selectedCustomId = created.id;
       _playerCount = created.playerCount;
     });
   }
 
-  void _startLobby() {
-    final selected = _selectedScenario;
-    final isCustom = selected == null &&
-        _customScenarios.any((item) => 'custom_${item.id}' == _selectedScenarioId);
+  void _selectScenario(ScenarioDefinition scenario) {
+    setState(() {
+      _selectedCustomId = null;
+      _selectedScenarioId = scenario.id;
+      _playerCount = scenario.minPlayers;
+    });
+  }
 
-    if (!isCustom && selected == null) {
+  void _selectCustom(CustomScenario scenario) {
+    setState(() {
+      _mode = ScenarioMode.friendly;
+      _selectedScenarioId = null;
+      _selectedCustomId = scenario.id;
+      _playerCount = scenario.playerCount;
+    });
+  }
+
+  void _startGame() {
+    final custom = _selectedCustom;
+    final selected = _selectedScenario;
+
+    if (custom == null && selected == null) {
       _showMessage('ابتدا یک سناریو انتخاب کنید.');
       return;
     }
 
-    if (!isCustom &&
-        !ScenarioCatalog.canStart(
-          scenarioId: selected!.id,
-          mode: _mode,
-          playerCount: _playerCount,
-        )) {
+    if (custom != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ScenarioGameScreen(
+            customScenario: custom,
+            mode: ScenarioMode.friendly,
+            playerCount: custom.playerCount,
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (!ScenarioCatalog.canStart(
+      scenarioId: selected!.id,
+      mode: _mode,
+      playerCount: _playerCount,
+    )) {
       _showMessage('تعداد بازیکن با ظرفیت این سناریو هماهنگ نیست.');
       return;
     }
 
     if (_mode == ScenarioMode.ranked && _playerCount != 10) {
-      _showMessage('تمام بازی‌های امتیازی دقیقاً ۱۰ نفره هستند.');
+      _showMessage('بازی امتیازی دقیقاً ۱۰ نفره است.');
       return;
     }
 
-    _showMessage(
-      'لابی آماده شد: ${isCustom ? 'سناریوی دست‌ساز' : selected!.title} | $_playerCount نفر | ${_mode == ScenarioMode.ranked ? 'امتیازی' : 'دوستانه'}',
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ScenarioGameScreen(
+          scenario: selected,
+          mode: _mode,
+          playerCount: _playerCount,
+        ),
+      ),
     );
   }
 
@@ -106,6 +148,9 @@ class _ScenarioLobbyScreenState extends State<ScenarioLobbyScreen> {
   @override
   Widget build(BuildContext context) {
     final selected = _selectedScenario;
+    final custom = _selectedCustom;
+    final minPlayers = custom?.playerCount ?? selected?.minPlayers ?? 6;
+    final maxPlayers = custom?.playerCount ?? selected?.maxPlayers ?? 20;
 
     return Scaffold(
       appBar: AppBar(
@@ -113,9 +158,7 @@ class _ScenarioLobbyScreenState extends State<ScenarioLobbyScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Center(
-              child: Text('💎 ${DiamondManager.balance}'),
-            ),
+            child: Center(child: Text('💎 ${DiamondManager.balance}')),
           ),
         ],
       ),
@@ -124,39 +167,42 @@ class _ScenarioLobbyScreenState extends State<ScenarioLobbyScreen> {
         children: [
           _ModeSelector(mode: _mode, onChanged: _changeMode),
           const SizedBox(height: 16),
-          const Text(
-            'سناریوها',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
+          const Text('سناریوها', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           ..._availableScenarios.map(_scenarioCard),
           const SizedBox(height: 8),
           _customBuilderCard(),
           if (_customScenarios.isNotEmpty) ...[
             const SizedBox(height: 16),
-            const Text(
-              'سناریوهای دست‌ساز من',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            const Text('سناریوهای دست‌ساز من', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             ..._customScenarios.map(_customScenarioCard),
           ],
           const SizedBox(height: 20),
-          if (selected != null) ...[
+          if (custom != null)
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.bookmark),
+                title: Text(custom.name),
+                subtitle: Text('${custom.playerCount} نفر • دوستانه • Deck اختصاصی'),
+              ),
+            )
+          else if (selected != null) ...[
             Text('ظرفیت: ${selected.minPlayers} تا ${selected.maxPlayers} نفر'),
-            Slider(
-              value: _playerCount.toDouble().clamp(
-                    selected.minPlayers.toDouble(),
-                    selected.maxPlayers.toDouble(),
-                  ),
-              min: selected.minPlayers.toDouble(),
-              max: selected.maxPlayers.toDouble(),
-              divisions: selected.maxPlayers - selected.minPlayers,
-              label: '$_playerCount نفر',
-              onChanged: (value) => setState(() {
-                _playerCount = value.round();
-              }),
-            ),
+            if (selected.minPlayers != selected.maxPlayers)
+              Slider(
+                value: _playerCount.toDouble().clamp(
+                  selected.minPlayers.toDouble(),
+                  selected.maxPlayers.toDouble(),
+                ),
+                min: selected.minPlayers.toDouble(),
+                max: selected.maxPlayers.toDouble(),
+                divisions: selected.maxPlayers - selected.minPlayers,
+                label: '$_playerCount نفر',
+                onChanged: (value) => setState(() => _playerCount = value.round()),
+              )
+            else
+              Text('تعداد ثابت: $_playerCount نفر'),
           ],
           if (_mode == ScenarioMode.ranked)
             const Card(
@@ -167,9 +213,9 @@ class _ScenarioLobbyScreenState extends State<ScenarioLobbyScreen> {
             ),
           const SizedBox(height: 12),
           FilledButton.icon(
-            onPressed: _startLobby,
+            onPressed: _startGame,
             icon: const Icon(Icons.play_arrow),
-            label: const Text('ساخت و ورود به لابی'),
+            label: Text(custom == null ? 'ساخت لابی و شروع بازی' : 'شروع سناریوی دست‌ساز'),
           ),
         ],
       ),
@@ -177,22 +223,17 @@ class _ScenarioLobbyScreenState extends State<ScenarioLobbyScreen> {
   }
 
   Widget _scenarioCard(ScenarioDefinition scenario) {
-    final selected = _selectedScenarioId == scenario.id;
+    final selected = _selectedScenarioId == scenario.id && _selectedCustomId == null;
     return Card(
       child: ListTile(
         selected: selected,
         leading: Icon(
-          scenario.family == ScenarioFamily.modern
-              ? Icons.auto_awesome
-              : Icons.style,
+          scenario.family == ScenarioFamily.modern ? Icons.auto_awesome : Icons.style,
         ),
         title: Text(scenario.title),
         subtitle: Text(scenario.description),
         trailing: Text('${scenario.minPlayers}-${scenario.maxPlayers}'),
-        onTap: () => setState(() {
-          _selectedScenarioId = scenario.id;
-          _playerCount = scenario.minPlayers;
-        }),
+        onTap: () => _selectScenario(scenario),
       ),
     );
   }
@@ -210,17 +251,14 @@ class _ScenarioLobbyScreenState extends State<ScenarioLobbyScreen> {
   }
 
   Widget _customScenarioCard(CustomScenario scenario) {
-    final selected = _selectedScenarioId == 'custom_${scenario.id}';
+    final selected = _selectedCustomId == scenario.id;
     return Card(
       child: ListTile(
         selected: selected,
         leading: const Icon(Icons.bookmark),
         title: Text(scenario.name),
         subtitle: Text('${scenario.playerCount} نفر • دوستانه • ذخیره‌شده برای شما'),
-        onTap: () => setState(() {
-          _selectedScenarioId = 'custom_${scenario.id}';
-          _playerCount = scenario.playerCount;
-        }),
+        onTap: () => _selectCustom(scenario),
       ),
     );
   }
@@ -235,38 +273,44 @@ class CustomScenarioBuilderScreen extends StatefulWidget {
   });
 
   @override
-  State<CustomScenarioBuilderScreen> createState() =>
-      _CustomScenarioBuilderScreenState();
+  State<CustomScenarioBuilderScreen> createState() => _CustomScenarioBuilderScreenState();
 }
 
-class _CustomScenarioBuilderScreenState
-    extends State<CustomScenarioBuilderScreen> {
+class _CustomScenarioBuilderScreenState extends State<CustomScenarioBuilderScreen> {
   final _nameController = TextEditingController();
   int _playerCount = 10;
-  late List<String> _roles;
+  late List<TextEditingController> _roleControllers;
 
   @override
   void initState() {
     super.initState();
-    _roles = List<String>.filled(_playerCount, 'شهروند');
+    _roleControllers = List.generate(
+      _playerCount,
+      (_) => TextEditingController(text: 'شهروند'),
+    );
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    for (final controller in _roleControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
   void _resizeRoles(int count) {
-    final next = List<String>.from(_roles);
-    if (next.length < count) {
-      next.addAll(List<String>.filled(count - next.length, 'شهروند'));
-    } else {
-      next.removeRange(count, next.length);
+    final old = _roleControllers;
+    final next = <TextEditingController>[];
+    for (int i = 0; i < count; i++) {
+      next.add(i < old.length ? old[i] : TextEditingController(text: 'شهروند'));
+    }
+    for (int i = count; i < old.length; i++) {
+      old[i].dispose();
     }
     setState(() {
       _playerCount = count;
-      _roles = next;
+      _roleControllers = next;
     });
   }
 
@@ -276,38 +320,30 @@ class _CustomScenarioBuilderScreenState
       _show('نام سناریو را وارد کنید.');
       return;
     }
-
     if (!DiamondManager.canCreateCustomScenario()) {
       _show('برای ساخت سناریوی دست‌ساز حداقل ۵۰ الماس لازم است.');
       return;
     }
 
-    final before = DiamondManager.balance;
     final success = await CustomScenarioStore.create(
       ownerId: widget.ownerId,
       name: name,
       playerCount: _playerCount,
-      roles: _roles,
+      roles: _roleControllers.map((controller) => controller.text).toList(),
     );
 
     if (!mounted) return;
-    if (success) {
-      final items = await CustomScenarioStore.loadForOwner(widget.ownerId);
-      final created = items.isNotEmpty
-          ? items.last
-          : CustomScenario(
-              id: '',
-              ownerId: widget.ownerId,
-              name: name,
-              playerCount: _playerCount,
-              roles: List<String>.from(_roles),
-              createdAt: DateTime.now(),
-            );
-      _show('سناریو ساخته شد و ۵۰ الماس از $before به ${DiamondManager.balance} رسید.');
-      Navigator.pop(context, created);
-    } else {
+    if (!success) {
       _show('ساخت سناریو انجام نشد؛ الماس شما کسر نشد.');
+      return;
     }
+
+    final items = await CustomScenarioStore.loadForOwner(widget.ownerId);
+    final created = items.firstWhere(
+      (item) => item.name == name,
+      orElse: () => items.last,
+    );
+    Navigator.pop(context, created);
   }
 
   void _show(String message) {
@@ -330,8 +366,8 @@ class _CustomScenarioBuilderScreenState
                   const Text('💎 هزینه ساخت: ۵۰ الماس'),
                   const SizedBox(height: 4),
                   Text('موجودی: ${DiamondManager.balance} الماس'),
-                  const SizedBox(height: 12),
-                  const Text('این سناریو فقط در حالت دوستانه قابل استفاده است.'),
+                  const SizedBox(height: 8),
+                  const Text('سناریوی دست‌ساز فقط در حالت دوستانه قابل استفاده است.'),
                 ],
               ),
             ),
@@ -355,21 +391,17 @@ class _CustomScenarioBuilderScreenState
             onChanged: (value) => _resizeRoles(value.round()),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Deck نقش‌ها',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+          const Text('Deck نقش‌ها', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          for (int i = 0; i < _roles.length; i++)
+          for (int i = 0; i < _roleControllers.length; i++)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: TextField(
-                controller: TextEditingController(text: _roles[i]),
+                controller: _roleControllers[i],
                 decoration: InputDecoration(
                   labelText: 'نقش ${i + 1}',
                   border: const OutlineInputBorder(),
                 ),
-                onChanged: (value) => _roles[i] = value,
               ),
             ),
           const SizedBox(height: 12),
@@ -409,4 +441,8 @@ class _ModeSelector extends StatelessWidget {
       onSelectionChanged: (value) => onChanged(value.first),
     );
   }
+}
+
+extension _FirstOrNull<T> on Iterable<T> {
+  T? get firstOrNull => isEmpty ? null : first;
 }
