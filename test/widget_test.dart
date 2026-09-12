@@ -6,8 +6,9 @@ void main() {
     await tester.pumpWidget(const MafiaGame());
     await tester.pump();
 
-    expect(find.text('انتخاب سناریو و ساخت لابی'), findsOneWidget);
-    expect(find.text('سناریوها'), findsOneWidget);
-    expect(find.text('ساخت لابی و شروع بازی'), findsOneWidget);
+    expect(find.text('Mafia Radical'), findsOneWidget);
+    expect(find.text('Welcome to Mafia Game!'), findsOneWidget);
+    expect(find.text('🎮 Friendly Game (Free)'), findsOneWidget);
+    expect(find.text('🏆 Ranked Game (100 Coins)'), findsOneWidget);
   });
 }
