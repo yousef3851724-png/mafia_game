@@ -19,11 +19,11 @@ class VictoryScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.emoji_events, size: 100, color: color),
+            Icon(Icons.emoji_events, size: 100, color: color),
             const SizedBox(height: 24),
             Text(title, style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: color)),
             const SizedBox(height: 20),
-            Text('بازیکنان:', style: const TextStyle(fontSize: 18)),
+            const Text('بازیکنان:', style: TextStyle(fontSize: 18)),
             Expanded(
               child: ListView.builder(
                 itemCount: players.length,
