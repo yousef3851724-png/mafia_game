@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'features/scenarios/scenario_lobby_screen.dart';
 import 'dart:math';
 
 void main() async {
@@ -22,7 +23,7 @@ class MafiaGame extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFF0a0e14),
         primaryColor: const Color(0xFFd4af87),
       ),
-      home: const LobbyScreen(),
+      home: const ScenarioLobbyScreen(ownerId: 'local_creator'),
     );
   }
 }
