@@ -157,19 +157,27 @@ class _ScenarioGameScreenState extends State<ScenarioGameScreen> {
   void _runBotNightActions({bool skipUser = false}) {
     final living = _alive;
     final mafia = living.where((p) => _mafia(p.role)).toList();
+
+    // Resolve protection before attacks so bot doctors/guards can actually
+    // save the mafia's target during the same night.
+    for (final bot in living.where((p) => !p.isUser && !_blocked(p))) {
+      if (bot.role == 'دکتر' || bot.role == 'محافظ') {
+        final c = _alive; if (c.isNotEmpty) _protectedNextNight.add(c[_random.nextInt(c.length)].name);
+      } else if (bot.role == 'تکاور' && !_abilityUsedThisRound) {
+        _protectedNextNight.add(bot.name);
+      }
+    }
+
     if (mafia.isNotEmpty && !(skipUser && _mafia(_user.role))) {
       final candidates = living.where((p) => !_mafia(p.role) && !p.isUser).toList();
       if (candidates.isNotEmpty) _nightKill(candidates[_random.nextInt(candidates.length)]);
     }
+
     for (final bot in living.where((p) => !p.isUser && !_blocked(p))) {
-      if (bot.role == 'دکتر' || bot.role == 'محافظ') {
-        final c = _alive; if (c.isNotEmpty) _protectedNextNight.add(c[_random.nextInt(c.length)].name);
-      } else if (bot.role == 'کارآگاه' || bot.role == 'بازپرس') {
+      if (bot.role == 'کارآگاه' || bot.role == 'بازپرس') {
         if (_alive.length > 1) _investigate(_alive[_random.nextInt(_alive.length)]);
       } else if (bot.role == 'روانشناس') {
         final c = _alive.where((p) => p != bot).toList(); if (c.isNotEmpty) _silencedNextDay.add(c[_random.nextInt(c.length)].name);
-      } else if (bot.role == 'تکاور' && !_abilityUsedThisRound) {
-        _protectedNextNight.add(bot.name);
       } else if (bot.role == 'تک‌تیرانداز' && !_sniperShotUsed) {
         final c = _alive.where((p) => p != bot && !_hunter(p.role)).toList(); if (c.isNotEmpty) { _sniperShotUsed = true; _nightKill(c[_random.nextInt(c.length)]); }
       } else if (bot.role == 'شکارچی ارشد' && !_hunterMasterUsed) {
@@ -197,11 +205,35 @@ class _ScenarioGameScreenState extends State<ScenarioGameScreen> {
 
   void _resolveVote() {
     final selected = _target;
-    if (selected == null) { _result = 'رأی‌گیری بدون انتخاب هدف انجام شد.'; }
-    else {
+    if (selected == null) {
+      _result = 'رأی‌گیری بدون انتخاب هدف انجام شد.';
+    } else {
       final target = _players.firstWhere((p) => p.name == selected);
-      if (!target.alive) _result = 'هدف انتخاب‌شده دیگر زنده نیست.';
-      else { target.voteWeight = _has('شهردار', _user) ? 2 : 1; target.alive = false; _result = '${target.name} با رأی‌گیری از بازی خارج شد.'; }
+      if (!target.alive) {
+        _result = 'هدف انتخاب‌شده دیگر زنده نیست.';
+      } else {
+        final candidates = _alive.where((p) => !p.isUser).toList();
+        final voteCounts = <String, int>{for (final p in candidates) p.name: 0};
+
+        // The user's vote counts normally as one, or two when the user is the mayor.
+        voteCounts[selected] = (voteCounts[selected] ?? 0) + (_has('شهردار', _user) ? 2 : 1);
+
+        // Bots cast one vote each. A bot never votes for itself and respects silence.
+        for (final bot in _alive.where((p) => !p.isUser && !_silencedNextDay.contains(p.name))) {
+          final options = candidates.where((p) => p.name != bot.name).toList();
+          if (options.isEmpty) continue;
+          final choice = options[_random.nextInt(options.length)];
+          voteCounts[choice.name] = (voteCounts[choice.name] ?? 0) + 1;
+        }
+
+        final maxVotes = voteCounts.values.reduce(max);
+        final leaders = voteCounts.entries.where((entry) => entry.value == maxVotes).map((entry) => entry.key).toList();
+        final eliminatedName = leaders[_random.nextInt(leaders.length)];
+        final eliminated = _players.firstWhere((p) => p.name == eliminatedName);
+        eliminated.alive = false;
+        eliminated.voteWeight = voteCounts[eliminatedName] ?? 0;
+        _result = '${eliminated.name} با ${eliminated.voteWeight} رأی از بازی خارج شد.';
+      }
     }
     _target = null; _silencedNextDay.clear(); _phase = _Phase.dayResult; setState(() {}); _checkWinner();
   }
