@@ -32,7 +32,6 @@ class MafiaRadicalApp extends StatelessWidget {
         useMaterial3: true,
         colorScheme: scheme,
         scaffoldBackgroundColor: background,
-        fontFamily: 'sans',
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.transparent,
           foregroundColor: Colors.white,
@@ -55,7 +54,7 @@ class MafiaRadicalApp extends StatelessWidget {
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
             backgroundColor: gold,
-            foregroundColor: const Color(0xFF17100A),
+            foregroundColor: Color(0xFF17100A),
             minimumSize: const Size.fromHeight(52),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
@@ -79,7 +78,7 @@ class MafiaRadicalApp extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: gold.withValues(alpha: .7), width: 1.5),
+            borderSide: BorderSide(color: gold.withOpacity(.7), width: 1.5),
           ),
         ),
       ),
