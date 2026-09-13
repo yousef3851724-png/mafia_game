@@ -10,14 +10,14 @@ class MafiaRadicalLogo extends StatefulWidget {
 
 class _MafiaRadicalLogoState extends State<MafiaRadicalLogo>
     with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
+  late final AnimationController _pulseController;
 
   @override
   void initState() {
     super.initState();
     _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1600),
+      duration: const Duration(milliseconds: 1800),
     )..repeat(reverse: true);
   }
 
@@ -32,7 +32,7 @@ class _MafiaRadicalLogoState extends State<MafiaRadicalLogo>
     return AnimatedBuilder(
       animation: _pulseController,
       builder: (context, child) {
-        final glow = _pulseController.value;
+        final glow = Curves.easeInOut.transform(_pulseController.value);
         return Container(
           width: widget.size,
           height: widget.size,
@@ -40,15 +40,17 @@ class _MafiaRadicalLogoState extends State<MafiaRadicalLogo>
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.redAccent.withOpacity(0.3 + (glow * 0.4)),
-                blurRadius: 20 + (glow * 10),
-                spreadRadius: 2 + (glow * 4),
+                color: const Color(0xFFE3B873).withOpacity(.12 + glow * .18),
+                blurRadius: 22 + glow * 10,
+                spreadRadius: 1 + glow * 3,
+              ),
+              BoxShadow(
+                color: const Color(0xFF9E263D).withOpacity(.10 + glow * .12),
+                blurRadius: 28,
               ),
             ],
           ),
-          child: CustomPaint(
-            painter: _RadicalLogoPainter(glowValue: glow),
-          ),
+          child: CustomPaint(painter: _RadicalLogoPainter(glowValue: glow)),
         );
       },
     );
@@ -57,68 +59,61 @@ class _MafiaRadicalLogoState extends State<MafiaRadicalLogo>
 
 class _RadicalLogoPainter extends CustomPainter {
   final double glowValue;
-  _RadicalLogoPainter({required this.glowValue});
+  const _RadicalLogoPainter({required this.glowValue});
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
+    final rect = Rect.fromCircle(center: center, radius: radius);
 
-    // پس‌زمینه نشان
     final bgPaint = Paint()
       ..shader = const RadialGradient(
-        colors: [Color(0xFF2B080C), Color(0xFF100305)],
-      ).createShader(Rect.fromCircle(center: center, radius: radius));
+        colors: [Color(0xFF2A2118), Color(0xFF0B0C11)],
+      ).createShader(rect);
     canvas.drawCircle(center, radius, bgPaint);
 
-    // حلقه بیرونی درخشان
-    final borderPaint = Paint()
+    final outer = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0
+      ..strokeWidth = 2.4 + glowValue * .8
       ..shader = const SweepGradient(
-        colors: [Colors.redAccent, Colors.amber, Colors.deepOrangeAccent, Colors.redAccent],
-      ).createShader(Rect.fromCircle(center: center, radius: radius));
-    canvas.drawCircle(center, radius - 2, borderPaint);
+        colors: [Color(0xFFE3B873), Color(0xFF9E263D), Color(0xFFFFDFA0), Color(0xFFE3B873)],
+      ).createShader(rect);
+    canvas.drawCircle(center, radius - 2.5, outer);
 
-    // کلاه و نماد مافیا
-    final hatPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
+    final inner = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1
+      ..color = const Color(0x55E3B873);
+    canvas.drawCircle(center, radius * .82, inner);
 
     final w = size.width;
     final h = size.height;
+    final hat = Paint()..color = const Color(0xFFF2E7D0);
+    final hatPath = Path()
+      ..moveTo(w * .20, h * .53)
+      ..quadraticBezierTo(w * .50, h * .43, w * .80, h * .53)
+      ..quadraticBezierTo(w * .50, h * .60, w * .20, h * .53)
+      ..moveTo(w * .31, h * .51)
+      ..lineTo(w * .35, h * .31)
+      ..quadraticBezierTo(w * .50, h * .35, w * .65, h * .31)
+      ..lineTo(w * .69, h * .51)
+      ..close();
+    canvas.drawPath(hatPath, hat);
 
-    // لبه کلاه
-    final hatPath = Path();
-    hatPath.moveTo(w * 0.22, h * 0.52);
-    hatPath.quadraticBezierTo(w * 0.5, h * 0.44, w * 0.78, h * 0.52);
-    hatPath.quadraticBezierTo(w * 0.5, h * 0.58, w * 0.22, h * 0.52);
+    final ribbon = Paint()
+      ..color = const Color(0xFF9E263D)
+      ..strokeWidth = 2.8
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(Offset(w * .33, h * .48), Offset(w * .67, h * .48), ribbon);
 
-    // تاج کلاه
-    hatPath.moveTo(w * 0.32, h * 0.50);
-    hatPath.lineTo(w * 0.36, h * 0.32);
-    hatPath.quadraticBezierTo(w * 0.5, h * 0.35, w * 0.64, h * 0.32);
-    hatPath.lineTo(w * 0.68, h * 0.50);
-
-    canvas.drawPath(hatPath, hatPaint);
-
-    // نوار قرمز کلاه
-    final ribbonPaint = Paint()
-      ..color = Colors.redAccent
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5;
-    canvas.drawLine(Offset(w * 0.33, h * 0.48), Offset(w * 0.67, h * 0.48), ribbonPaint);
-
-    // قطره خون رادیکال
-    final bloodPaint = Paint()
-      ..color = const Color(0xFFFF1744)
-      ..style = PaintingStyle.fill;
-
-    final dropPath = Path();
-    dropPath.moveTo(w * 0.5, h * 0.62);
-    dropPath.quadraticBezierTo(w * 0.44, h * 0.73, w * 0.5, h * 0.78);
-    dropPath.quadraticBezierTo(w * 0.56, h * 0.73, w * 0.5, h * 0.62);
-    canvas.drawPath(dropPath, bloodPaint);
+    final drop = Paint()..color = const Color(0xFFED4D67);
+    final dropPath = Path()
+      ..moveTo(w * .50, h * .61)
+      ..quadraticBezierTo(w * .43, h * .73, w * .50, h * .79)
+      ..quadraticBezierTo(w * .57, h * .73, w * .50, h * .61)
+      ..close();
+    canvas.drawPath(dropPath, drop);
   }
 
   @override
