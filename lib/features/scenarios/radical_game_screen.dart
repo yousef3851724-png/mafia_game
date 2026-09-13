@@ -44,7 +44,7 @@ class RadicalGameScreen extends StatelessWidget {
       child: Row(children: [
         IconButton(
           onPressed: () => Navigator.maybePop(context),
-          style: IconButton.styleFrom(backgroundColor: RadicalTheme.panel.withOpacity(.92), foregroundColor: Colors.white),
+          style: IconButton.styleFrom(backgroundColor: RadicalTheme.panel.withValues(alpha: .92), foregroundColor: Colors.white),
           icon: const Icon(Icons.close_rounded),
         ),
         const SizedBox(width: 8),
@@ -70,7 +70,7 @@ class RadicalGameScreen extends StatelessWidget {
             Positioned.fill(child: CustomPaint(painter: _TablePainter())),
             Container(
               width: compact ? 104 : 128, height: compact ? 104 : 128,
-              decoration: BoxDecoration(shape: BoxShape.circle, color: RadicalTheme.ink, border: Border.all(color: RadicalTheme.gold.withOpacity(.48), width: 1.5), boxShadow: [BoxShadow(color: RadicalTheme.gold.withOpacity(.08), blurRadius: 28, spreadRadius: 5), BoxShadow(color: Colors.black.withOpacity(.6), blurRadius: 24)]),
+              decoration: BoxDecoration(shape: BoxShape.circle, color: RadicalTheme.ink, border: Border.all(color: RadicalTheme.gold.withValues(alpha: .48), width: 1.5), boxShadow: [BoxShadow(color: RadicalTheme.gold.withValues(alpha: .08), blurRadius: 28, spreadRadius: 5), BoxShadow(color: Colors.black.withValues(alpha: .6), blurRadius: 24)]),
               child: const Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                 Text('RADICAL', style: TextStyle(color: RadicalTheme.gold, fontWeight: FontWeight.w900, letterSpacing: 3, fontSize: 15)),
                 SizedBox(height: 4),
@@ -91,9 +91,9 @@ class RadicalGameScreen extends StatelessWidget {
   Widget _phaseBanner() => Container(
     width: double.infinity,
     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF211A14), Color(0xFF11151E)]), borderRadius: BorderRadius.circular(20), border: Border.all(color: RadicalTheme.gold.withOpacity(.20))),
+    decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF211A14), Color(0xFF11151E)]), borderRadius: BorderRadius.circular(20), border: Border.all(color: RadicalTheme.gold.withValues(alpha: .20))),
     child: Row(children: [
-      Container(width: 42, height: 42, decoration: BoxDecoration(shape: BoxShape.circle, color: RadicalTheme.gold.withOpacity(.10)), child: const Icon(Icons.nights_stay_rounded, color: RadicalTheme.gold)),
+      Container(width: 42, height: 42, decoration: BoxDecoration(shape: BoxShape.circle, color: RadicalTheme.gold.withValues(alpha: .10)), child: const Icon(Icons.nights_stay_rounded, color: RadicalTheme.gold)),
       const SizedBox(width: 12),
       const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('آماده شروع بازی', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
@@ -132,14 +132,14 @@ class RadicalGameScreen extends StatelessWidget {
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [accent.withOpacity(.95), const Color(0xFF171B25)]),
-          boxShadow: [BoxShadow(color: accent.withOpacity(.20), blurRadius: 16, spreadRadius: 1)],
+          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [accent.withValues(alpha: .95), const Color(0xFF171B25)]),
+          boxShadow: [BoxShadow(color: accent.withValues(alpha: .20), blurRadius: 16, spreadRadius: 1)],
         ),
-        child: ClipOval(child: RealisticAvatar(role: 'شهروند', female: female, size: 54, alive: true)),
+        child: ClipOval(child: RealisticAvatar(role: 'شهروند', female: female, size: 54)),
       ),
       const SizedBox(height: 4),
       Row(mainAxisSize: MainAxisSize.min, children: [
-        Container(width: 15, height: 15, decoration: BoxDecoration(shape: BoxShape.circle, color: RadicalTheme.panel2, border: Border.all(color: accent.withOpacity(.45))), child: Center(child: Text('$number', style: TextStyle(fontSize: 8, color: accent, fontWeight: FontWeight.w900)))),
+        Container(width: 15, height: 15, decoration: BoxDecoration(shape: BoxShape.circle, color: RadicalTheme.panel2, border: Border.all(color: accent.withValues(alpha: .45))), child: Center(child: Text('$number', style: TextStyle(fontSize: 8, color: accent, fontWeight: FontWeight.w900)))),
         const SizedBox(width: 4),
         Text(name, style: TextStyle(fontSize: 9, fontWeight: user ? FontWeight.w900 : FontWeight.w600, color: user ? RadicalTheme.goldBright : Colors.white)),
       ]),
@@ -172,7 +172,7 @@ class RadicalGameScreen extends StatelessWidget {
 
   Widget _bottomLaunch(BuildContext context) => Container(
     padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
-    decoration: BoxDecoration(color: RadicalTheme.panel.withOpacity(.98), border: Border(top: BorderSide(color: RadicalTheme.line)), boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 24, offset: Offset(0, -8))]),
+    decoration: BoxDecoration(color: RadicalTheme.panel.withValues(alpha: .98), border: Border(top: BorderSide(color: RadicalTheme.line)), boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 24, offset: Offset(0, -8))]),
     child: Column(mainAxisSize: MainAxisSize.min, children: [
       Row(children: [
         const Icon(Icons.lock_outline_rounded, size: 16, color: RadicalTheme.smoke),
@@ -202,7 +202,7 @@ class _Atmosphere extends StatelessWidget {
 class _GlowPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final p = Paint()..shader = RadialGradient(colors: [RadicalTheme.crimson.withOpacity(.10), Colors.transparent]).createShader(Rect.fromCircle(center: Offset(size.width * .50, size.height * .43), radius: size.width * .65));
+    final p = Paint()..shader = RadialGradient(colors: [RadicalTheme.crimson.withValues(alpha: .10), Colors.transparent]).createShader(Rect.fromCircle(center: Offset(size.width * .50, size.height * .43), radius: size.width * .65));
     canvas.drawCircle(Offset(size.width * .50, size.height * .43), size.width * .65, p);
   }
   @override
@@ -214,8 +214,8 @@ class _TablePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final c = Offset(size.width / 2, size.height / 2);
     final r = size.shortestSide * .34;
-    final ring = Paint()..style = PaintingStyle.stroke..strokeWidth = 2..color = RadicalTheme.gold.withOpacity(.12);
-    final ring2 = Paint()..style = PaintingStyle.stroke..strokeWidth = 1..color = RadicalTheme.crimson.withOpacity(.13);
+    final ring = Paint()..style = PaintingStyle.stroke..strokeWidth = 2..color = RadicalTheme.gold.withValues(alpha: .12);
+    final ring2 = Paint()..style = PaintingStyle.stroke..strokeWidth = 1..color = RadicalTheme.crimson.withValues(alpha: .13);
     canvas.drawCircle(c, r, ring);
     canvas.drawCircle(c, r + 30, ring2);
     canvas.drawCircle(c, r + 55, ring2);
