@@ -44,6 +44,9 @@ jobs:
       - name: Build release APK
         run: flutter build apk --release
 
+      - name: Verify release APK
+        run: test -s build/app/outputs/flutter-apk/app-release.apk
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
