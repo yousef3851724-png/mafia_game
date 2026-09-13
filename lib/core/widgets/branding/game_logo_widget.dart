@@ -56,14 +56,12 @@ class _MafiaRadicalLogoState extends State<MafiaRadicalLogo>
               borderRadius: BorderRadius.circular(widget.size * .47),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFE3B873)
-                      .withOpacity(.12 + glow * .18),
+                  color: const Color(0xFFE3B873).withOpacity(.12 + glow * .18),
                   blurRadius: 22 + glow * 10,
                   spreadRadius: 1 + glow * 3,
                 ),
                 BoxShadow(
-                  color: const Color(0xFF9E263D)
-                      .withOpacity(.10 + glow * .12),
+                  color: const Color(0xFF9E263D).withOpacity(.10 + glow * .12),
                   blurRadius: 28,
                 ),
               ],
@@ -97,22 +95,18 @@ class _RadicalLogoPainter extends CustomPainter {
     final center = Offset(w / 2, h / 2);
     final radius = size.shortestSide * .46;
 
-    // نشان تقریباً دایره‌ای است؛ فقط کمی ارتفاع بیشتری دارد.
     final badgeRect = Rect.fromCenter(
       center: center,
       width: radius * 2.0,
       height: radius * 2.06,
     );
 
-    // پس‌زمینه بر اساس سناریو قابل تعویض است.
     final bgPaint = Paint()
       ..shader = _scenarioGradient(scenario, badgeRect);
     canvas.drawOval(badgeRect, bgPaint);
 
-    // جزئیات تصویری ساده و سبک متناسب با سناریو.
     _drawScenarioDetails(canvas, badgeRect, scenario, glowValue);
 
-    // حاشیه گرادیانی نشان.
     final borderPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.4 + glowValue * .8
@@ -139,7 +133,6 @@ class _RadicalLogoPainter extends CustomPainter {
       inner,
     );
 
-    // کلاه.
     final hat = Paint()..color = const Color(0xFFF2E7D0);
     final hatPath = Path()
       ..moveTo(w * .20, h * .53)
@@ -152,7 +145,6 @@ class _RadicalLogoPainter extends CustomPainter {
       ..close();
     canvas.drawPath(hatPath, hat);
 
-    // نوار قرمز کلاه.
     final ribbon = Paint()
       ..color = const Color(0xFF9E263D)
       ..strokeWidth = 2.8
@@ -163,7 +155,6 @@ class _RadicalLogoPainter extends CustomPainter {
       ribbon,
     );
 
-    // قطره خون رادیکال.
     final drop = Paint()..color = const Color(0xFFED4D67);
     final dropPath = Path()
       ..moveTo(w * .50, h * .61)
