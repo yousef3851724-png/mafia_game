@@ -9,7 +9,7 @@ void main() {
     TestWidgetsFlutterBinding.ensureInitialized();
     SharedPreferences.setMockInitialValues({});
 
-    await tester.pumpWidget(const MafiaGame());
+    await tester.pumpWidget(const MafiaRadicalApp());
     await tester.pumpAndSettle();
 
     expect(find.byType(MaterialApp), findsOneWidget);
