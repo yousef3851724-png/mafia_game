@@ -10,7 +10,10 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     await tester.pumpWidget(const MafiaRadicalApp());
-    await tester.pumpAndSettle();
+    // The cinematic home intentionally contains repeating animations, so
+    // pumpAndSettle() would wait forever. A bounded frame is enough for this
+    // smoke test to verify that the app mounts and builds without exceptions.
+    await tester.pump(const Duration(milliseconds: 250));
 
     expect(find.byType(MaterialApp), findsOneWidget);
     expect(find.byType(Scaffold), findsOneWidget);
