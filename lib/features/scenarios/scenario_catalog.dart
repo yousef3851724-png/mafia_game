@@ -2,7 +2,7 @@
 ///
 /// سناریوهای دوستانه برای بازی آزاد هستند و سناریوهای ۱۰ نفره
 /// می‌توانند در حالت Ranked نیز فعال باشند.
-enum ScenarioFamily { classic, advanced, modern, custom }
+enum ScenarioFamily { classic, advanced, modern, custom, hunter }
 
 enum ScenarioMode { friendly, ranked }
 
@@ -85,6 +85,16 @@ class ScenarioCatalog {
       minPlayers: 12,
       maxPlayers: 20,
       roles: ['مافیا', 'شهروند', 'زامبی', 'دکتر', 'کارآگاه'],
+      allowedModes: {ScenarioMode.friendly},
+    ),
+    ScenarioDefinition(
+      id: 'hunter_15_20',
+      title: 'شکارچی',
+      description: 'ساید مستقل شکارچی با ترکیب بالانس‌شده و متغیر از ۱۵ تا ۲۰ نفر؛ تک‌تیرانداز، ردیاب و شکارچی ارشد.',
+      family: ScenarioFamily.hunter,
+      minPlayers: 15,
+      maxPlayers: 20,
+      roles: ['مافیا', 'پدرخوانده', 'تک‌تیرانداز', 'ردیاب', 'شکارچی ارشد', 'دکتر', 'کارآگاه', 'محافظ', 'شهردار', 'روانشناس', 'تکاور', 'شهروند'],
       allowedModes: {ScenarioMode.friendly},
     ),
     ScenarioDefinition(
