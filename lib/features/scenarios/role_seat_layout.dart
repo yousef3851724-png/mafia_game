@@ -1,16 +1,13 @@
 /// Canonical, deterministic ordering for visible player seats.
 ///
-/// The game should not randomly shuffle roles because that makes the visual
-/// table look arbitrary. Roles are grouped by game faction and importance,
-/// while preserving every occurrence exactly once.
+/// Roles are grouped by faction first, then by strategic importance. The
+/// ordering is deterministic so the table never looks randomly shuffled.
 class RoleSeatLayout {
   RoleSeatLayout._();
 
   static const List<String> _mafiaPriority = <String>[
     'پدرخوانده',
     'مافیا',
-    'جک',
-    'دادستان',
   ];
 
   static const List<String> _hunterPriority = <String>[
@@ -34,16 +31,15 @@ class RoleSeatLayout {
     'روانشناس',
     'تکاور',
     'مذاکره',
+    'دادستان',
+    'جک',
     'شهردار',
-    'تک‌تیرانداز',
-    'ردیاب',
   ];
 
   /// Returns a deterministic seat order without changing role counts.
   ///
-  /// Faction blocks are kept together: mafia, hunter, independent, town
-  /// specials, then ordinary citizens. Unknown/custom roles are retained in
-  /// their original relative order at the end.
+  /// The visible table is grouped as: mafia, hunter, independent, town
+  /// specials, custom roles, then ordinary citizens.
   static List<String> arrange(Iterable<String> roles) {
     final remaining = List<String>.from(roles);
     final result = <String>[];
@@ -72,6 +68,7 @@ class RoleSeatLayout {
         custom.add(role);
       }
     }
+
     result.addAll(custom);
     result.addAll(citizens);
     return result;
