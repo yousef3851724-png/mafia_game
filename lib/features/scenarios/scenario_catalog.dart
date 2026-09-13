@@ -1,7 +1,7 @@
-/// کاتالوگ رسمی سناریوهای مافیا رادیکال.
+/// کاتالوگ رسمی و کامل سناریوهای مافیا رادیکال.
 ///
-/// سه سناریوی امتیازی ۱۰ نفره در دوستانه هم قابل اجرا هستند، اما
-/// فقط در حالت Ranked امتیازدهی می‌شوند. سناریوی دست‌ساز فقط دوستانه است.
+/// سناریوهای دوستانه برای بازی آزاد هستند و سناریوهای ۱۰ نفره
+/// می‌توانند در حالت Ranked نیز فعال باشند.
 enum ScenarioFamily { classic, advanced, modern, custom }
 
 enum ScenarioMode { friendly, ranked }
@@ -50,7 +50,7 @@ class ScenarioCatalog {
     ScenarioDefinition(
       id: 'jack',
       title: 'جک',
-      description: 'سناریوی پیشرفته برای بازی دوستانه.',
+      description: 'سناریوی پیشرفته با نقش جک در کنار تیم شهروند و مافیا.',
       family: ScenarioFamily.advanced,
       minPlayers: 8,
       maxPlayers: 20,
@@ -60,7 +60,7 @@ class ScenarioCatalog {
     ScenarioDefinition(
       id: 'joker',
       title: 'جوکر',
-      description: 'سناریوی مدرن با نقش مستقل جوکر.',
+      description: 'سناریوی مدرن با نقش مستقل جوکر و هدف پیروزی جداگانه.',
       family: ScenarioFamily.modern,
       minPlayers: 8,
       maxPlayers: 20,
@@ -70,7 +70,7 @@ class ScenarioCatalog {
     ScenarioDefinition(
       id: 'prosecutor',
       title: 'دادستان',
-      description: 'سناریوی پیشرفته برای بازی دوستانه.',
+      description: 'سناریوی پیشرفته با نقش دادستان و فضای حقوقی بازی.',
       family: ScenarioFamily.advanced,
       minPlayers: 8,
       maxPlayers: 20,
@@ -80,7 +80,7 @@ class ScenarioCatalog {
     ScenarioDefinition(
       id: 'zombie_20',
       title: 'زامبی ۲۰ نفره',
-      description: 'سناریوی بزرگ ۲۰ نفره که فقط در حالت دوستانه فعال است.',
+      description: 'سناریوی بزرگ و مدرن برای جمع‌های ۱۲ تا ۲۰ نفره.',
       family: ScenarioFamily.modern,
       minPlayers: 12,
       maxPlayers: 20,
@@ -98,9 +98,69 @@ class ScenarioCatalog {
       allowedModes: {ScenarioMode.friendly},
     ),
     ScenarioDefinition(
+      id: 'godfather',
+      title: 'پدرخوانده',
+      description: 'سناریوی مافیایی با تمرکز بیشتر روی رهبر تیم مافیا.',
+      family: ScenarioFamily.advanced,
+      minPlayers: 8,
+      maxPlayers: 20,
+      roles: ['پدرخوانده', 'مافیا', 'شهروند', 'دکتر', 'کارآگاه'],
+      allowedModes: {ScenarioMode.friendly},
+    ),
+    ScenarioDefinition(
+      id: 'guardian',
+      title: 'محافظ',
+      description: 'سناریوی دفاعی با نقش محافظ در تیم شهروند.',
+      family: ScenarioFamily.advanced,
+      minPlayers: 8,
+      maxPlayers: 20,
+      roles: ['مافیا', 'شهروند', 'محافظ', 'دکتر', 'کارآگاه'],
+      allowedModes: {ScenarioMode.friendly},
+    ),
+    ScenarioDefinition(
+      id: 'mayor',
+      title: 'شهردار',
+      description: 'سناریوی اجتماعی با نقش ویژه شهردار در رأی‌گیری.',
+      family: ScenarioFamily.advanced,
+      minPlayers: 8,
+      maxPlayers: 20,
+      roles: ['مافیا', 'شهروند', 'شهردار', 'دکتر', 'کارآگاه'],
+      allowedModes: {ScenarioMode.friendly},
+    ),
+    ScenarioDefinition(
+      id: 'sniper',
+      title: 'تک‌تیرانداز',
+      description: 'سناریوی مدرن با نقش تک‌تیرانداز و قابلیت ویژه شبانه.',
+      family: ScenarioFamily.modern,
+      minPlayers: 8,
+      maxPlayers: 20,
+      roles: ['مافیا', 'شهروند', 'تک‌تیرانداز', 'دکتر', 'کارآگاه'],
+      allowedModes: {ScenarioMode.friendly},
+    ),
+    ScenarioDefinition(
+      id: 'psychologist',
+      title: 'روانشناس',
+      description: 'سناریوی پیشرفته با نقش روانشناس برای کنترل روند بازی.',
+      family: ScenarioFamily.advanced,
+      minPlayers: 8,
+      maxPlayers: 20,
+      roles: ['مافیا', 'شهروند', 'روانشناس', 'دکتر', 'کارآگاه'],
+      allowedModes: {ScenarioMode.friendly},
+    ),
+    ScenarioDefinition(
+      id: 'duel',
+      title: 'دوئل',
+      description: 'سناریوی رقابتی دوستانه با دو نقش ویژه و بازی سریع‌تر.',
+      family: ScenarioFamily.modern,
+      minPlayers: 8,
+      maxPlayers: 16,
+      roles: ['مافیا', 'شهروند', 'دوئلیست', 'دکتر', 'کارآگاه'],
+      allowedModes: {ScenarioMode.friendly},
+    ),
+    ScenarioDefinition(
       id: 'investigator_10',
       title: 'بازپرس',
-      description: 'سناریوی ۱۰ نفره که در دوستانه و امتیازی قابل اجراست.',
+      description: 'سناریوی ۱۰ نفره با نقش بازپرس؛ مناسب دوستانه و امتیازی.',
       family: ScenarioFamily.advanced,
       minPlayers: 10,
       maxPlayers: 10,
@@ -110,7 +170,7 @@ class ScenarioCatalog {
     ScenarioDefinition(
       id: 'commando_10',
       title: 'تکاور',
-      description: 'سناریوی ۱۰ نفره که در دوستانه و امتیازی قابل اجراست.',
+      description: 'سناریوی ۱۰ نفره با نقش تکاور؛ مناسب دوستانه و امتیازی.',
       family: ScenarioFamily.advanced,
       minPlayers: 10,
       maxPlayers: 10,
@@ -120,7 +180,7 @@ class ScenarioCatalog {
     ScenarioDefinition(
       id: 'negotiator_10',
       title: 'مذاکره',
-      description: 'سناریوی ۱۰ نفره که در دوستانه و امتیازی قابل اجراست.',
+      description: 'سناریوی ۱۰ نفره با نقش مذاکره؛ مناسب دوستانه و امتیازی.',
       family: ScenarioFamily.modern,
       minPlayers: 10,
       maxPlayers: 10,
