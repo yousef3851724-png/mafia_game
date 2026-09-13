@@ -5,6 +5,7 @@ import '../../core/theme/radical_theme.dart';
 import 'scenario_game_screen.dart';
 import 'scenario_catalog.dart';
 import 'custom_scenario_system.dart';
+import 'realistic_avatar.dart';
 
 /// Professional cinematic entry shell for every game session.
 /// The actual game engine remains in ScenarioGameScreen.
@@ -105,24 +106,43 @@ class RadicalGameScreen extends StatelessWidget {
 
   List<Widget> _seatPreviews(bool compact) {
     final names = const ['شما', 'آرش', 'سارا', 'بابک', 'نگار', 'کیان', 'مهسا', 'رضا', 'الناز', 'پارسا', 'ترانه', 'مانی'];
+    final females = const {'سارا', 'نگار', 'مهسا', 'الناز', 'ترانه'};
     final count = playerCount.clamp(1, 12);
     final radiusX = compact ? 118.0 : 146.0;
     final radiusY = compact ? 112.0 : 146.0;
     return List.generate(count, (i) {
       final angle = -math.pi / 2 + (2 * math.pi * i / count);
+      final name = names[i % names.length];
       return Align(
         alignment: Alignment.center,
-        child: Transform.translate(offset: Offset(radiusX * math.cos(angle), radiusY * math.sin(angle)), child: _seat(names[i % names.length], i == 0, i + 1)),
+        child: Transform.translate(
+          offset: Offset(radiusX * math.cos(angle), radiusY * math.sin(angle)),
+          child: _seat(name, i == 0, i + 1, females.contains(name)),
+        ),
       );
     });
   }
 
-  Widget _seat(String name, bool user, int number) {
+  Widget _seat(String name, bool user, int number, bool female) {
     final accent = user ? RadicalTheme.gold : RadicalTheme.crimson;
     return Column(mainAxisSize: MainAxisSize.min, children: [
-      Container(width: 54, height: 54, decoration: BoxDecoration(shape: BoxShape.circle, gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF242A36), Color(0xFF10131B)]), border: Border.all(color: accent.withOpacity(.78), width: user ? 2.2 : 1.2), boxShadow: [BoxShadow(color: accent.withOpacity(.16), blurRadius: 14)]), child: Center(child: Text(user ? '👤' : (number % 4 == 0 ? '🎭' : '🙂'), style: const TextStyle(fontSize: 23)))),
+      Container(
+        width: 58,
+        height: 58,
+        padding: const EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [accent.withOpacity(.95), const Color(0xFF171B25)]),
+          boxShadow: [BoxShadow(color: accent.withOpacity(.20), blurRadius: 16, spreadRadius: 1)],
+        ),
+        child: ClipOval(child: RealisticAvatar(role: 'شهروند', female: female, size: 54, alive: true)),
+      ),
       const SizedBox(height: 4),
-      Text(name, style: TextStyle(fontSize: 9, fontWeight: user ? FontWeight.w900 : FontWeight.w600, color: user ? RadicalTheme.goldBright : Colors.white)),
+      Row(mainAxisSize: MainAxisSize.min, children: [
+        Container(width: 15, height: 15, decoration: BoxDecoration(shape: BoxShape.circle, color: RadicalTheme.panel2, border: Border.all(color: accent.withOpacity(.45))), child: Center(child: Text('$number', style: TextStyle(fontSize: 8, color: accent, fontWeight: FontWeight.w900)))),
+        const SizedBox(width: 4),
+        Text(name, style: TextStyle(fontSize: 9, fontWeight: user ? FontWeight.w900 : FontWeight.w600, color: user ? RadicalTheme.goldBright : Colors.white)),
+      ]),
     ]);
   }
 
