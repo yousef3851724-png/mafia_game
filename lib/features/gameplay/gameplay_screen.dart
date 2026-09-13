@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/models/game_models.dart';
+import '../../core/theme/radical_theme.dart';
 
 class GameplayScreen extends StatefulWidget {
   final List<Player> players;
@@ -26,8 +27,8 @@ class _GameplayScreenState extends State<GameplayScreen> {
   }
 
   Player? _firstAliveWith(RoleType type) {
-    for (final p in _alive) {
-      if (p.role.type == type) return p;
+    for (final player in _alive) {
+      if (player.role.type == type) return player;
     }
     return null;
   }
@@ -40,37 +41,98 @@ class _GameplayScreenState extends State<GameplayScreen> {
     return null;
   }
 
-  Future<Player?> _pickFromAlive(String prompt, {String? except, bool allowCancel = false}) {
+  Future<void> _showWinner(Team winner) async {
+    if (!mounted) return;
+    final mafia = winner == Team.mafia;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: RadicalTheme.panel,
+        title: Text(mafia ? '🩸 پیروزی مافیا' : '🛡️ پیروزی شهروندان'),
+        content: Text(
+          mafia
+              ? 'تیم مافیا اکثریت میز را به دست آورد.'
+              : 'تمام اعضای مافیا از بازی خارج شدند.',
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('پایان بازی'),
+          ),
+        ],
+      ),
+    );
+    if (mounted) widget.onGameOver(winner);
+  }
+
+  Future<Player?> _pickFromAlive(
+    String prompt, {
+    String? except,
+    bool allowCancel = false,
+  }) {
     return showDialog<Player>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => SimpleDialog(
-        title: Text(prompt),
-        children: [
-          for (final p in _alive)
-            if (p.name != except)
-              SimpleDialogOption(
-                onPressed: () => Navigator.pop(ctx, p),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(p.name),
+      builder: (ctx) => AlertDialog(
+        backgroundColor: RadicalTheme.panel,
+        title: Text(prompt, textAlign: TextAlign.right),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+        content: SizedBox(
+          width: 420,
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              for (final player in _alive)
+                if (player.name != except)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 7),
+                    child: ListTile(
+                      onTap: () => Navigator.pop(ctx, player),
+                      tileColor: RadicalTheme.panel2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        side: const BorderSide(color: RadicalTheme.line),
+                      ),
+                      leading: CircleAvatar(
+                        backgroundColor: player.role.team == Team.mafia
+                            ? RadicalTheme.crimson
+                            : RadicalTheme.gold.withValues(alpha: .16),
+                        child: Icon(
+                          player.role.icon,
+                          color: player.role.team == Team.mafia
+                              ? Colors.white
+                              : RadicalTheme.goldBright,
+                          size: 19,
+                        ),
+                      ),
+                      title: Text(
+                        player.name,
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                      subtitle: Text(
+                        player.role.nameFa,
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(color: RadicalTheme.smoke, fontSize: 11),
+                      ),
+                    ),
+                  ),
+              if (allowCancel)
+                ListTile(
+                  onTap: () => Navigator.pop(ctx),
+                  leading: const Icon(Icons.close, color: RadicalTheme.smoke),
+                  title: const Text('انصراف / رد کردن', textAlign: TextAlign.right),
                 ),
-              ),
-          if (allowCancel)
-            SimpleDialogOption(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Align(
-                alignment: Alignment.centerRight,
-                child: Text('انصراف / رد کردن'),
-              ),
-            ),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }
 
   Future<void> _startNight() async {
-    if (_busy) return;
+    if (_busy || _alive.length < 2) return;
     setState(() {
       _busy = true;
       _isNight = true;
@@ -80,16 +142,15 @@ class _GameplayScreenState extends State<GameplayScreen> {
     });
 
     final log = <String>[];
-    final dead = <String>[];
+    final dead = <String>{};
 
-    // 1) انتخاب قربانی توسط مافیا
     final mafia = _alive.where((p) => p.role.team == Team.mafia).toList();
     Player? victim;
     if (mafia.isNotEmpty) {
-      Player leader = mafia.first;
-      for (final p in mafia) {
-        if (p.role.type == RoleType.godfather) {
-          leader = p;
+      var leader = mafia.first;
+      for (final player in mafia) {
+        if (player.role.type == RoleType.godfather) {
+          leader = player;
           break;
         }
       }
@@ -99,80 +160,92 @@ class _GameplayScreenState extends State<GameplayScreen> {
       );
     }
 
-    // 2) نجات توسط دکتر
-    Player? saved;
     final doctor = _firstAliveWith(RoleType.doctor);
+    Player? saved;
     if (doctor != null) {
       saved = await _pickFromAlive('${doctor.name} (دکتر): چه کسی را نجات بدهد؟');
     }
 
-    // 3) استعلام خصوصی کارآگاه
     final detective = _firstAliveWith(RoleType.detective);
     if (detective != null) {
-      final target = await _pickFromAlive('${detective.name} (کارآگاه): از چه کسی استعلام بگیری؟');
+      final target = await _pickFromAlive(
+        '${detective.name} (کارآگاه): از چه کسی استعلام بگیری؟',
+        except: detective.name,
+      );
       if (target != null) {
-        final isMafia = target.role.team == Team.mafia;
+        // طبق قانون این نسخه، پدرخوانده برای کارآگاه شهروند دیده می‌شود.
+        final isMafiaForDetective =
+            target.role.team == Team.mafia && target.role.type != RoleType.godfather;
         await showDialog<void>(
           context: context,
           barrierDismissible: false,
           builder: (ctx) => AlertDialog(
+            backgroundColor: RadicalTheme.panel,
             title: const Text('🔍 نتیجه استعلام'),
-            content: Text('${target.name}: ${isMafia ? 'مافیا است' : 'شهروند است'}'),
+            content: Text(
+              '${target.name}: ${isMafiaForDetective ? 'مافیا است' : 'شهروند است'}',
+              textAlign: TextAlign.right,
+            ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('باشه')),
+              FilledButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('باشه'),
+              ),
             ],
           ),
         );
       }
     }
 
-    // 4) شلیک اختیاری حرفه‌ای
     final sniper = _firstAliveWith(RoleType.sniper);
-    if (sniper != null) {
+    if (sniper != null && !dead.contains(sniper.name)) {
       final shot = await _pickFromAlive(
-        '${sniper.name} (حرفه‌ای): به چه کسی شلیک کنی؟ (انصراف = شلیک نکن)',
+        '${sniper.name} (حرفه‌ای): به چه کسی شلیک کنی؟',
+        except: sniper.name,
         allowCancel: true,
       );
       if (shot != null) {
+        dead.add(shot.name);
         if (shot.role.team == Team.mafia) {
-          dead.add(shot.name);
           log.add('💥 حرفه‌ای، ${shot.name} را از پای درآورد');
         } else {
-          dead.add(shot.name);
           dead.add(sniper.name);
-          log.add('💥 تیر حرفه‌ای به شهروند خورد و خودش هم کشته شد');
+          log.add('💥 تیر حرفه‌ای به شهروند خورد و ${sniper.name} هم کشته شد');
         }
       }
     }
 
-    // 5) اعمال قتل مافیا و نجات دکتر
-    if (victim != null) {
-      if (saved != null && saved.name == victim.name) {
+    if (victim != null && !dead.contains(victim.name)) {
+      if (saved?.name == victim.name) {
         log.add('🩺 دکتر جان ${victim.name} را نجات داد');
       } else {
         dead.add(victim.name);
         log.add('🔪 مافیا ${victim.name} را کشت');
       }
+    } else if (victim != null && saved?.name == victim.name) {
+      log.add('🩺 دکتر جان ${victim.name} را نجات داد');
     }
 
     if (!mounted) return;
     setState(() {
       _alive = _alive.where((p) => !dead.contains(p.name)).toList();
-      _log.addAll(log);
+      _log
+        ..clear()
+        ..addAll(log);
       _isNight = false;
       _busy = false;
     });
 
-    final w = _winner();
-    if (w != null) widget.onGameOver(w);
+    final winner = _winner();
+    if (winner != null) await _showWinner(winner);
   }
 
   Future<void> _startVoting() async {
-    if (_busy) return;
+    if (_busy || _alive.length < 2) return;
     setState(() => _busy = true);
 
     final votes = <String, int>{};
-    for (final voter in _alive) {
+    for (final voter in List<Player>.of(_alive)) {
       final target = await _pickFromAlive(
         '${voter.name}: به چه کسی رأی می‌دهی؟',
         except: voter.name,
@@ -191,7 +264,7 @@ class _GameplayScreenState extends State<GameplayScreen> {
         topCount = count;
         top = name;
         tie = false;
-      } else if (count == topCount) {
+      } else if (count == topCount && count > 0) {
         tie = true;
       }
     });
@@ -203,78 +276,173 @@ class _GameplayScreenState extends State<GameplayScreen> {
       if (top != null && !tie && topCount > 0) {
         _alive = _alive.where((p) => p.name != top).toList();
         _eliminated = top!;
-        _log.add('🗳️ شهروندان ${top} را اعدام کردند');
+        _log.add('🗳️ شهروندان $top را اعدام کردند');
       } else {
-        _log.add('🗳️ رأی کافی نبود؛ کسی اعدام نشد');
+        _log.add('🗳️ رأی مساوی یا ناکافی بود؛ کسی اعدام نشد');
       }
     });
 
-    final w = _winner();
-    if (w != null) widget.onGameOver(w);
+    final winner = _winner();
+    if (winner != null) await _showWinner(winner);
+  }
+
+  Widget _phaseHeader() {
+    final night = _isNight;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 10),
+      padding: const EdgeInsets.all(17),
+      decoration: RadicalTheme.glass(accent: night),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: (night ? RadicalTheme.violet : RadicalTheme.gold).withValues(alpha: .13),
+              border: Border.all(
+                color: (night ? RadicalTheme.violet : RadicalTheme.gold).withValues(alpha: .45),
+              ),
+            ),
+            child: Icon(
+              night ? Icons.nightlight_round : Icons.wb_sunny_outlined,
+              color: night ? RadicalTheme.violet : RadicalTheme.goldBright,
+            ),
+          ),
+          const SizedBox(width: 13),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  night ? 'فاز شب' : 'فاز روز',
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  night
+                      ? 'نقش‌های ویژه بیدار می‌شوند و اکشن خود را انجام می‌دهند.'
+                      : 'بحث، تحلیل و رأی‌گیری برای حذف یک بازیکن.',
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(color: RadicalTheme.smoke, fontSize: 12, height: 1.35),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _playerTile(Player player, int index) {
+    final mafia = player.role.team == Team.mafia;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: RadicalTheme.glass(radius: 17),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+        leading: CircleAvatar(
+          backgroundColor: (mafia ? RadicalTheme.crimson : RadicalTheme.gold).withValues(alpha: .14),
+          child: Text(
+            '${index + 1}',
+            style: TextStyle(
+              color: mafia ? RadicalTheme.crimsonBright : RadicalTheme.goldBright,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+        title: Text(
+          player.name,
+          textAlign: TextAlign.right,
+          style: const TextStyle(fontWeight: FontWeight.w800),
+        ),
+        subtitle: Text(
+          player.role.nameFa,
+          textAlign: TextAlign.right,
+          style: const TextStyle(color: RadicalTheme.smoke, fontSize: 11),
+        ),
+        trailing: Icon(player.role.icon, color: mafia ? RadicalTheme.crimsonBright : RadicalTheme.gold),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final phaseIcon = _isNight ? '🌙' : '☀️';
-    final phaseTitle = _isNight ? 'شب — نقش‌های ویژه بیدار می‌شوند' : 'روز — بحث و رأی‌گیری';
-
     String buttonLabel;
     VoidCallback? onPressed;
     if (_isNight) {
-      buttonLabel = _busy ? '...' : '🌙 شروع شب';
+      buttonLabel = _busy ? 'در حال اجرای اکشن‌های شب...' : '🌙 شروع شب';
       onPressed = _busy ? null : _startNight;
     } else if (!_votingDone) {
-      buttonLabel = _busy ? '...' : '🗳️ شروع رأی‌گیری';
+      buttonLabel = _busy ? 'در حال ثبت رأی‌ها...' : '🗳️ شروع رأی‌گیری';
       onPressed = _busy ? null : _startVoting;
     } else {
       buttonLabel = '🌙 شب بعدی';
-      onPressed = _startNight;
+      onPressed = _busy ? null : _startNight;
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('$phaseIcon $phaseTitle'),
+        title: const Text('MAFIA • RADICAL'),
+        actions: [
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: 16),
+            child: Center(
+              child: Text(
+                '${_alive.length} زنده',
+                style: const TextStyle(color: RadicalTheme.goldBright, fontWeight: FontWeight.w800),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('👥 بازیکنان زنده: ${_alive.length}'),
-                if (_eliminated.isNotEmpty)
-                  const Text('☠️ اعدام شد', style: TextStyle(color: Colors.redAccent)),
-              ],
-            ),
-          ),
+          _phaseHeader(),
           Expanded(
             child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
               children: [
-                for (var i = 0; i < _alive.length; i++)
-                  ListTile(
-                    leading: CircleAvatar(child: Text('${i + 1}')),
-                    title: Text(_alive[i].name),
+                Text(
+                  'بازیکنان زنده',
+                  textAlign: TextAlign.right,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 9),
+                for (var i = 0; i < _alive.length; i++) _playerTile(_alive[i], i),
+                if (_log.isNotEmpty) ...[
+                  const SizedBox(height: 9),
+                  const Text(
+                    'گزارش این راند',
+                    textAlign: TextAlign.right,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
                   ),
-                const Divider(),
-                for (final line in _log)
-                  ListTile(
-                    dense: true,
-                    leading: const Icon(Icons.circle, size: 8),
-                    title: Text(line),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: RadicalTheme.glass(radius: 17),
+                    child: Column(
+                      children: [
+                        for (final line in _log)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            child: Text(line, textAlign: TextAlign.right),
+                          ),
+                      ],
+                    ),
                   ),
+                ],
               ],
             ),
           ),
           SafeArea(
+            top: false,
             child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: onPressed,
-                  child: Text(buttonLabel),
-                ),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              child: FilledButton(
+                onPressed: onPressed,
+                child: Text(buttonLabel),
               ),
             ),
           ),
