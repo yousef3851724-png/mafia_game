@@ -44,7 +44,6 @@ class _Player {
 }
 
 class _ScenarioGameScreenState extends State<ScenarioGameScreen> {
-  final Random _random = Random();
   late final List<_Player> _players;
   _Phase _phase = _Phase.night;
   int _round = 1;
@@ -452,7 +451,6 @@ class _Table extends StatelessWidget {
                     role: player.role,
                     female: player.female,
                     size: 55,
-                    alive: player.alive,
                   ),
                 ),
               ),
