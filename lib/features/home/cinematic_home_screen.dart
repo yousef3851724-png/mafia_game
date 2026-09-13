@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/radical_theme.dart';
 import '../../core/widgets/branding/game_logo_widget.dart';
+import '../../core/widgets/branding/mafia_radical_wordmark.dart';
 import '../scenarios/realistic_avatar.dart';
 import '../scenarios/scenario_lobby_screen.dart';
 
@@ -65,8 +66,10 @@ class CinematicHomeScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 18),
-                  const Center(child: MafiaRadicalLogo(size: 128)),
+                  const SizedBox(height: 22),
+                  const Center(child: MafiaRadicalWordmark(width: 330)),
+                  const SizedBox(height: 12),
+                  const Center(child: MafiaRadicalLogo(size: 92)),
                   const SizedBox(height: 6),
                   const Text(
                     'میزگرد رادیکال',
