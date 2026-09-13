@@ -35,3 +35,7 @@ features/pass_and_play/role_reveal_screen.dart
 features/setup/setup_screen.dart
 features/victory/victory_screen.dart
 main.dart
+
+FINAL CHECKPOINT — Mafia Radical
+Latest verified source commit: 252ed1fdfac527657ed7bc79129a01ea217aca29
+Finalization checkpoint: trigger CI/APK verification after the latest source fixes.
