@@ -333,13 +333,24 @@ class LobbyPermission {
       managerId: managerId,
     );
 
+    // سازنده را هیچ‌کس نمی‌تواند اخراج کند.
     if (targetRole == LobbyMemberRole.creator) {
       return false;
     }
 
-    return actorRole == LobbyMemberRole.creator ||
-        (actorRole == LobbyMemberRole.manager &&
-            targetRole == LobbyMemberRole.player);
+    // سازنده اختیار کامل مدیریت اعضا را دارد.
+    if (actorRole == LobbyMemberRole.creator) {
+      return true;
+    }
+
+    // مدیر فقط می‌تواند بازیکن عادی را اخراج کند.
+    if (actorRole == LobbyMemberRole.manager &&
+        targetRole == LobbyMemberRole.player) {
+      return true;
+    }
+
+    // بازیکن عادی اجازه اخراج ندارد.
+    return false;
   }
 
   /// آیا این شخص می‌تواند هدف را بن کند؟
