@@ -25,6 +25,21 @@ void main() {
     expect(result.last, 'شهروند');
   });
 
+  test('keeps special town roles out of the mafia block', () {
+    final result = RoleSeatLayout.arrange(<String>[
+      'شهروند',
+      'دادستان',
+      'جک',
+      'مافیا',
+      'دکتر',
+      'پدرخوانده',
+    ]);
+
+    expect(result.indexOf('پدرخوانده'), lessThan(result.indexOf('دادستان')));
+    expect(result.indexOf('دادستان'), lessThan(result.indexOf('شهروند')));
+    expect(result.indexOf('جک'), greaterThan(result.indexOf('مافیا')));
+  });
+
   test('keeps custom roles instead of dropping them', () {
     final result = RoleSeatLayout.arrange(<String>[
       'شهروند',
