@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/theme/radical_theme.dart';
-import 'features/home/radical_home_screen.dart';
+import 'features/home/cinematic_home_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +16,7 @@ class MafiaRadicalApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'مافیا رادیکال',
       theme: RadicalTheme.dark(),
-      home: const RadicalHomeScreen(),
+      home: const CinematicHomeScreen(),
     );
   }
 }
