@@ -1,10 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
-/// A lightweight, asset-free portrait component for the scenario table.
+/// Fictional, asset-free portrait used by the scenario table.
 ///
-/// It deliberately uses fictional faces and layered lighting rather than
-/// celebrity likenesses. Real portrait assets can later replace the portrait
-/// layer without changing the game UI API.
+/// The portrait is intentionally drawn from simple vector layers so the app
+/// stays offline-friendly and does not depend on celebrity or real-person
+/// likenesses. Special roles receive their own visual treatment.
 class RealisticAvatar extends StatelessWidget {
   final String role;
   final bool female;
@@ -21,38 +23,19 @@ class RealisticAvatar extends StatelessWidget {
 
   bool get _special => const {'دلقک', 'جوکر', 'زامبی', 'قاتل مستقل'}.contains(role);
 
-  IconData get _icon {
-    if (role == 'دلقک' || role == 'جوکر') return Icons.sentiment_very_dissatisfied_rounded;
-    if (role == 'زامبی') return Icons.coronavirus_rounded;
-    if (role == 'قاتل مستقل') return Icons.visibility_off_rounded;
-    if (female) return Icons.face_3_rounded;
-    return Icons.face_rounded;
-  }
-
-  List<Color> get _lighting {
-    if (role == 'دلقک' || role == 'جوکر') {
-      return const [Color(0xFF5E2B70), Color(0xFF17121D)];
-    }
-    if (role == 'زامبی') {
-      return const [Color(0xFF48664D), Color(0xFF111714)];
-    }
-    if (role == 'قاتل مستقل') {
-      return const [Color(0xFF4A1F2B), Color(0xFF100D12)];
-    }
-    if (role == 'مافیا' || role == 'پدرخوانده') {
-      return const [Color(0xFF354052), Color(0xFF0E1118)];
-    }
-    if (role == 'دکتر' || role == 'کارآگاه' || role == 'محافظ') {
-      return const [Color(0xFF3D6178), Color(0xFF111A20)];
-    }
-    return const [Color(0xFF52677A), Color(0xFF151B21)];
+  Color get _accent {
+    if (role == 'دلقک' || role == 'جوکر') return const Color(0xFFB56BE8);
+    if (role == 'زامبی') return const Color(0xFF78A87B);
+    if (role == 'قاتل مستقل') return const Color(0xFFB34B63);
+    if (role == 'مافیا' || role == 'پدرخوانده') return const Color(0xFF7888A3);
+    if (role == 'دکتر' || role == 'محافظ') return const Color(0xFF69A8C7);
+    return const Color(0xFF9DB1C4);
   }
 
   @override
   Widget build(BuildContext context) {
-    final effectiveOpacity = alive ? 1.0 : 0.38;
     return Opacity(
-      opacity: effectiveOpacity,
+      opacity: alive ? 1 : .38,
       child: Container(
         width: size,
         height: size,
@@ -61,8 +44,9 @@ class RealisticAvatar extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: _lighting,
+            colors: [_accent.withOpacity(.72), const Color(0xFF11151B)],
           ),
+          border: Border.all(color: Colors.white.withOpacity(.22), width: 1.2),
           boxShadow: const [
             BoxShadow(
               blurRadius: 12,
@@ -70,43 +54,152 @@ class RealisticAvatar extends StatelessWidget {
               color: Color(0x66000000),
             ),
           ],
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.20),
-            width: 1.2,
-          ),
         ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Positioned(
-              top: size * .10,
-              left: size * .13,
-              child: Container(
-                width: size * .25,
-                height: size * .16,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size),
-                  color: Colors.white.withValues(alpha: .16),
-                ),
-              ),
+        child: ClipOval(
+          child: CustomPaint(
+            painter: _PortraitPainter(
+              female: female,
+              special: role,
+              accent: _accent,
             ),
-            Icon(_icon, size: size * .52, color: Colors.white.withValues(alpha: .92)),
-            if (_special)
-              Positioned(
-                right: size * .03,
-                bottom: size * .02,
-                child: Container(
-                  padding: EdgeInsets.all(size * .055),
-                  decoration: const BoxDecoration(
-                    color: Color(0xDD0E0E12),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.auto_awesome, size: size * .18, color: Colors.white),
-                ),
-              ),
-          ],
+            child: const SizedBox.expand(),
+          ),
         ),
       ),
     );
   }
+}
+
+class _PortraitPainter extends CustomPainter {
+  final bool female;
+  final String special;
+  final Color accent;
+
+  const _PortraitPainter({
+    required this.female,
+    required this.special,
+    required this.accent,
+  });
+
+  bool get isClown => special == 'دلقک' || special == 'جوکر';
+  bool get isZombie => special == 'زامبی';
+  bool get isKiller => special == 'قاتل مستقل';
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final s = math.min(size.width, size.height);
+    final c = Offset(size.width / 2, size.height / 2);
+
+    final glow = Paint()
+      ..shader = RadialGradient(
+        colors: [Colors.white.withOpacity(.20), Colors.transparent],
+      ).createShader(Rect.fromCircle(center: c.translate(-s * .16, -s * .18), radius: s * .72));
+    canvas.drawCircle(c.translate(-s * .16, -s * .18), s * .62, glow);
+
+    final neckPaint = Paint()..color = const Color(0xFFB87961);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(s * .39, s * .64, s * .22, s * .25),
+        Radius.circular(s * .08),
+      ),
+      neckPaint,
+    );
+
+    final shirt = Paint()..color = isKiller ? const Color(0xFF181018) : const Color(0xFF202A35);
+    canvas.drawPath(
+      Path()
+        ..moveTo(s * .14, s)
+        ..quadraticBezierTo(s * .20, s * .73, s * .50, s * .70)
+        ..quadraticBezierTo(s * .80, s * .73, s * .86, s)
+        ..close(),
+      shirt,
+    );
+
+    if (female && !isZombie) {
+      final hair = Paint()..color = const Color(0xFF34251F);
+      canvas.drawOval(Rect.fromLTWH(s * .16, s * .10, s * .68, s * .82), hair);
+    }
+
+    final skin = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: isZombie
+            ? const [Color(0xFF9AAF91), Color(0xFF536858)]
+            : isClown
+                ? const [Color(0xFFF2D7D2), Color(0xFFC9A7A3)]
+                : const [Color(0xFFE5AE8D), Color(0xFF9B604F)],
+      ).createShader(Rect.fromLTWH(s * .24, s * .20, s * .52, s * .57));
+
+    final faceRect = Rect.fromLTWH(s * .25, s * .18, s * .50, s * .56);
+    canvas.drawOval(faceRect, skin);
+
+    final hair = Paint()..color = isClown ? const Color(0xFF3C174A) : const Color(0xFF231A18);
+    if (!isZombie) {
+      canvas.drawPath(
+        Path()
+          ..moveTo(s * .22, s * .38)
+          ..quadraticBezierTo(s * .18, s * .10, s * .50, s * .09)
+          ..quadraticBezierTo(s * .83, s * .10, s * .78, s * .40)
+          ..quadraticBezierTo(s * .68, s * .25, s * .50, s * .29)
+          ..quadraticBezierTo(s * .33, s * .25, s * .22, s * .38)
+          ..close(),
+        hair,
+      );
+    }
+
+    final eye = Paint()..color = const Color(0xFF15171B);
+    final eyeY = s * .43;
+    canvas.drawOval(Rect.fromLTWH(s * .34, eyeY, s * .09, s * .055), eye);
+    canvas.drawOval(Rect.fromLTWH(s * .57, eyeY, s * .09, s * .055), eye);
+
+    if (isZombie) {
+      final scar = Paint()
+        ..color = const Color(0xFF6F3E3E)
+        ..strokeWidth = s * .018
+        ..style = PaintingStyle.stroke;
+      canvas.drawLine(Offset(s * .31, s * .52), Offset(s * .43, s * .57), scar);
+      canvas.drawLine(Offset(s * .58, s * .55), Offset(s * .69, s * .50), scar);
+    }
+
+    final nose = Paint()
+      ..color = const Color(0x665C3029)
+      ..strokeWidth = s * .018
+      ..style = PaintingStyle.stroke;
+    canvas.drawLine(Offset(s * .50, s * .45), Offset(s * .48, s * .52), nose);
+
+    final mouth = Paint()
+      ..color = isClown || isKiller ? const Color(0xFF5C1D2B) : const Color(0xFF6C3935)
+      ..strokeWidth = s * .025
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    final mouthPath = Path()
+      ..moveTo(s * .42, s * .59)
+      ..quadraticBezierTo(s * .50, s * (isClown ? .65 : .62), s * .58, s * .59);
+    canvas.drawPath(mouthPath, mouth);
+
+    if (isClown) {
+      final red = Paint()..color = const Color(0xFFE04B5A);
+      canvas.drawCircle(Offset(s * .50, s * .47), s * .045, red);
+      canvas.drawCircle(Offset(s * .36, s * .47), s * .026, red);
+      canvas.drawCircle(Offset(s * .64, s * .47), s * .026, red);
+    }
+
+    if (isKiller) {
+      final mask = Paint()..color = const Color(0xCC111217);
+      canvas.drawRect(Rect.fromLTWH(s * .27, s * .40, s * .46, s * .17), mask);
+    }
+
+    final rim = Paint()
+      ..color = accent.withOpacity(.45)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = s * .018;
+    canvas.drawCircle(c, s * .48, rim);
+  }
+
+  @override
+  bool shouldRepaint(covariant _PortraitPainter oldDelegate) =>
+      oldDelegate.female != female ||
+      oldDelegate.special != special ||
+      oldDelegate.accent != accent;
 }
