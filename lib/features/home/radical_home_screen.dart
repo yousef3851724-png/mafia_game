@@ -239,6 +239,7 @@ class _RadicalStoreScreenState extends State<RadicalStoreScreen> {
     (name: 'آواتار رئیس', id: 'avatar_boss', avatar: '🎩', price: 180),
     (name: 'فریم طلایی', id: 'frame_gold', avatar: '✨', price: 150),
     (name: 'فریم شب خونین', id: 'frame_night', avatar: '🌙', price: 180),
+    (name: 'فریم شاهین • اختصاصی اکانت', id: 'frame_falcon_private', avatar: '🦅', price: 999999999),
   ];
 
   @override
@@ -251,6 +252,10 @@ class _RadicalStoreScreenState extends State<RadicalStoreScreen> {
 
   Future<void> buy(String id, int price, String avatar) async {
     if (owned.contains(id)) return;
+    if (id == 'frame_falcon_private') {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('فریم شاهین فعلاً رزرو شده و قابل خرید عمومی نیست.')));
+      return;
+    }
     if (coins < price) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('سکه کافی نیست.')));
       return;
@@ -298,8 +303,11 @@ class _ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isAvatar = product.id.startsWith('avatar_');
-    return Card(color: RadicalTheme.panel, margin: const EdgeInsets.only(bottom: 12), child: ListTile(contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7), leading: Container(width: 58, height: 58, padding: const EdgeInsets.all(2), decoration: BoxDecoration(shape: BoxShape.circle, gradient: const LinearGradient(colors: [RadicalTheme.goldBright, RadicalTheme.crimson]), boxShadow: [BoxShadow(color: RadicalTheme.gold.withOpacity(.14), blurRadius: 12)]), child: isAvatar ? RealisticAvatar(role: role, female: female, size: 53) : Center(child: Text(product.avatar, style: const TextStyle(fontSize: 25)))), title: Text(product.name, style: const TextStyle(fontWeight: FontWeight.w900)), subtitle: Padding(padding: const EdgeInsets.only(top: 5), child: Text('${product.price} 🪙 • آیتم ویژه', style: const TextStyle(color: RadicalTheme.smoke))), trailing: FilledButton(onPressed: owned ? null : onBuy, child: Text(owned ? 'دارم' : 'خرید'))));
+    final isPrivate = product.id == 'frame_falcon_private';
+    return Card(color: RadicalTheme.panel, margin: const EdgeInsets.only(bottom: 12), child: ListTile(contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7), leading: Container(width: 58, height: 58, padding: const EdgeInsets.all(2), decoration: BoxDecoration(shape: BoxShape.circle, gradient: const LinearGradient(colors: [RadicalTheme.goldBright, RadicalTheme.crimson]), boxShadow: [BoxShadow(color: RadicalTheme.gold.withOpacity(.14), blurRadius: 12)]), child: isAvatar ? RealisticAvatar(role: role, female: female, size: 53) : Center(child: Text(product.avatar, style: const TextStyle(fontSize: 25)))), title: Text(product.name, style: const TextStyle(fontWeight: FontWeight.w900)), subtitle: Padding(padding: const EdgeInsets.only(top: 5), child: Text(isPrivate ? 'رزرو خصوصی • $priceLabel 🪙' : '${product.price} 🪙 • آیتم ویژه', style: const TextStyle(color: RadicalTheme.smoke))), trailing: FilledButton(onPressed: isPrivate ? () => onBuy() : (owned ? null : onBuy), child: Text(isPrivate ? 'رزرو' : (owned ? 'دارم' : 'خرید'))));
   }
+
+  String get priceLabel => '999,999,999';
 }
 
 class _ProfileTab extends StatefulWidget {
