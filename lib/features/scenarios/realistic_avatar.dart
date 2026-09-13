@@ -11,17 +11,13 @@ class RealisticAvatar extends StatelessWidget {
   final String role;
   final bool female;
   final double size;
-  final bool alive;
 
   const RealisticAvatar({
     super.key,
     required this.role,
     this.female = false,
     this.size = 54,
-    this.alive = true,
   });
-
-  bool get _special => const {'دلقک', 'جوکر', 'زامبی', 'قاتل مستقل'}.contains(role);
 
   Color get _accent {
     if (role == 'دلقک' || role == 'جوکر') return const Color(0xFFB56BE8);
@@ -34,36 +30,33 @@ class RealisticAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: alive ? 1 : .38,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [_accent.withOpacity(.72), const Color(0xFF11151B)],
-          ),
-          border: Border.all(color: Colors.white.withOpacity(.22), width: 1.2),
-          boxShadow: const [
-            BoxShadow(
-              blurRadius: 12,
-              offset: Offset(2, 5),
-              color: Color(0x66000000),
-            ),
-          ],
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [_accent.withValues(alpha: .72), const Color(0xFF11151B)],
         ),
-        child: ClipOval(
-          child: CustomPaint(
-            painter: _PortraitPainter(
-              female: female,
-              special: role,
-              accent: _accent,
-            ),
-            child: const SizedBox.expand(),
+        border: Border.all(color: Colors.white.withValues(alpha: .22), width: 1.2),
+        boxShadow: const [
+          BoxShadow(
+            blurRadius: 12,
+            offset: Offset(2, 5),
+            color: Color(0x66000000),
           ),
+        ],
+      ),
+      child: ClipOval(
+        child: CustomPaint(
+          painter: _PortraitPainter(
+            female: female,
+            special: role,
+            accent: _accent,
+          ),
+          child: const SizedBox.expand(),
         ),
       ),
     );
@@ -92,7 +85,7 @@ class _PortraitPainter extends CustomPainter {
 
     final glow = Paint()
       ..shader = RadialGradient(
-        colors: [Colors.white.withOpacity(.20), Colors.transparent],
+        colors: [Colors.white.withValues(alpha: .20), Colors.transparent],
       ).createShader(Rect.fromCircle(center: c.translate(-s * .16, -s * .18), radius: s * .72));
     canvas.drawCircle(c.translate(-s * .16, -s * .18), s * .62, glow);
 
@@ -191,7 +184,7 @@ class _PortraitPainter extends CustomPainter {
     }
 
     final rim = Paint()
-      ..color = accent.withOpacity(.45)
+      ..color = accent.withValues(alpha: .45)
       ..style = PaintingStyle.stroke
       ..strokeWidth = s * .018;
     canvas.drawCircle(c, s * .48, rim);
