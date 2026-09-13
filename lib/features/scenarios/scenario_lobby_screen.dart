@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'custom_scenario_system.dart';
+import 'radical_game_screen.dart';
 import 'scenario_catalog.dart';
-import 'scenario_game_screen.dart';
 
 class ScenarioLobbyScreen extends StatefulWidget {
   final String ownerId;
@@ -76,12 +76,12 @@ class _ScenarioLobbyScreenState extends State<ScenarioLobbyScreen> {
     final selected = _selectedScenario;
     if (custom == null && selected == null) return _showMessage('ابتدا یک سناریو انتخاب کنید.');
     if (custom != null) {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => ScenarioGameScreen(customScenario: custom, mode: ScenarioMode.friendly, playerCount: custom.playerCount)));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => RadicalGameScreen(customScenario: custom, mode: ScenarioMode.friendly, playerCount: custom.playerCount)));
       return;
     }
     if (!ScenarioCatalog.canStart(scenarioId: selected!.id, mode: _mode, playerCount: _playerCount)) return _showMessage('تعداد بازیکن با ظرفیت این سناریو هماهنگ نیست.');
     if (_mode == ScenarioMode.ranked && _playerCount != 10) return _showMessage('بازی امتیازی دقیقاً ۱۰ نفره است.');
-    Navigator.push(context, MaterialPageRoute(builder: (_) => ScenarioGameScreen(scenario: selected, mode: _mode, playerCount: _playerCount)));
+    Navigator.push(context, MaterialPageRoute(builder: (_) => RadicalGameScreen(scenario: selected, mode: _mode, playerCount: _playerCount)));
   }
 
   void _showMessage(String message) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
