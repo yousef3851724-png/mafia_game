@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import 'custom_scenario_system.dart';
 import 'hunter_scenario.dart';
+import 'realistic_avatar.dart';
+import 'role_seat_layout.dart';
 import 'scenario_catalog.dart';
 
 /// موتور بازی سناریوها با پشتیبانی از ساید مستقل «شکارچی».
@@ -64,9 +66,19 @@ class _ScenarioGameScreenState extends State<ScenarioGameScreen> {
   }
 
   void _createPlayers() {
-    final roles = _roles..shuffle(_random);
+    // Roles are intentionally not shuffled. The seat order is deterministic
+    // and groups related roles together for a coherent visual table.
+    final roles = RoleSeatLayout.arrange(_roles);
     const names = <String>['شما','آرش','سارا','بابک','نگار','کیان','مهسا','رضا','الناز','پارسا','ترانه','مانی','هلیا','سام','نیکا','یاسین','رها','بردیا','آوا','نوید'];
-    _players = [for (int i = 0; i < widget.playerCount; i++) _ScenarioPlayer(name: names[i], role: roles[i], isUser: i == 0)];
+    _players = [
+      for (int i = 0; i < widget.playerCount; i++)
+        _ScenarioPlayer(
+          name: names[i],
+          role: roles[i],
+          isUser: i == 0,
+          female: const {'سارا','نگار','مهسا','الناز','ترانه','هلیا','نیکا','رها','آوا'}.contains(names[i]),
+        ),
+    ];
   }
 
   List<_ScenarioPlayer> get _alive => _players.where((p) => p.alive).toList();
@@ -224,7 +236,13 @@ class _ScenarioGameScreenState extends State<ScenarioGameScreen> {
         Text('دور $_round • ${_alive.length}/${_players.length} بازیکن', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         if (isHunterScenario) const Padding(padding: EdgeInsets.only(top: 6), child: Text('🎯 ساید مستقل شکارچی • ۱۵ تا ۲۰ نفر', style: TextStyle(fontWeight: FontWeight.bold))),
         const SizedBox(height: 8),
-        Card(child: ListTile(leading: const CircleAvatar(child: Icon(Icons.badge)), title: Text('نقش شما: ${_user.role}'), subtitle: Text(_abilityDescription(_user.role)))),
+        Card(
+          child: ListTile(
+            leading: RealisticAvatar(role: _user.role, female: _user.female, size: 58),
+            title: Text('نقش شما: ${_user.role}'),
+            subtitle: Text(_abilityDescription(_user.role)),
+          ),
+        ),
         if (_investigationResult != null) Card(child: ListTile(leading: const Icon(Icons.search), title: Text(_investigationResult!))),
         if (_phase == _Phase.ended) _endCard() else ...[
           Text(_phase.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
@@ -266,7 +284,16 @@ class _ScenarioGameScreenState extends State<ScenarioGameScreen> {
       Expanded(child: ListView.builder(itemCount: choices.length, itemBuilder: (_, index) {
         final player = choices[index];
         final disabled = !night && _silencedNextDay.contains(player.name);
-        return Card(child: ListTile(selected: _target == player.name, enabled: !disabled, leading: CircleAvatar(child: Text('${index + 1}')), title: Text(player.name), subtitle: Text(disabled ? 'ساکت شده' : (player.infected ? 'آلوده' : 'زنده')), onTap: disabled ? null : () => setState(() => _target = player.name)));
+        return Card(
+          child: ListTile(
+            selected: _target == player.name,
+            enabled: !disabled,
+            leading: RealisticAvatar(role: player.role, female: player.female, size: 48, alive: player.alive),
+            title: Text(player.name),
+            subtitle: Text(disabled ? 'ساکت شده' : (player.infected ? 'آلوده' : 'زنده')),
+            onTap: disabled ? null : () => setState(() => _target = player.name),
+          ),
+        );
       })),
       FilledButton.icon(onPressed: _target == null ? null : (night ? _resolveNight : _resolveVote), icon: const Icon(Icons.check), label: Text(night ? 'اجرای توانایی شب' : 'ثبت رأی')),
     ]));
@@ -295,9 +322,10 @@ class _ScenarioPlayer {
   final String name;
   final String role;
   final bool isUser;
+  final bool female;
   bool alive;
   bool infected = false;
   int voteWeight = 1;
 
-  _ScenarioPlayer({required this.name, required this.role, required this.isUser, this.alive = true});
+  _ScenarioPlayer({required this.name, required this.role, required this.isUser, required this.female, this.alive = true});
 }
