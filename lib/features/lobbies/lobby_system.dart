@@ -4,7 +4,6 @@ enum LobbyChatMessageType {
   system,
 }
 
-
 class LobbyChatMessage {
   final String id;
   final String lobbyId;
@@ -32,6 +31,7 @@ class LobbyChatMessage {
         entry.key: List<String>.from(entry.value),
     };
     final actors = updatedReactions.putIfAbsent(emoji, () => <String>[]);
+    if (!actors.contains(actorId)) {
       actors.add(actorId);
     }
     return LobbyChatMessage(
@@ -67,7 +67,8 @@ class LobbyChatMessage {
     if (rawReactions is Map) {
       rawReactions.forEach((key, value) {
         if (value is List) {
-          parsedReactions[key.toString()] = value.map((e) => e.toString()).toList();
+          parsedReactions[key.toString()] =
+              value.map((e) => e.toString()).toList();
         }
       });
     }
