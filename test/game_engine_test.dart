@@ -66,6 +66,40 @@ void main() {
       expect(second.players.map((p) => p.seat).toSet(), hasLength(20));
     });
 
+    test('100 seeded games distribute mafia uniformly across seats', () {
+      const playerCount = 10;
+      const simulations = 100;
+      final mafiaBySeat = List<int>.filled(playerCount, 0);
+      final userSeatCounts = List<int>.filled(playerCount, 0);
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final controller = container.read(gameControllerProvider.notifier);
+
+      for (var seed = 1; seed <= simulations; seed++) {
+        controller.start(playerCount: playerCount, seed: seed);
+        final state = container.read(gameControllerProvider);
+        expect(state.players.where((p) => p.role == 'مافیا'), hasLength(3));
+
+        for (final player in state.players) {
+          if (player.role == 'مافیا') mafiaBySeat[player.seat - 1]++;
+          if (player.isUser) userSeatCounts[player.seat - 1]++;
+        }
+      }
+
+      // 300 mafia assignments over 10 seats should not collapse into a seat pattern.
+      // The bounds are intentionally broad so this is a distribution sanity check,
+      // not a requirement to manufacture an artificially anti-clustered table.
+      expect(mafiaBySeat.reduce((a, b) => a + b), 300);
+      expect(mafiaBySeat.every((count) => count >= 12 && count <= 48), isTrue,
+          reason: 'Mafia assignments are unexpectedly concentrated by seat: $mafiaBySeat');
+      expect(mafiaBySeat.reduce((a, b) => a > b ? a : b) - mafiaBySeat.reduce((a, b) => a < b ? a : b), lessThanOrEqualTo(24),
+          reason: 'Mafia distribution varies too much by seat: $mafiaBySeat');
+
+      expect(userSeatCounts.reduce((a, b) => a + b), simulations);
+      expect(userSeatCounts.every((count) => count >= 2 && count <= 20), isTrue,
+          reason: 'User seat is unexpectedly concentrated: $userSeatCounts');
+    });
+
     test('role counts remain valid while roles are independent from seats', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
