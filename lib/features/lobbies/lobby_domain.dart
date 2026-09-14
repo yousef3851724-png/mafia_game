@@ -64,6 +64,7 @@ class LobbyStoreCatalog {
 class RadicalStaffDirectory {
   RadicalStaffDirectory._();
   static const members = [LobbyPlayerLabel(playerId: 'staff_01', playerName: 'رادیکال • مدیر', isStaff: true, rating: 9999), LobbyPlayerLabel(playerId: 'staff_02', playerName: 'رادیکال • ناظر', isStaff: true, rating: 9800), LobbyPlayerLabel(playerId: 'staff_03', playerName: 'رادیکال • پشتیبان', isStaff: true, rating: 9500)];
+  static LobbyPlayerLabel? member(String id) => members.where((m) => m.playerId == id).firstOrNull;
   static bool isStaff(String id) => members.any((m) => m.playerId == id);
 }
 
@@ -92,5 +93,3 @@ class LobbyChatMessage {
   factory LobbyChatMessage.fromMap(Map<String, dynamic> map) => LobbyChatMessage(id: map['id'] as String, lobbyId: map['lobbyId'] as String, senderId: map['senderId'] as String, senderName: map['senderName'] as String, content: map['content'] as String, sentAt: map['sentAt'] == null ? null : DateTime.fromMillisecondsSinceEpoch((map['sentAt'] as num).toInt()), type: LobbyChatMessageType.values.firstWhere((value) => value.name == map['type'], orElse: () => LobbyChatMessageType.text), reactions: ((map['reactions'] as Map?) ?? const {}).map((key, value) => MapEntry(key.toString(), List<String>.from(value as List))));
 }
 typedef LobbyMessage = LobbyChatMessage;
-
-extension LobbyFirstOrNull<T> on Iterable<T> { T? get firstOrNull => isEmpty ? null : first; }
