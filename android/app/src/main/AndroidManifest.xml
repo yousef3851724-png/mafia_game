@@ -2,7 +2,7 @@
     <application
         android:label="Mafia Radical"
         android:name="${applicationName}"
-        android:icon="@drawable/ic_launcher">
+        android:icon="@drawable/mafia_radical_launcher">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -27,7 +27,7 @@
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
-            <data android:mimeType="text/plain"/>
+            <data android:mimeType="text/plain" />
         </intent>
     </queries>
 </manifest>
