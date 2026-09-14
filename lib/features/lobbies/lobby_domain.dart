@@ -6,7 +6,6 @@ enum LobbyAge { teen, adult }
 enum LobbyLabel { radical, pros, newcomers, vip }
 enum DiamondType { blue, radical, teen, adult }
 enum LobbyPermission { viewChat, sendChat, react, kick, lock, startGame, viewStats, admin }
-
 enum LobbyChatMessageType { text, emoji, sticker, system }
 
 class LobbyCategory {
@@ -89,6 +88,8 @@ class LobbyChatMessage {
   String? get sticker => type == LobbyChatMessageType.sticker ? content : null;
   bool get system => type == LobbyChatMessageType.system;
   LobbyChatMessage react(String reaction, String playerId) { final copy = <String, List<String>>{for (final e in reactions.entries) e.key: [...e.value]}; final actors = copy.putIfAbsent(reaction, () => <String>[]); if (!actors.contains(playerId)) actors.add(playerId); return LobbyChatMessage(id: id, lobbyId: lobbyId, senderId: senderId, senderName: senderName, content: content, sentAt: sentAt, type: type, reactions: copy); }
+  Map<String, dynamic> toMap() => {'id': id, 'lobbyId': lobbyId, 'senderId': senderId, 'senderName': senderName, 'content': content, 'sentAt': sentAt?.millisecondsSinceEpoch, 'type': type.name, 'reactions': reactions.map((key, value) => MapEntry(key, List<String>.from(value)))};
+  factory LobbyChatMessage.fromMap(Map<String, dynamic> map) => LobbyChatMessage(id: map['id'] as String, lobbyId: map['lobbyId'] as String, senderId: map['senderId'] as String, senderName: map['senderName'] as String, content: map['content'] as String, sentAt: map['sentAt'] == null ? null : DateTime.fromMillisecondsSinceEpoch((map['sentAt'] as num).toInt()), type: LobbyChatMessageType.values.firstWhere((value) => value.name == map['type'], orElse: () => LobbyChatMessageType.text), reactions: ((map['reactions'] as Map?) ?? const {}).map((key, value) => MapEntry(key.toString(), List<String>.from(value as List))));
 }
 typedef LobbyMessage = LobbyChatMessage;
 
