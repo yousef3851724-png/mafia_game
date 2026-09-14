@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'core/theme/radical_theme.dart';
 import 'features/home/cinematic_home_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MafiaRadicalApp());
+  runApp(const ProviderScope(child: MafiaRadicalApp()));
 }
 
 class MafiaRadicalApp extends StatelessWidget {
