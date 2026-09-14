@@ -153,7 +153,7 @@ class _TableGlowState extends State<_TableGlow> with SingleTickerProviderStateMi
   @override
   void dispose() { _pulse.dispose(); super.dispose(); }
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(animation: _pulse, builder: (_, __) => Container(width: 335 + _pulse.value * 16, height: 335 + _pulse.value * 16, decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [BoxShadow(color: (widget.night ? RadicalTheme.violet : RadicalTheme.crimson).withValues(alpha: .07 + _pulse.value * .05), blurRadius: 42 + _pulse.value * 18, spreadRadius: 5)])));
+  Widget build(BuildContext context) => AnimatedBuilder(animation: _pulse, builder: (_, __) => Container(width: 335 + _pulse.value * 16, height: 335 + _pulse.value * 16, decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [BoxShadow(color: (widget.night ? RadicalTheme.violet : RadicalTheme.crimson).withValues(alpha: .07 + _pulse.value * .05), blurRadius: 42 + _pulse.value * 18, spreadRadius: 5)]));
 }
 
 class _Seat extends StatefulWidget {
@@ -207,7 +207,7 @@ class _MomentEmoji extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final emoji = switch (phase) { GamePhase.night => '🎭', GamePhase.dayDiscussion => '😱', GamePhase.dayVoting => '🔥', GamePhase.ended => '🎉' };
-    return IgnorePointer(child: FadeTransition(opacity: Tween(begin: .0, end: .18).animate(CurvedAnimation(parent: animation, curve: const Interval(0, .35, curve: Curves.easeOut))), child: ScaleTransition(scale: Tween(begin: .72, end: 1.12).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutBack)), child: Text(emoji, style: const TextStyle(fontSize: 84))));
+    return IgnorePointer(child: FadeTransition(opacity: Tween(begin: .0, end: .22).animate(CurvedAnimation(parent: animation, curve: const Interval(0, .45, curve: Curves.easeOut))), child: ScaleTransition(scale: Tween(begin: .70, end: 1.14).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutBack)), child: Text(emoji, style: const TextStyle(fontSize: 84))));
   }
 }
 
@@ -263,11 +263,14 @@ class _ReactionButton extends StatefulWidget {
 class _ReactionButtonState extends State<_ReactionButton> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   @override
-  void initState() { super.initState(); _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 260)); }
+  void initState() { super.initState(); _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 320)); }
   @override
   void dispose() { _controller.dispose(); super.dispose(); }
   @override
-  Widget build(BuildContext context) => Expanded(child: ScaleTransition(scale: Tween(begin: .96, end: 1.0).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack)), child: Material(color: Colors.transparent, child: InkWell(onTap: () { _controller.forward(from: 0); widget.onTap(); }, borderRadius: BorderRadius.circular(15), child: AnimatedContainer(duration: const Duration(milliseconds: 180), padding: const EdgeInsets.symmetric(vertical: 9), decoration: BoxDecoration(color: widget.active ? widget.color.withValues(alpha: .12) : RadicalTheme.panel2, borderRadius: BorderRadius.circular(15), border: Border.all(color: widget.active ? widget.color.withValues(alpha: .48) : RadicalTheme.line)), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text(widget.icon, style: const TextStyle(fontSize: 18)), const SizedBox(width: 6), Text(widget.label, style: TextStyle(fontWeight: FontWeight.w900, color: widget.active ? widget.color : Colors.white)), if (widget.count > 0) ...[const SizedBox(width: 6), Text('${widget.count}', style: TextStyle(color: widget.color, fontWeight: FontWeight.w900))]])))));
+  Widget build(BuildContext context) {
+    final curve = CurvedAnimation(parent: _controller, curve: Curves.easeOutBack);
+    return Expanded(child: FadeTransition(opacity: Tween(begin: .72, end: 1.0).animate(curve), child: ScaleTransition(scale: Tween(begin: .90, end: 1.0).animate(curve), child: Material(color: Colors.transparent, child: InkWell(onTap: () { _controller.forward(from: 0); widget.onTap(); }, borderRadius: BorderRadius.circular(15), splashColor: widget.color.withValues(alpha: .20), highlightColor: widget.color.withValues(alpha: .08), child: AnimatedContainer(duration: const Duration(milliseconds: 180), padding: const EdgeInsets.symmetric(vertical: 9), decoration: BoxDecoration(color: widget.active ? widget.color.withValues(alpha: .12) : RadicalTheme.panel2, borderRadius: BorderRadius.circular(15), border: Border.all(color: widget.active ? widget.color.withValues(alpha: .48) : RadicalTheme.line), boxShadow: widget.active ? [BoxShadow(color: widget.color.withValues(alpha: .14), blurRadius: 16)] : const []), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text(widget.icon, style: const TextStyle(fontSize: 18)), const SizedBox(width: 6), Text(widget.label, style: TextStyle(fontWeight: FontWeight.w900, color: widget.active ? widget.color : Colors.white)), if (widget.count > 0) ...[const SizedBox(width: 6), Text('${widget.count}', style: TextStyle(color: widget.color, fontWeight: FontWeight.w900))]]))))));
+  }
 }
 
 class _BottomAction extends StatelessWidget {
@@ -294,7 +297,7 @@ class _AnimatedActionButton extends StatefulWidget {
 class _AnimatedActionButtonState extends State<_AnimatedActionButton> {
   bool _down = false;
   @override
-  Widget build(BuildContext context) => AnimatedScale(scale: _down ? .94 : 1, duration: const Duration(milliseconds: 100), child: FilledButton.icon(onPressed: widget.enabled ? widget.onPressed : null, icon: Icon(widget.icon, size: 18), label: Text(widget.label), style: FilledButton.styleFrom(backgroundColor: RadicalTheme.gold, foregroundColor: RadicalTheme.ink, splashFactory: InkRipple.splashFactory, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))).copyWith(overlayColor: WidgetStatePropertyAll(RadicalTheme.goldBright.withValues(alpha: .22)))));
+  Widget build(BuildContext context) => Listener(onPointerDown: (_) => setState(() => _down = true), onPointerUp: (_) => setState(() => _down = false), onPointerCancel: (_) => setState(() => _down = false), child: AnimatedScale(scale: _down ? .94 : 1, duration: const Duration(milliseconds: 100), curve: Curves.easeOut, child: FilledButton.icon(onPressed: widget.enabled ? widget.onPressed : null, icon: Icon(widget.icon, size: 18), label: Text(widget.label), style: FilledButton.styleFrom(backgroundColor: RadicalTheme.gold, foregroundColor: RadicalTheme.ink, splashFactory: InkRipple.splashFactory, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))).copyWith(overlayColor: WidgetStatePropertyAll(RadicalTheme.goldBright.withValues(alpha: .22))))));
 }
 
 class _Panel extends StatelessWidget {
