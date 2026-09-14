@@ -26,14 +26,16 @@ class LobbyChatMessage {
   });
 
   LobbyChatMessage react(String emoji, String actorId) {
-    final updatedReactions = <String, List<String>>{
-      for (final entry in reactions.entries)
-        entry.key: List<String>.from(entry.value),
-    };
+    final updatedReactions = <String, List<String>>{};
+    for (final entry in reactions.entries) {
+      updatedReactions[entry.key] = List<String>.from(entry.value);
+    }
+
     final actors = updatedReactions.putIfAbsent(emoji, () => <String>[]);
     if (!actors.contains(actorId)) {
       actors.add(actorId);
     }
+
     return LobbyChatMessage(
       id: id,
       lobbyId: lobbyId,
