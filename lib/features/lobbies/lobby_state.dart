@@ -141,7 +141,7 @@ class LobbyController extends Notifier<LobbyState> {
     final index = messages.indexWhere((m) => m.id == messageId);
     if (index < 0) return;
     messages[index] = messages[index].react(reaction, actorId);
-    final chats = {...state.chats, lobbyId: List.unmodifiable(messages)};
+    final chats = <String, List<LobbyChatMessage>>{...state.chats, lobbyId: List.unmodifiable(messages)};
     state = state.copyWith(chats: chats, error: null, revision: state.revision + 1);
   }
 
@@ -160,7 +160,8 @@ class LobbyController extends Notifier<LobbyState> {
 
   void _addMessage(LobbyChatMessage message) {
     final messages = [...(state.chats[message.lobbyId] ?? const <LobbyChatMessage>[]), message];
-    state = state.copyWith(chats: {...state.chats, message.lobbyId: List.unmodifiable(messages)}, error: null, revision: state.revision + 1);
+    final chats = <String, List<LobbyChatMessage>>{...state.chats, message.lobbyId: List.unmodifiable(messages)};
+    state = state.copyWith(chats: chats, error: null, revision: state.revision + 1);
   }
 
   void _system(String lobbyId, String text) => _addMessage(LobbyChatMessage(id: '${lobbyId}_system_${state.revision + 1}', lobbyId: lobbyId, senderId: 'system', senderName: 'سیستم', content: text, sentAt: DateTime.now(), type: LobbyChatMessageType.system));
