@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mafia_radical/core/models/app_models.dart';
 import 'package:mafia_radical/features/game/game_state.dart';
 import 'package:mafia_radical/features/game/player_avatar.dart';
+import 'package:mafia_radical/features/scenarios/scenario_game_screen.dart';
 
 void main() {
   group('GameController', () {
@@ -12,7 +13,7 @@ void main() {
       addTearDown(container.dispose);
 
       final controller = container.read(gameControllerProvider.notifier);
-      controller.start(playerCount: 8);
+      controller.start(playerCount: 8, seed: 42);
       final state = container.read(gameControllerProvider);
 
       expect(state.initialized, isTrue);
@@ -26,6 +27,7 @@ void main() {
       expect(state.players.where((player) => player.isLeader), hasLength(1));
       expect(state.players.where((player) => player.isStaff), hasLength(1));
       expect(state.availableAction, isA<NightAction>());
+      expect(state.players.map((player) => player.seat).toSet(), {1, 2, 3, 4, 5, 6, 7, 8});
     });
 
     test('selectPlayer accepts only a living non-user player', () {
@@ -33,7 +35,7 @@ void main() {
       addTearDown(container.dispose);
 
       final controller = container.read(gameControllerProvider.notifier);
-      controller.start(playerCount: 6);
+      controller.start(playerCount: 6, seed: 7);
       final before = container.read(gameControllerProvider);
       final target = before.players.firstWhere((player) => !player.isUser);
 
@@ -43,6 +45,63 @@ void main() {
       controller.selectPlayer(before.user!.id);
       expect(container.read(gameControllerProvider).selectedPlayerId, target.id);
     });
+
+    test('different seeds change role-to-seat mapping and user seat', () {
+      final firstContainer = ProviderContainer();
+      final secondContainer = ProviderContainer();
+      addTearDown(firstContainer.dispose);
+      addTearDown(secondContainer.dispose);
+
+      firstContainer.read(gameControllerProvider.notifier).start(playerCount: 20, seed: 101);
+      secondContainer.read(gameControllerProvider.notifier).start(playerCount: 20, seed: 202);
+
+      final first = firstContainer.read(gameControllerProvider);
+      final second = secondContainer.read(gameControllerProvider);
+      final firstMapping = first.players.map((p) => '${p.seat}:${p.role}').join('|');
+      final secondMapping = second.players.map((p) => '${p.seat}:${p.role}').join('|');
+
+      expect(firstMapping, isNot(secondMapping));
+      expect(first.user!.seat, isNot(second.user!.seat));
+      expect(first.players.map((p) => p.seat).toSet(), hasLength(20));
+      expect(second.players.map((p) => p.seat).toSet(), hasLength(20));
+    });
+
+    test('role counts remain valid while roles are independent from seats', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final controller = container.read(gameControllerProvider.notifier);
+
+      controller.start(playerCount: 10, seed: 11);
+      final first = container.read(gameControllerProvider);
+      controller.start(playerCount: 10, seed: 12);
+      final second = container.read(gameControllerProvider);
+
+      for (final state in [first, second]) {
+        expect(state.players.where((p) => p.role == 'مافیا'), hasLength(3));
+        expect(state.players.where((p) => p.role == 'دکتر'), hasLength(1));
+        expect(state.players.where((p) => p.role == 'کارآگاه'), hasLength(1));
+        expect(state.players, hasLength(10));
+      }
+      expect(first.players.map((p) => p.role).join('|'), isNot(second.players.map((p) => p.role).join('|')));
+    });
+  });
+
+  group('GameTableLayout', () {
+    for (final count in [6, 10, 15, 20]) {
+      test('keeps $count seats inside the canvas without overlap', () {
+        final offsets = GameTableLayout.offsetsFor(count);
+        expect(offsets, hasLength(count));
+        expect(offsets.every(GameTableLayout.fitsCanvas), isTrue);
+
+        for (var i = 0; i < offsets.length; i++) {
+          for (var j = i + 1; j < offsets.length; j++) {
+            final a = GameTableLayout.seatRect(offsets[i]);
+            final b = GameTableLayout.seatRect(offsets[j]);
+            expect(a.overlaps(b), isFalse, reason: 'seats $i and $j overlap for $count players');
+          }
+        }
+      });
+    }
   });
 
   test('GamePlayer preserves real avatar and lobby badges across copyWith', () {
