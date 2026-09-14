@@ -13,7 +13,7 @@ class LobbyAccessProfile {
 
 class LobbyState {
   final List<LobbyDefinition> lobbies;
-  final Map<String, List<LobbyMessage>> chats;
+  final Map<String, List<LobbyChatMessage>> chats;
   final String? activeLobbyId;
   final String? error;
   final int revision;
@@ -31,7 +31,7 @@ class LobbyState {
     return null;
   }
 
-  LobbyState copyWith({List<LobbyDefinition>? lobbies, Map<String, List<LobbyMessage>>? chats, Object? activeLobbyId = _keep, Object? error = _keep, int? revision}) => LobbyState(
+  LobbyState copyWith({List<LobbyDefinition>? lobbies, Map<String, List<LobbyChatMessage>>? chats, Object? activeLobbyId = _keep, Object? error = _keep, int? revision}) => LobbyState(
         lobbies: lobbies ?? this.lobbies,
         chats: chats ?? this.chats,
         activeLobbyId: identical(activeLobbyId, _keep) ? this.activeLobbyId : activeLobbyId as String?,
@@ -125,24 +125,27 @@ class LobbyController extends Notifier<LobbyState> {
     if (lobby == null || !lobby.players.any((p) => p.playerId == senderId)) throw StateError('فقط اعضای همان لابی می‌توانند پیام ارسال کنند.');
     final trimmed = text.trim();
     if (trimmed.isEmpty && emoji == null && sticker == null) return;
-    _addMessage(LobbyMessage(id: '${lobbyId}_${state.revision + 1}', lobbyId: lobbyId, senderId: senderId, senderName: senderName, text: trimmed, sentAt: DateTime.now(), emoji: emoji, sticker: sticker));
+    final type = emoji != null ? LobbyChatMessageType.emoji : sticker != null ? LobbyChatMessageType.sticker : LobbyChatMessageType.text;
+    final content = emoji ?? sticker ?? trimmed;
+    _addMessage(LobbyChatMessage(id: '${lobbyId}_${DateTime.now().microsecondsSinceEpoch}', lobbyId: lobbyId, senderId: senderId, senderName: senderName, content: content, sentAt: DateTime.now(), type: type));
   }
 
   void sendQuickEmoji({required String lobbyId, required String senderId, required String senderName, required String emoji}) => sendMessage(lobbyId: lobbyId, senderId: senderId, senderName: senderName, text: '', emoji: emoji);
 
-  void react({required String lobbyId, required String messageId, required String actorId}) {
+  void sendSticker({required String lobbyId, required String senderId, required String senderName, required String sticker}) => sendMessage(lobbyId: lobbyId, senderId: senderId, senderName: senderName, text: '', sticker: sticker);
+
+  void react({required String lobbyId, required String messageId, required String actorId, String reaction = '👍'}) {
     final lobby = _find(lobbyId);
     if (lobby == null || !lobby.players.any((p) => p.playerId == actorId)) throw StateError('واکنش فقط برای اعضای همان لابی مجاز است.');
-    final messages = [...(state.chats[lobbyId] ?? const <LobbyMessage>[])];
+    final messages = [...(state.chats[lobbyId] ?? const <LobbyChatMessage>[])];
     final index = messages.indexWhere((m) => m.id == messageId);
     if (index < 0) return;
-    final old = messages[index];
-    messages[index] = LobbyMessage(id: old.id, lobbyId: old.lobbyId, senderId: old.senderId, senderName: old.senderName, text: old.text, sentAt: old.sentAt, system: old.system, emoji: old.emoji, sticker: old.sticker, reactions: old.reactions + 1);
+    messages[index] = messages[index].react(reaction, actorId);
     final chats = {...state.chats, lobbyId: List.unmodifiable(messages)};
     state = state.copyWith(chats: chats, error: null, revision: state.revision + 1);
   }
 
-  List<LobbyMessage> messagesFor(String lobbyId) => List.unmodifiable(state.chats[lobbyId] ?? const <LobbyMessage>[]);
+  List<LobbyChatMessage> messagesFor(String lobbyId) => List.unmodifiable(state.chats[lobbyId] ?? const <LobbyChatMessage>[]);
 
   LobbyDefinition? _find(String id) {
     for (final lobby in state.lobbies) {
@@ -155,12 +158,12 @@ class LobbyController extends Notifier<LobbyState> {
 
   void _commit({List<LobbyDefinition>? lobbies, Object? activeLobbyId = _keep, Object? error = _keep}) => state = state.copyWith(lobbies: lobbies, activeLobbyId: activeLobbyId, error: error, revision: state.revision + 1);
 
-  void _addMessage(LobbyMessage message) {
-    final messages = [...(state.chats[message.lobbyId] ?? const <LobbyMessage>[]) , message];
+  void _addMessage(LobbyChatMessage message) {
+    final messages = [...(state.chats[message.lobbyId] ?? const <LobbyChatMessage>[]), message];
     state = state.copyWith(chats: {...state.chats, message.lobbyId: List.unmodifiable(messages)}, error: null, revision: state.revision + 1);
   }
 
-  void _system(String lobbyId, String text) => _addMessage(LobbyMessage(id: '${lobbyId}_system_${state.revision + 1}', lobbyId: lobbyId, senderId: 'system', senderName: 'سیستم', text: text, sentAt: DateTime.now(), system: true));
+  void _system(String lobbyId, String text) => _addMessage(LobbyChatMessage(id: '${lobbyId}_system_${state.revision + 1}', lobbyId: lobbyId, senderId: 'system', senderName: 'سیستم', content: text, sentAt: DateTime.now(), type: LobbyChatMessageType.system));
 
   void _requireLeader(LobbyDefinition lobby, String actorId) {
     if (lobby.ownerId != actorId) throw StateError('این عملیات فقط در اختیار لیدر لابی است.');
