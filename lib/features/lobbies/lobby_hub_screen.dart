@@ -131,6 +131,25 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
     );
   }
 
+  LobbyPlayerLabel _demoPlayer({required String id, required String name, bool leader = false, bool staff = false}) {
+    return LobbyPlayerLabel(
+      playerId: id,
+      playerName: name,
+      isLeader: leader,
+      isStaff: staff,
+      groupLabels: staff ? const {LobbyLabel.radical} : const {},
+    );
+  }
+
+  LobbyPlayerLabel? _chatPlayer(String senderId) {
+    if (senderId == widget.ownerId) {
+      return _demoPlayer(id: senderId, name: 'شما', leader: true, staff: RadicalStaffDirectory.isStaff(senderId));
+    }
+    final staff = RadicalStaffDirectory.member(senderId);
+    if (staff != null) return staff;
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final scenario = _scenario;
@@ -155,7 +174,12 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
         body: ListView(
           padding: const EdgeInsets.fromLTRB(14, 8, 14, 30),
           children: [
-            _section('تفکیک لابی', _categoryGrid()),
+            _section('فیلتر لابی', _categoryGrid()),
+            const SizedBox(height: 5),
+            const Text(
+              'دوستانه یا امتیازی را با تفکیک نوجوان و بزرگسال انتخاب کن.',
+              style: TextStyle(color: RadicalTheme.smoke, fontSize: 11),
+            ),
             const SizedBox(height: 14),
             _lobbyCard(label),
             const SizedBox(height: 14),
@@ -341,18 +365,21 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
   }
 
   Widget _playersPanel() {
+    final players = [
+      _demoPlayer(id: widget.ownerId, name: 'شما', leader: true, staff: RadicalStaffDirectory.isStaff(widget.ownerId)),
+      _demoPlayer(id: 'staff_01', name: 'رادیکال • مدیر', staff: true),
+      _demoPlayer(id: 'newcomer', name: 'بازیکن تازه‌وارد'),
+      _demoPlayer(id: 'pro', name: 'بازیکن حرفه‌ای'),
+    ];
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: RadicalTheme.glass(),
-      child: const Column(
+      child: Column(
         children: [
-          _PlayerRow(name: 'شما', leader: true),
-          Divider(height: 18),
-          _PlayerRow(name: 'بازیکن رادیکال', staff: true),
-          SizedBox(height: 8),
-          _PlayerRow(name: 'بازیکن تازه‌وارد'),
-          SizedBox(height: 8),
-          _PlayerRow(name: 'بازیکن حرفه‌ای'),
+          for (var i = 0; i < players.length; i++) ...[
+            _PlayerRow(player: players[i]),
+            if (i != players.length - 1) const Divider(height: 18),
+          ],
         ],
       ),
     );
@@ -399,6 +426,7 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
 
   Widget _message(LobbyChatMessage message) {
     final isSystem = message.type == LobbyChatMessageType.system;
+    final sender = _chatPlayer(message.senderId);
     final prefix = switch (message.type) {
       LobbyChatMessageType.text => '${message.senderName}: ',
       LobbyChatMessageType.emoji => '${message.senderName}: ',
@@ -415,13 +443,25 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
             color: isSystem ? RadicalTheme.panel3 : RadicalTheme.panel2,
             borderRadius: BorderRadius.circular(13),
           ),
-          child: Text(
-            '$prefix${message.content}',
-            style: TextStyle(
-              color: isSystem ? RadicalTheme.smoke : Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: Text(
+                  '$prefix${message.content}',
+                  style: TextStyle(
+                    color: isSystem ? RadicalTheme.smoke : Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              if (!isSystem && sender != null) ...[
+                const SizedBox(width: 6),
+                if (sender.isLeader) _badge('👑 لیدر لابی', RadicalTheme.gold),
+                if (sender.isStaff) _badge('◆ همکار رادیکال', RadicalTheme.violet),
+              ],
+            ],
           ),
         ),
       ),
@@ -459,7 +499,7 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
                   const CircleAvatar(radius: 17, child: Icon(Icons.person_rounded, size: 18)),
                   const SizedBox(width: 8),
                   Expanded(child: Text(member.playerName, style: const TextStyle(fontWeight: FontWeight.w800))),
-                  _badge('◆ STAFF', RadicalTheme.violet),
+                  _badge('◆ همکار رادیکال', RadicalTheme.violet),
                 ],
               ),
             ),
@@ -487,7 +527,7 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
         borderRadius: BorderRadius.circular(9),
         border: Border.all(color: color.withValues(alpha: .35)),
       ),
-      child: Text(text, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w900)),
+      child: Text(text, style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w900)),
     );
   }
 
@@ -508,7 +548,7 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
                 leading: _DiamondIcon(item),
                 title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.w900)),
                 subtitle: Text(item.usage),
-                trailing: Text(item.emoji, style: const TextStyle(fontSize: 24)),
+                trailing: Text(item.emoji, style: TextStyle(color: item.primary, fontSize: 24)),
               ),
             const Divider(),
             const Text('فروشگاه', style: TextStyle(fontWeight: FontWeight.w900)),
@@ -566,10 +606,8 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
 }
 
 class _PlayerRow extends StatelessWidget {
-  final String name;
-  final bool leader;
-  final bool staff;
-  const _PlayerRow({required this.name, this.leader = false, this.staff = false});
+  final LobbyPlayerLabel player;
+  const _PlayerRow({required this.player});
 
   @override
   Widget build(BuildContext context) {
@@ -577,12 +615,25 @@ class _PlayerRow extends StatelessWidget {
       children: [
         const CircleAvatar(radius: 19, child: Icon(Icons.person_rounded, size: 20)),
         const SizedBox(width: 9),
-        Expanded(child: Text(name, style: const TextStyle(fontWeight: FontWeight.w800))),
-        if (staff)
-          const Text('◆ STAFF', style: TextStyle(color: RadicalTheme.violet, fontSize: 10, fontWeight: FontWeight.w900)),
-        if (leader)
-          const Text(' 👑 لیدر لابی', style: TextStyle(color: RadicalTheme.gold, fontSize: 10, fontWeight: FontWeight.w900)),
+        Expanded(
+          child: Text(player.playerName, style: const TextStyle(fontWeight: FontWeight.w800)),
+        ),
+        if (player.isStaff) _miniBadge('◆ همکار رادیکال', RadicalTheme.violet),
+        if (player.isLeader) _miniBadge('👑 لیدر لابی', RadicalTheme.gold),
       ],
+    );
+  }
+
+  Widget _miniBadge(String text, Color color) {
+    return Container(
+      margin: const EdgeInsets.only(left: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: .11),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: .30)),
+      ),
+      child: Text(text, style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w900)),
     );
   }
 }
