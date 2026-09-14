@@ -7,6 +7,7 @@ class RadicalScaffold extends StatelessWidget {
   final Widget child;
   final PreferredSizeWidget? appBar;
   final EdgeInsetsGeometry padding;
+  final bool padded;
   final bool safeArea;
 
   const RadicalScaffold({
@@ -14,12 +15,16 @@ class RadicalScaffold extends StatelessWidget {
     required this.child,
     this.appBar,
     this.padding = const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+    this.padded = true,
     this.safeArea = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    final content = Padding(padding: padding, child: child);
+    final content = Padding(
+      padding: padded ? padding : EdgeInsets.zero,
+      child: child,
+    );
     return Scaffold(
       backgroundColor: RadicalTheme.ink,
       appBar: appBar,
