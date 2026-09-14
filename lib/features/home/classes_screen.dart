@@ -31,9 +31,9 @@ class ClassesScreen extends ConsumerWidget {
               Expanded(
                 child: ListView(
                   children: [
-                    _buildCard(context, 'بازی دوستانه', 'ورود سریع به لابی‌های فعال، گفتگو و بازی آزاد', Icons.groups_rounded, const Color(0xFF1E88E5), () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LobbyHubScreen()))),
+                    _buildCard(context, 'بازی دوستانه', 'ورود سریع به لابی‌های فعال، گفتگو و بازی آزاد', Icons.groups_rounded, const Color(0xFF1E88E5), () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LobbyHubScreen(ownerId: 'local_creator')))),
                     const SizedBox(height: 12),
-                    _buildCard(context, 'رقابتی رنکد (Ranked)', 'ثبت امتیاز، ارتقای رتبه و نبرد با حرفه‌ای‌ها', Icons.military_tech_rounded, RadicalColors.goldAccent, () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LobbyHubScreen()))),
+                    _buildCard(context, 'رقابتی رنکد (Ranked)', 'ثبت امتیاز، ارتقای رتبه و نبرد با حرفه‌ای‌ها', Icons.military_tech_rounded, RadicalColors.goldAccent, () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LobbyHubScreen(ownerId: 'local_creator')))),
                     const SizedBox(height: 12),
                     _buildCard(context, 'سناریوهای اختصاصی', 'پدرخوانده، شب مافیا، بازپرس و سناریوهای دست‌ساز', Icons.auto_stories_rounded, RadicalColors.crimsonPrimary, () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ScenarioSelectionScreen()))),
                   ],
