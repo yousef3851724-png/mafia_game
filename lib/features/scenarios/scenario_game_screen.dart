@@ -10,21 +10,18 @@ import 'scenario_catalog.dart';
 
 /// Geometry shared by the table widget and its layout tests.
 class GameTableLayout {
-  static const double canvasSize = 800;
+  static const double canvasSize = 1200;
   static const double seatWidth = 96;
   static const double seatHeight = 104;
   static const double tableDiameter = 300;
-  static const double radiusX = 310;
-  static const double radiusY = 290;
+  static const double radiusX = 450;
+  static const double radiusY = 410;
 
   static List<Offset> offsetsFor(int playerCount) {
     final count = playerCount.clamp(1, 20);
     return List.generate(count, (index) {
       final angle = -math.pi / 2 + (math.pi * 2 * index / count);
-      return Offset(
-        radiusX * math.cos(angle),
-        radiusY * math.sin(angle),
-      );
+      return Offset(radiusX * math.cos(angle), radiusY * math.sin(angle));
     }, growable: false);
   }
 
@@ -221,7 +218,6 @@ class _GameTable extends StatelessWidget {
     final offsets = GameTableLayout.offsetsFor(count);
     return LayoutBuilder(
       builder: (context, constraints) {
-        final scale = math.min(constraints.maxWidth / GameTableLayout.canvasSize, constraints.maxHeight / GameTableLayout.canvasSize).clamp(.35, 1.0);
         return Center(
           child: FittedBox(
             fit: BoxFit.contain,
