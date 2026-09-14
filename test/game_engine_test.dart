@@ -26,15 +26,15 @@ void main() {
   });
 
   test('player badges survive immutable state updates', () {
-    const player = GamePlayer(
+    final player = GamePlayer(
       id: 'p1',
       name: 'بازیکن',
       role: 'شهروند',
-      appRole: AppRole.player,
+      appRole: roleForName('شهروند'),
       seat: 1,
       isUser: true,
       alive: true,
-      avatar: PlayerAvatar(id: 'avatar_shadow', displayName: 'بازیکن', seed: 1),
+      avatar: const PlayerAvatar(id: 'avatar_shadow', displayName: 'بازیکن', seed: 1),
       isLeader: true,
       isStaff: false,
     );
