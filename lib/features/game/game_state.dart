@@ -70,9 +70,31 @@ class GameState {
   final bool nightActionDone;
   final bool initialized;
 
-  const GameState({required this.phase, required this.round, required this.secondsLeft, required this.players, required this.selectedPlayerId, required this.message, required this.winner, required this.availableAction, required this.nightActionDone, required this.initialized});
+  const GameState({
+    required this.phase,
+    required this.round,
+    required this.secondsLeft,
+    required this.players,
+    required this.selectedPlayerId,
+    required this.message,
+    required this.winner,
+    required this.availableAction,
+    required this.nightActionDone,
+    required this.initialized,
+  });
 
-  factory GameState.initial() => const GameState(phase: GamePhase.night, round: 1, secondsLeft: 20, players: [], selectedPlayerId: null, message: 'شب اول شروع شد.', winner: null, availableAction: NightAction.none, nightActionDone: false, initialized: false);
+  factory GameState.initial() => const GameState(
+        phase: GamePhase.night,
+        round: 1,
+        secondsLeft: 20,
+        players: [],
+        selectedPlayerId: null,
+        message: 'شب اول شروع شد.',
+        winner: null,
+        availableAction: NightAction.none,
+        nightActionDone: false,
+        initialized: false,
+      );
 
   List<GamePlayer> get alivePlayers => players.where((p) => p.alive).toList(growable: false);
 
@@ -83,7 +105,18 @@ class GameState {
     return null;
   }
 
-  GameState copyWith({GamePhase? phase, int? round, int? secondsLeft, List<GamePlayer>? players, Object? selectedPlayerId = _keep, String? message, Object? winner = _keep, NightAction? availableAction, bool? nightActionDone, bool? initialized}) => GameState(
+  GameState copyWith({
+    GamePhase? phase,
+    int? round,
+    int? secondsLeft,
+    List<GamePlayer>? players,
+    Object? selectedPlayerId = _keep,
+    String? message,
+    Object? winner = _keep,
+    NightAction? availableAction,
+    bool? nightActionDone,
+    bool? initialized,
+  }) => GameState(
         phase: phase ?? this.phase,
         round: round ?? this.round,
         secondsLeft: secondsLeft ?? this.secondsLeft,
@@ -103,7 +136,7 @@ final gameControllerProvider = NotifierProvider.autoDispose<GameController, Game
 
 class GameController extends AutoDisposeNotifier<GameState> {
   Timer? _timer;
-  final Random _random = Random();
+  Random _random = Random();
 
   @override
   GameState build() {
@@ -111,34 +144,75 @@ class GameController extends AutoDisposeNotifier<GameState> {
     return GameState.initial();
   }
 
-  void start({required int playerCount, ScenarioDefinition? scenario, CustomScenario? customScenario}) {
+  void start({
+    required int playerCount,
+    ScenarioDefinition? scenario,
+    CustomScenario? customScenario,
+    int? seed,
+  }) {
     _timer?.cancel();
+    _random = seed == null ? Random() : Random(seed);
     final count = playerCount.clamp(4, 20);
     final roles = _buildRandomRoles(count, scenario: scenario, customScenario: customScenario);
     const names = ['شما', 'آرش', 'سارا', 'بابک', 'نگار', 'کیان', 'مهسا', 'رضا', 'الناز', 'پارسا', 'ترانه', 'مانی', 'هلیا', 'سام', 'نیکا', 'یاسین', 'کیارش', 'مریم', 'رامین', 'نوشین'];
     const females = {'سارا', 'نگار', 'مهسا', 'الناز', 'ترانه', 'هلیا', 'نیکا', 'مریم', 'نوشین'};
     final avatarIds = ['avatar_shadow', 'avatar_detective', 'avatar_crimson', 'avatar_gold', 'avatar_noir'];
 
-    final built = List.generate(count, (index) {
+    // Build lobby identities first. Roles are assigned independently from these identities.
+    final identities = List.generate(count, (index) {
       final name = names[index % names.length];
-      final roleName = roles[index];
       final avatarId = avatarIds[index % avatarIds.length];
-      return GamePlayer(
+      return _PlayerIdentity(
         id: 'player_${index + 1}',
         name: name,
-        role: roleName,
-        appRole: roleForName(roleName),
-        seat: index + 1,
         isUser: index == 0,
-        alive: true,
         isLeader: index == 0,
         isStaff: index == 1,
-        avatar: PlayerAvatar(id: avatarId, displayName: name, assetPath: null, imageUrl: null, female: females.contains(name), seed: index + 1),
+        avatar: PlayerAvatar(
+          id: avatarId,
+          displayName: name,
+          assetPath: null,
+          imageUrl: null,
+          female: females.contains(name),
+          seed: index + 1,
+        ),
       );
     });
 
-    final action = _actionForRole(built.first.role);
-    state = state.copyWith(phase: GamePhase.night, round: 1, secondsLeft: 20, players: built, selectedPlayerId: null, message: 'شب اول شروع شد. ${_actionLabel(action)}', winner: null, availableAction: action, nightActionDone: false, initialized: true);
+    // Seat assignment is independently shuffled from the role list. A player's lobby
+    // position therefore carries no information about their role.
+    identities.shuffle(_random);
+
+    final built = List.generate(count, (seatIndex) {
+      final identity = identities[seatIndex];
+      final roleName = roles[seatIndex];
+      return GamePlayer(
+        id: identity.id,
+        name: identity.name,
+        role: roleName,
+        appRole: roleForName(roleName),
+        seat: seatIndex + 1,
+        isUser: identity.isUser,
+        alive: true,
+        isLeader: identity.isLeader,
+        isStaff: identity.isStaff,
+        avatar: identity.avatar,
+      );
+    }, growable: false);
+
+    final action = _actionForRole(built.firstWhere((p) => p.isUser).role);
+    state = state.copyWith(
+      phase: GamePhase.night,
+      round: 1,
+      secondsLeft: 20,
+      players: built,
+      selectedPlayerId: null,
+      message: 'شب اول شروع شد. ${_actionLabel(action)}',
+      winner: null,
+      availableAction: action,
+      nightActionDone: false,
+      initialized: true,
+    );
     _startTimer();
   }
 
@@ -298,7 +372,11 @@ class GameController extends AutoDisposeNotifier<GameState> {
         if (!state.nightActionDone) _resolveNpcNight();
         break;
       case GamePhase.dayDiscussion:
-        if (state.user?.alive ?? false) startVoting(); else _startObserverVoting();
+        if (state.user?.alive ?? false) {
+          startVoting();
+        } else {
+          _startObserverVoting();
+        }
         break;
       case GamePhase.dayVoting:
         _autoVote();
@@ -317,7 +395,6 @@ class GameController extends AutoDisposeNotifier<GameState> {
       _enterDay();
       return;
     }
-    // NPC mafia may target the user; the player is a valid night target when alive.
     final candidates = alive.where((p) => !_isMafia(p.role)).toList();
     if (candidates.isEmpty) {
       state = state.copyWith(nightActionDone: true);
@@ -325,7 +402,6 @@ class GameController extends AutoDisposeNotifier<GameState> {
       return;
     }
     final target = candidates[_random.nextInt(candidates.length)];
-    // NPC doctors may also save the user, but never themselves.
     final saveCandidates = alive.where((p) => p.id != doctor?.id).toList();
     final saved = doctor == null || saveCandidates.isEmpty ? null : saveCandidates[_random.nextInt(saveCandidates.length)];
     if (target.id == saved?.id) {
@@ -405,4 +481,22 @@ class GameController extends AutoDisposeNotifier<GameState> {
   }
 
   List<GamePlayer> _setAlive(String id, bool alive) => state.players.map((p) => p.id == id ? p.copyWith(alive: alive) : p).toList(growable: false);
+}
+
+class _PlayerIdentity {
+  final String id;
+  final String name;
+  final bool isUser;
+  final bool isLeader;
+  final bool isStaff;
+  final PlayerAvatar avatar;
+
+  const _PlayerIdentity({
+    required this.id,
+    required this.name,
+    required this.isUser,
+    required this.isLeader,
+    required this.isStaff,
+    required this.avatar,
+  });
 }
