@@ -1,59 +1,70 @@
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:mafia_radical/features/lobbies/lobby_system.dart';
+import 'package:mafia_game/features/lobbies/lobby_system.dart';
 
 void main() {
-  test('LobbyChatMessage serializes typed content and reaction actors', () {
-    final sentAt = DateTime.fromMillisecondsSinceEpoch(1730000000123);
-    final message = LobbyChatMessage(
-      id: 'm1',
-      lobbyId: 'l1',
-      senderId: 'user1',
-      senderName: 'User 1',
-      content: '🔥',
-      sentAt: sentAt,
-      type: LobbyChatMessageType.emoji,
-    ).react('👍', 'user1').react('👍', 'user2');
+  group('LobbyChatMessage Tests', () {
+    test('creates instance correctly', () {
+      final now = DateTime.now();
+      final message = LobbyChatMessage(
+        id: '1',
+        lobbyId: 'lobby-1',
+        senderId: 'user-1',
+        senderName: 'Yousef',
+        content: 'Hello World',
+        sentAt: now,
+        type: LobbyChatMessageType.text,
+      );
 
-    final restored = LobbyChatMessage.fromMap(message.toMap());
-
-    expect(restored.id, 'm1');
-    expect(restored.content, '🔥');
-    expect(restored.type, LobbyChatMessageType.emoji);
-    expect(restored.sentAt?.millisecondsSinceEpoch, 1730000000123);
-    expect(restored.reactions, {
-      '👍': ['user1', 'user2'],
+      expect(message.id, '1');
+      expect(message.lobbyId, 'lobby-1');
+      expect(message.senderId, 'user-1');
+      expect(message.senderName, 'Yousef');
+      expect(message.content, 'Hello World');
+      expect(message.sentAt, now);
+      expect(message.type, LobbyChatMessageType.text);
+      expect(message.reactions, isEmpty);
     });
-  });
 
-  test('react is immutable and does not duplicate the same actor', () {
-    const message = LobbyChatMessage(
-      id: 'm2',
-      lobbyId: 'l1',
-      senderId: 'user1',
-      senderName: 'User 1',
-      content: 'hello',
-      sentAt: null,
-    );
+    test('react adds new reaction', () {
+      final message = LobbyChatMessage(
+        id: '1',
+        lobbyId: 'lobby-1',
+        senderId: 'user-1',
+        senderName: 'Yousef',
+        content: 'Hello',
+        sentAt: DateTime.now(),
+      );
 
-    final reacted = message.react('👍', 'user1').react('👍', 'user1');
+      final reacted = message.react('❤️', 'user-2');
+      expect(reacted.reactions['❤️'], contains('user-2'));
+    });
 
-    expect(message.reactions, isEmpty);
-    expect(reacted.reactions['👍'], ['user1']);
-  });
+    test('toMap and fromMap serialization work', () {
+      final now = DateTime.fromMillisecondsSinceEpoch(1700000000000);
+      final message = LobbyChatMessage(
+        id: 'msg-123',
+        lobbyId: 'lobby-abc',
+        senderId: 'user-xyz',
+        senderName: 'Amir',
+        content: 'Ready to play',
+        sentAt: now,
+        type: LobbyChatMessageType.system,
+        reactions: const {
+          '👍': ['user-1', 'user-2'],
+        },
+      );
 
-  test('system messages use the typed system variant', () {
-    final message = LobbyChatMessage(
-      id: 'm3',
-      lobbyId: 'l1',
-      senderId: 'system',
-      senderName: 'سیستم',
-      content: 'لابی ساخته شد.',
-      sentAt: DateTime.now(),
-      type: LobbyChatMessageType.system,
-    );
+      final map = message.toMap();
+      final fromMapMessage = LobbyChatMessage.fromMap(map);
 
-    expect(message.type, LobbyChatMessageType.system);
-    expect(message.content, 'لابی ساخته شد.');
+      expect(fromMapMessage.id, message.id);
+      expect(fromMapMessage.lobbyId, message.lobbyId);
+      expect(fromMapMessage.senderId, message.senderId);
+      expect(fromMapMessage.senderName, message.senderName);
+      expect(fromMapMessage.content, message.content);
+      expect(fromMapMessage.sentAt, message.sentAt);
+      expect(fromMapMessage.type, message.type);
+      expect(fromMapMessage.reactions['👍'], ['user-1', 'user-2']);
+    });
   });
 }

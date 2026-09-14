@@ -3,6 +3,11 @@ enum LobbyChatMessageType {
   emoji,
   system,
 }
+enum LobbyChatMessageType {
+  text,
+  emoji,
+  system,
+}
 
 class LobbyChatMessage {
   final String id;
@@ -30,13 +35,9 @@ class LobbyChatMessage {
       for (final entry in reactions.entries)
         entry.key: List<String>.from(entry.value),
     };
-
     final actors = updatedReactions.putIfAbsent(emoji, () => <String>[]);
-
-    if (!actors.contains(actorId)) {
       actors.add(actorId);
     }
-
     return LobbyChatMessage(
       id: id,
       lobbyId: lobbyId,
@@ -59,10 +60,7 @@ class LobbyChatMessage {
       'sentAt': sentAt?.millisecondsSinceEpoch,
       'type': type.name,
       'reactions': reactions.map(
-        (emoji, actors) => MapEntry(
-          emoji,
-          List<String>.from(actors),
-        ),
+        (emoji, actors) => MapEntry(emoji, List<String>.from(actors)),
       ),
     };
   }
@@ -70,20 +68,16 @@ class LobbyChatMessage {
   factory LobbyChatMessage.fromMap(Map<String, dynamic> map) {
     final rawReactions = map['reactions'];
     final parsedReactions = <String, List<String>>{};
-
     if (rawReactions is Map) {
       rawReactions.forEach((key, value) {
         if (value is List) {
-          parsedReactions[key.toString()] = value
-              .map((actor) => actor.toString())
-              .toList();
+          parsedReactions[key.toString()] = value.map((e) => e.toString()).toList();
         }
       });
     }
 
     final rawSentAt = map['sentAt'];
     DateTime? parsedSentAt;
-
     if (rawSentAt is int) {
       parsedSentAt = DateTime.fromMillisecondsSinceEpoch(rawSentAt);
     } else if (rawSentAt is String) {
