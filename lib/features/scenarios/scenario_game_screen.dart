@@ -1,11 +1,14 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../core/theme/radical_theme.dart';
+import '../game/game_state.dart';
+import '../game/player_avatar.dart';
 import 'custom_scenario_system.dart';
-import 'hunter_scenario.dart';
 import 'realistic_avatar.dart';
 import 'scenario_catalog.dart';
 
-class ScenarioGameScreen extends StatefulWidget {
+class ScenarioGameScreen extends ConsumerStatefulWidget {
   final ScenarioDefinition? scenario;
   final CustomScenario? customScenario;
   final ScenarioMode mode;
@@ -20,211 +23,81 @@ class ScenarioGameScreen extends StatefulWidget {
   });
 
   @override
-  State<ScenarioGameScreen> createState() => _ScenarioGameScreenState();
+  ConsumerState<ScenarioGameScreen> createState() => _ScenarioGameScreenState();
 }
 
-enum _Phase { night, nightResult, day, dayResult, ended }
-
-class _Player {
-  final String name;
-  final String role;
-  final bool female;
-  final int seat;
-  final bool isUser;
-  bool alive;
-
-  _Player({
-    required this.name,
-    required this.role,
-    required this.female,
-    required this.seat,
-    required this.isUser,
-    this.alive = true,
-  });
-}
-
-class _ScenarioGameScreenState extends State<ScenarioGameScreen> {
-  late final List<_Player> _players;
-  _Phase _phase = _Phase.night;
-  int _round = 1;
-  String? _selected;
-  String _result = '';
-  String? _winner;
-
-  static const _names = [
-    'شما', 'آرش', 'سارا', 'بابک', 'نگار', 'کیان', 'مهسا', 'رضا',
-    'الناز', 'پارسا', 'ترانه', 'مانی', 'هلیا', 'سام', 'نیکا', 'یاسین',
-  ];
-
-  static const _femaleNames = {
-    'سارا', 'نگار', 'مهسا', 'الناز', 'ترانه', 'هلیا', 'نیکا',
-  };
-
+class _ScenarioGameScreenState extends ConsumerState<ScenarioGameScreen> {
   @override
   void initState() {
     super.initState();
-    final roles = _buildRoles();
-    _players = List.generate(widget.playerCount, (index) {
-      final name = _names[index % _names.length];
-      return _Player(
-        name: name,
-        role: roles[index % roles.length],
-        female: _femaleNames.contains(name),
-        seat: index + 1,
-        isUser: index == 0,
-      );
-    });
-  }
-
-  List<String> _buildRoles() {
-    if (widget.customScenario != null && widget.customScenario!.roles.isNotEmpty) {
-      return List<String>.from(widget.customScenario!.roles);
-    }
-    if (widget.scenario != null && widget.scenario!.roles.isNotEmpty) {
-      return List<String>.from(widget.scenario!.roles);
-    }
-    if (widget.scenario?.id == HunterScenario.id &&
-        HunterScenario.supports(widget.playerCount)) {
-      return HunterScenario.rolesFor(widget.playerCount);
-    }
-    return const ['مافیا', 'دکتر', 'کارآگاه', 'شهروند'];
-  }
-
-  _Player get user => _players.firstWhere((player) => player.isUser);
-
-  List<_Player> get alive => _players.where((player) => player.alive).toList();
-
-  String get title =>
-      widget.customScenario?.name ?? widget.scenario?.title ?? 'سناریوی رادیکال';
-
-  bool get isNight => _phase == _Phase.night || _phase == _Phase.nightResult;
-
-  bool get isActive => _phase == _Phase.night || _phase == _Phase.day;
-
-  String get phaseText {
-    switch (_phase) {
-      case _Phase.night:
-        return 'شب $_round';
-      case _Phase.nightResult:
-        return 'نتیجه شب';
-      case _Phase.day:
-        return 'روز $_round • رأی‌گیری';
-      case _Phase.dayResult:
-        return 'نتیجه رأی‌گیری';
-      case _Phase.ended:
-        return 'پایان بازی';
-    }
-  }
-
-  void _select(String name) {
-    if (!isActive) return;
-    setState(() => _selected = name);
-  }
-
-  void _confirm() {
-    if (_selected == null) {
-      setState(() => _result = 'یک بازیکن را انتخاب کن.');
-      return;
-    }
-    if (_phase == _Phase.night) {
-      _playNight();
-    } else if (_phase == _Phase.day) {
-      _vote();
-    }
-  }
-
-  void _playNight() {
-    final target = _players.firstWhere((player) => player.name == _selected);
-    if (!target.alive) {
-      setState(() => _result = 'این بازیکن دیگر زنده نیست.');
-      return;
-    }
-
-    final role = user.role;
-    if (role == 'دکتر' || role == 'محافظ') {
-      _result = '${target.name} برای این شب محافظت شد.';
-    } else if (role == 'کارآگاه' || role == 'بازپرس') {
-      _result = '${target.name}: ${_isMafia(target.role) ? 'مافیا' : 'شهروند'}';
-    } else if (_isMafia(role) || role == 'قاتل مستقل' || role == 'تک‌تیرانداز') {
-      target.alive = false;
-      _result = '${target.name} در شب حذف شد.';
-    } else {
-      _result = 'توانایی نقش شما روی ${target.name} اجرا شد.';
-    }
-
-    _selected = null;
-    _phase = _Phase.nightResult;
-    _checkWinner();
-    setState(() {});
-  }
-
-  void _vote() {
-    final target = _players.firstWhere((player) => player.name == _selected);
-    if (!target.alive) {
-      setState(() => _result = 'این بازیکن دیگر زنده نیست.');
-      return;
-    }
-    target.alive = false;
-    _result = '${target.name} با رأی میز از بازی خارج شد.';
-    _selected = null;
-    _phase = _Phase.dayResult;
-    _checkWinner();
-    setState(() {});
-  }
-
-  bool _isMafia(String role) => role == 'مافیا' || role == 'پدرخوانده';
-
-  void _checkWinner() {
-    final mafiaCount = alive.where((player) => _isMafia(player.role)).length;
-    final others = alive.length - mafiaCount;
-    if (mafiaCount == 0) {
-      _winner = 'شهروندان';
-      _phase = _Phase.ended;
-    } else if (mafiaCount >= others && others > 0) {
-      _winner = 'مافیا';
-      _phase = _Phase.ended;
-    }
-  }
-
-  void _next() {
-    if (_phase == _Phase.nightResult) {
-      _phase = _Phase.day;
-    } else if (_phase == _Phase.dayResult) {
-      _round++;
-      _phase = _Phase.night;
-    }
-    setState(() {});
+    ref.read(gameControllerProvider.notifier).start(
+          playerCount: widget.playerCount,
+          scenario: widget.scenario,
+          customScenario: widget.customScenario,
+        );
   }
 
   @override
   Widget build(BuildContext context) {
-    final background = isNight ? const Color(0xFF060912) : const Color(0xFF0C0908);
+    final game = ref.watch(gameControllerProvider);
+    final controller = ref.read(gameControllerProvider.notifier);
+    final night = game.phase == GamePhase.night;
+    final userAlive = game.user?.alive ?? false;
+
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: background,
-        body: SafeArea(
-          child: Column(
-            children: [
-              _header(context),
-              _banner(),
-              Expanded(
-                child: _Table(
-                  players: _players,
-                  selected: _selected,
-                  night: isNight,
-                  onSelect: isActive ? _select : null,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 350),
+        color: night ? const Color(0xFF060A12) : const Color(0xFF100A08),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: SafeArea(
+            child: Column(
+              children: [
+                _Header(game: game, title: _title),
+                _PhaseBanner(game: game),
+                Expanded(
+                  child: _GameTable(
+                    players: game.players,
+                    selectedId: game.selectedPlayerId,
+                    night: night,
+                    onSelect: userAlive && game.phase != GamePhase.ended
+                        ? controller.selectPlayer
+                        : null,
+                  ),
                 ),
-              ),
-              _bottomPanel(),
-            ],
+                _ActionPanel(
+                  game: game,
+                  onNightAction: controller.performNightAction,
+                  onStartVoting: controller.startVoting,
+                  onVote: controller.castVote,
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _header(BuildContext context) {
+  String get _title => widget.customScenario?.name ?? widget.scenario?.title ?? 'میز رادیکال';
+}
+
+class _Header extends StatelessWidget {
+  final GameState game;
+  final String title;
+
+  const _Header({required this.game, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    final phase = switch (game.phase) {
+      GamePhase.night => 'شب ${game.round}',
+      GamePhase.dayDiscussion => 'روز ${game.round} • بحث',
+      GamePhase.dayVoting => 'روز ${game.round} • رأی‌گیری',
+      GamePhase.ended => 'پایان بازی',
+    };
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 8, 14, 6),
       child: Row(
@@ -234,7 +107,7 @@ class _ScenarioGameScreenState extends State<ScenarioGameScreen> {
             icon: const Icon(Icons.close_rounded),
             style: IconButton.styleFrom(
               foregroundColor: Colors.white,
-              backgroundColor: const Color(0xCC11141C),
+              backgroundColor: RadicalTheme.panel2,
             ),
           ),
           const SizedBox(width: 8),
@@ -243,102 +116,22 @@ class _ScenarioGameScreenState extends State<ScenarioGameScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
-                Text(phaseText, style: const TextStyle(fontSize: 11, color: Color(0xFF9AA1B2))),
+                const SizedBox(height: 2),
+                Text(phase, style: const TextStyle(color: RadicalTheme.smoke, fontSize: 11, fontWeight: FontWeight.w700)),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xCC11141C),
+              color: RadicalTheme.panel2,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0x55E4B96B)),
+              border: Border.all(color: RadicalTheme.gold.withValues(alpha: .30)),
             ),
             child: Text(
-              '${alive.length}/${_players.length}',
-              style: const TextStyle(color: Color(0xFFFFD991), fontWeight: FontWeight.w900),
+              '${game.alivePlayers.length}/${game.players.length}',
+              style: const TextStyle(color: RadicalTheme.goldBright, fontWeight: FontWeight.w900),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _banner() {
-    final text = _winner ??
-        (isActive
-            ? (isNight ? 'توانایی نقش خود را اجرا کن' : 'یک بازیکن را برای رأی انتخاب کن')
-            : _result);
-    return Container(
-      margin: const EdgeInsets.fromLTRB(14, 2, 14, 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: isNight
-              ? const [Color(0xCC172238), Color(0xAA10131B)]
-              : const [Color(0xCC2B1915), Color(0xAA10131B)],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isNight ? const Color(0x55E4B96B) : const Color(0x55B92F45)),
-      ),
-      child: Row(
-        children: [
-          Icon(isNight ? Icons.nights_stay_rounded : Icons.wb_sunny_rounded,
-              color: const Color(0xFFFFD991), size: 30),
-          const SizedBox(width: 10),
-          Expanded(child: Text(text, maxLines: 2, overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.w900))),
-        ],
-      ),
-    );
-  }
-
-  Widget _bottomPanel() {
-    if (_phase == _Phase.ended) {
-      return Container(
-        margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: const Color(0xEE15120F),
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: const Color(0x66E4B96B)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.emoji_events_rounded, color: Color(0xFFFFD991), size: 30),
-            const SizedBox(width: 10),
-            Text('برنده: ${_winner ?? 'نامشخص'}',
-                style: const TextStyle(color: Color(0xFFFFD991), fontSize: 19, fontWeight: FontWeight.w900)),
-          ],
-        ),
-      );
-    }
-
-    final canNext = _phase == _Phase.nightResult || _phase == _Phase.dayResult;
-    return Container(
-      margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xEE10131B),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0x25FFFFFF)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              _selected == null ? (canNext ? _result : 'یک صندلی را لمس کن') : 'هدف: $_selected',
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Color(0xFFB8BFCD), fontWeight: FontWeight.w700),
-            ),
-          ),
-          const SizedBox(width: 10),
-          FilledButton.icon(
-            onPressed: canNext ? _next : (isActive ? _confirm : null),
-            icon: Icon(canNext ? Icons.arrow_forward_rounded : Icons.bolt_rounded, size: 18),
-            label: Text(canNext ? 'ادامه' : (isNight ? 'اجرا' : 'رأی')),
           ),
         ],
       ),
@@ -346,15 +139,82 @@ class _ScenarioGameScreenState extends State<ScenarioGameScreen> {
   }
 }
 
-class _Table extends StatelessWidget {
-  final List<_Player> players;
-  final String? selected;
+class _PhaseBanner extends StatelessWidget {
+  final GameState game;
+
+  const _PhaseBanner({required this.game});
+
+  @override
+  Widget build(BuildContext context) {
+    final night = game.phase == GamePhase.night;
+    final ended = game.phase == GamePhase.ended;
+    final color = ended ? RadicalTheme.gold : (night ? const Color(0xFF7B91C4) : RadicalTheme.crimsonBright);
+    final icon = ended
+        ? Icons.emoji_events_rounded
+        : night
+            ? Icons.nights_stay_rounded
+            : Icons.wb_sunny_rounded;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(14, 2, 14, 8),
+      padding: const EdgeInsets.all(13),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: night
+              ? const [Color(0xCC18243A), Color(0xAA10141D)]
+              : const [Color(0xCC321914), Color(0xAA11141B)],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: .32)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 43,
+            height: 43,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: color.withValues(alpha: .10),
+            ),
+            child: Icon(icon, color: color, size: 23),
+          ),
+          const SizedBox(width: 11),
+          Expanded(
+            child: Text(
+              game.message,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontWeight: FontWeight.w900, height: 1.35),
+            ),
+          ),
+          if (!ended)
+            Container(
+              margin: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: .22),
+                borderRadius: BorderRadius.circular(13),
+              ),
+              child: Text(
+                '${game.secondsLeft}s',
+                style: TextStyle(color: color, fontWeight: FontWeight.w900),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GameTable extends StatelessWidget {
+  final List<GamePlayer> players;
+  final String? selectedId;
   final bool night;
   final ValueChanged<String>? onSelect;
 
-  const _Table({
+  const _GameTable({
     required this.players,
-    required this.selected,
+    required this.selectedId,
     required this.night,
     required this.onSelect,
   });
@@ -363,38 +223,40 @@ class _Table extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final size = min(constraints.maxWidth * 0.56, constraints.maxHeight * 0.56);
-        final tableSize = max(190.0, min(size, 300.0));
-        final radius = tableSize / 2 + 28;
+        final table = (constraints.maxWidth * .48).clamp(190.0, 280.0);
+        final radiusX = table / 2 + 28;
+        final radiusY = table / 2 + 25;
+
         return Stack(
           alignment: Alignment.center,
           children: [
             Container(
-              width: tableSize + 44,
-              height: tableSize + 44,
+              width: table + 58,
+              height: table + 58,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: night ? const Color(0x445C76B8) : const Color(0x44E4B96B),
-                    blurRadius: 44,
-                    spreadRadius: 8,
+                    color: (night ? const Color(0xFF5C78B2) : RadicalTheme.crimson)
+                        .withValues(alpha: .10),
+                    blurRadius: 50,
+                    spreadRadius: 7,
                   ),
                 ],
               ),
             ),
             Container(
-              width: tableSize,
-              height: tableSize,
+              width: table,
+              height: table,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: night
-                      ? const [Color(0xFF30415A), Color(0xFF111722), Color(0xFF080C13)]
-                      : const [Color(0xFF4A3020), Color(0xFF19120F), Color(0xFF0C0A09)],
+                      ? const [Color(0xFF2B3A52), Color(0xFF121925), Color(0xFF080B11)]
+                      : const [Color(0xFF482C20), Color(0xFF1C1210), Color(0xFF0D0908)],
                 ),
                 border: Border.all(
-                  color: night ? const Color(0x77E4B96B) : const Color(0x77B92F45),
+                  color: (night ? RadicalTheme.gold : RadicalTheme.crimsonBright).withValues(alpha: .48),
                   width: 2,
                 ),
               ),
@@ -403,65 +265,290 @@ class _Table extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(night ? Icons.nights_stay_rounded : Icons.wb_sunny_rounded,
-                        color: const Color(0xFFFFD991), size: 30),
-                    const SizedBox(height: 6),
-                    const Text('MAFIA', style: TextStyle(letterSpacing: 5, fontSize: 18,
-                        fontWeight: FontWeight.w900, color: Color(0xFFFFD991))),
-                    Text(night ? 'NIGHT TABLE' : 'DAY TABLE',
-                        style: const TextStyle(letterSpacing: 2, fontSize: 9, color: Color(0xFF9AA1B2))),
+                        color: RadicalTheme.goldBright, size: 29),
+                    const SizedBox(height: 5),
+                    const Text('MAFIA', style: TextStyle(color: RadicalTheme.goldBright, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 4)),
+                    const SizedBox(height: 3),
+                    Text(night ? 'NIGHT TABLE' : 'DAY TABLE', style: const TextStyle(color: RadicalTheme.smoke, fontSize: 9, letterSpacing: 2)),
                   ],
                 ),
               ),
             ),
-            for (int i = 0; i < players.length; i++)
-              _seat(context, players[i], i, radius),
+            ...List.generate(players.length, (index) {
+              final angle = -1.5708 + (6.283185 * index / players.length);
+              final player = players[index];
+              return Transform.translate(
+                offset: Offset(radiusX * _cos(angle), radiusY * _sin(angle)),
+                child: _PlayerSeat(
+                  player: player,
+                  selected: player.id == selectedId,
+                  onTap: onSelect == null ? null : () => onSelect!(player.id),
+                ),
+              );
+            }),
           ],
         );
       },
     );
   }
 
-  Widget _seat(BuildContext context, _Player player, int index, double radius) {
-    final angle = -pi / 2 + (2 * pi * index / players.length);
-    return Transform.translate(
-      offset: Offset(cos(angle) * radius, sin(angle) * radius),
-      child: GestureDetector(
-        onTap: onSelect == null || !player.alive || player.isUser
-            ? null
-            : () => onSelect!(player.name),
-        child: Container(
-          width: 76,
-          height: 86,
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: player.name == selected ? const Color(0x45E4B96B) : const Color(0xDD10131B),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: player.name == selected
-                  ? const Color(0xFFFFD991)
-                  : (player.isUser ? const Color(0xFFE4B96B) : const Color(0x334E6E9E)),
-            ),
+  double _cos(double value) => value.cos();
+  double _sin(double value) => value.sin();
+}
+
+class _PlayerSeat extends StatelessWidget {
+  final GamePlayer player;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  const _PlayerSeat({required this.player, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = player.isUser ? RadicalTheme.gold : RadicalTheme.crimson;
+    final avatar = player.avatar;
+
+    return GestureDetector(
+      onTap: player.alive && !player.isUser ? onTap : null,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        width: 76,
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: selected ? RadicalTheme.gold.withValues(alpha: .12) : Colors.transparent,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: selected ? RadicalTheme.goldBright : Colors.transparent,
+            width: selected ? 1.5 : 1,
           ),
-          child: Column(
-            children: [
-              Expanded(
-                child: Opacity(
-                  opacity: player.alive ? 1 : .28,
-                  child: RealisticAvatar(
-                    role: player.role,
-                    female: player.female,
-                    size: 55,
-                  ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Opacity(
+              opacity: player.alive ? 1 : .32,
+              child: Container(
+                width: 54,
+                height: 54,
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(colors: [accent.withValues(alpha: .95), RadicalTheme.panel2]),
+                  boxShadow: [BoxShadow(color: accent.withValues(alpha: .18), blurRadius: 13)],
                 ),
+                child: ClipOval(child: _AvatarView(avatar: avatar)),
               ),
-              Text(player.name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w900)),
-              Text(player.alive ? '#${player.seat}' : 'حذف',
-                  style: const TextStyle(fontSize: 8, color: Color(0xFF9AA1B2))),
-            ],
-          ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              player.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 9,
+                fontWeight: player.isUser ? FontWeight.w900 : FontWeight.w700,
+                color: player.alive ? (player.isUser ? RadicalTheme.goldBright : Colors.white) : RadicalTheme.smoke,
+              ),
+            ),
+            Text(
+              player.alive ? '#${player.seat}' : 'حذف شد',
+              style: TextStyle(fontSize: 8, color: player.alive ? RadicalTheme.smoke : RadicalTheme.crimsonBright),
+            ),
+          ],
         ),
       ),
     );
   }
+}
+
+class _AvatarView extends StatelessWidget {
+  final PlayerAvatar avatar;
+
+  const _AvatarView({required this.avatar});
+
+  @override
+  Widget build(BuildContext context) {
+    if (avatar.assetPath != null && avatar.assetPath!.isNotEmpty) {
+      return Image.asset(avatar.assetPath!, fit: BoxFit.cover);
+    }
+    if (avatar.imageUrl != null && avatar.imageUrl!.isNotEmpty) {
+      return Image.network(avatar.imageUrl!, fit: BoxFit.cover);
+    }
+    return RealisticAvatar(role: 'شهروند', female: avatar.female, size: 50);
+  }
+}
+
+class _ActionPanel extends StatelessWidget {
+  final GameState game;
+  final VoidCallback onNightAction;
+  final VoidCallback onStartVoting;
+  final VoidCallback onVote;
+
+  const _ActionPanel({
+    required this.game,
+    required this.onNightAction,
+    required this.onStartVoting,
+    required this.onVote,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (game.phase == GamePhase.ended) {
+      return Container(
+        margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+        padding: const EdgeInsets.all(17),
+        decoration: BoxDecoration(
+          color: RadicalTheme.panel,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: RadicalTheme.gold.withValues(alpha: .36)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.emoji_events_rounded, color: RadicalTheme.goldBright, size: 30),
+            const SizedBox(width: 10),
+            Text('برنده: ${game.winner ?? 'نامشخص'}', style: const TextStyle(color: RadicalTheme.goldBright, fontSize: 19, fontWeight: FontWeight.w900)),
+          ],
+        ),
+      );
+    }
+
+    final userAlive = game.user?.alive ?? false;
+    final role = game.user?.role ?? 'شهروند';
+
+    if (!userAlive) {
+      return _ObserverPanel(seconds: game.secondsLeft);
+    }
+
+    if (game.phase == GamePhase.night) {
+      final action = switch (game.availableAction) {
+        NightAction.kill => ('شلیک', Icons.gps_fixed_rounded),
+        NightAction.save => ('نجات', Icons.health_and_safety_rounded),
+        NightAction.investigate => ('استعلام', Icons.search_rounded),
+        NightAction.none => ('ادامه شب', Icons.skip_next_rounded),
+      };
+      return _BottomPanel(
+        timer: game.secondsLeft,
+        hint: 'نقش شما: $role',
+        label: action.$1,
+        icon: action.$2,
+        enabled: game.availableAction == NightAction.none || game.selectedPlayerId != null,
+        onPressed: onNightAction,
+      );
+    }
+
+    if (game.phase == GamePhase.dayDiscussion) {
+      return _BottomPanel(
+        timer: game.secondsLeft,
+        hint: 'بحث روزانه؛ سپس رأی‌گیری شروع می‌شود.',
+        label: 'شروع رأی‌گیری',
+        icon: Icons.how_to_vote_rounded,
+        enabled: true,
+        onPressed: onStartVoting,
+      );
+    }
+
+    return _BottomPanel(
+      timer: game.secondsLeft,
+      hint: game.selectedPlayerId == null ? 'یک بازیکن را برای اخراج انتخاب کن.' : 'هدف رأی: ${_nameFor(game, game.selectedPlayerId!)}',
+      label: 'اخراج',
+      icon: Icons.gavel_rounded,
+      enabled: game.selectedPlayerId != null,
+      onPressed: onVote,
+    );
+  }
+
+  String _nameFor(GameState game, String id) {
+    for (final player in game.players) {
+      if (player.id == id) return player.name;
+    }
+    return 'بازیکن';
+  }
+}
+
+class _BottomPanel extends StatelessWidget {
+  final int timer;
+  final String hint;
+  final String label;
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onPressed;
+
+  const _BottomPanel({required this.timer, required this.hint, required this.label, required this.icon, required this.enabled, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: RadicalTheme.panel.withValues(alpha: .98),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: RadicalTheme.line),
+        boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 20, offset: Offset(0, -7))],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 43,
+            height: 43,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: RadicalTheme.gold.withValues(alpha: .10)),
+            child: Center(child: Text('${timer}s', style: const TextStyle(color: RadicalTheme.goldBright, fontSize: 11, fontWeight: FontWeight.w900))),
+          ),
+          const SizedBox(width: 10),
+          Expanded(child: Text(hint, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: RadicalTheme.smoke, fontSize: 11, fontWeight: FontWeight.w700))),
+          const SizedBox(width: 9),
+          FilledButton.icon(onPressed: enabled ? onPressed : null, icon: Icon(icon, size: 18), label: Text(label)),
+        ],
+      ),
+    );
+  }
+}
+
+class _ObserverPanel extends StatelessWidget {
+  final int seconds;
+
+  const _ObserverPanel({required this.seconds});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(color: RadicalTheme.panel, borderRadius: BorderRadius.circular(20), border: Border.all(color: RadicalTheme.line)),
+      child: Row(children: [
+        const Icon(Icons.visibility_rounded, color: RadicalTheme.smoke),
+        const SizedBox(width: 9),
+        const Expanded(child: Text('شما از بازی حذف شده‌اید؛ بازی را به‌عنوان ناظر دنبال کنید.', style: TextStyle(color: RadicalTheme.smoke, fontSize: 11, fontWeight: FontWeight.w700))),
+        Text('${seconds}s', style: const TextStyle(color: RadicalTheme.gold, fontWeight: FontWeight.w900)),
+      ]),
+    );
+  }
+}
+
+extension on double {
+  double cos() => _cosine(this);
+  double sin() => _sine(this);
+}
+
+double _cosine(double value) => value == -1.5708 ? 0 : (value == 1.5708 ? 0 : _cosApprox(value));
+double _sine(double value) => _sinApprox(value);
+
+// Small local approximations keep the table layout dependency-free.
+double _cosApprox(double x) {
+  const pi = 3.141592653589793;
+  var y = x;
+  while (y > pi) y -= 2 * pi;
+  while (y < -pi) y += 2 * pi;
+  final x2 = y * y;
+  return 1 - x2 / 2 + x2 * x2 / 24 - x2 * x2 * x2 / 720;
+}
+
+double _sinApprox(double x) {
+  const pi = 3.141592653589793;
+  var y = x;
+  while (y > pi) y -= 2 * pi;
+  while (y < -pi) y += 2 * pi;
+  final x2 = y * y;
+  return y - y * x2 / 6 + y * x2 * x2 / 120 - y * x2 * x2 * x2 / 5040;
 }
