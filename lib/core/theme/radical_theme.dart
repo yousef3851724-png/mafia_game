@@ -59,13 +59,17 @@ class RadicalTheme {
         bodyMedium: const TextStyle(fontSize: 13, height: 1.4, color: smoke),
         labelLarge: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900),
       ),
+      iconTheme: const IconThemeData(color: goldBright),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
-        foregroundColor: Colors.white,
+        foregroundColor: goldBright,
         elevation: 0,
         centerTitle: false,
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,
+        iconTheme: IconThemeData(color: goldBright),
+        actionsIconTheme: IconThemeData(color: goldBright),
+        titleTextStyle: TextStyle(color: goldBright, fontSize: 20, fontWeight: FontWeight.w900),
       ),
       cardTheme: CardThemeData(
         color: panel,
@@ -76,6 +80,59 @@ class RadicalTheme {
           borderRadius: BorderRadius.circular(22),
           side: BorderSide(color: line),
         ),
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: panel3,
+        surfaceTintColor: Colors.transparent,
+        textStyle: const TextStyle(color: goldBright, fontWeight: FontWeight.w800),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Color(0x55E3B873)),
+        ),
+      ),
+      dropdownMenuTheme: DropdownMenuThemeData(
+        textStyle: const TextStyle(color: goldBright, fontWeight: FontWeight.w800),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: panel2,
+          labelStyle: const TextStyle(color: smoke, fontWeight: FontWeight.w700),
+          hintStyle: const TextStyle(color: smoke),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(17),
+            borderSide: const BorderSide(color: line),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(17),
+            borderSide: const BorderSide(color: line),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(17),
+            borderSide: const BorderSide(color: gold, width: 1.4),
+          ),
+        ),
+        menuStyle: MenuStyle(
+          backgroundColor: const WidgetStatePropertyAll(panel3),
+          surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+          elevation: const WidgetStatePropertyAll(14),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: const BorderSide(color: Color(0x66E3B873)),
+            ),
+          ),
+        ),
+      ),
+      switchTheme: SwitchThemeData(
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return const Color(0x88E3B873);
+          return panel3;
+        }),
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return goldBright;
+          return smoke;
+        }),
+        trackOutlineColor: WidgetStatePropertyAll(Color(0x55E3B873)),
+        overlayColor: const WidgetStatePropertyAll(Color(0x18E3B873)),
       ),
       navigationBarTheme: const NavigationBarThemeData(
         backgroundColor: Color(0xFF090C12),
@@ -130,6 +187,8 @@ class RadicalTheme {
         thumbColor: goldBright,
         inactiveTrackColor: Color(0x30FFFFFF),
         overlayColor: Color(0x18E3B873),
+        valueIndicatorColor: panel3,
+        valueIndicatorTextStyle: TextStyle(color: goldBright, fontWeight: FontWeight.w900),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: panel3,
