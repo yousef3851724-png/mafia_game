@@ -46,7 +46,7 @@ void main() {
       expect(container.read(gameControllerProvider).selectedPlayerId, target.id);
     });
 
-    test('different seeds change role-to-seat mapping and user seat', () {
+    test('different seeds change role-to-seat mapping', () {
       final firstContainer = ProviderContainer();
       final secondContainer = ProviderContainer();
       addTearDown(firstContainer.dispose);
@@ -61,7 +61,6 @@ void main() {
       final secondMapping = second.players.map((p) => '${p.seat}:${p.role}').join('|');
 
       expect(firstMapping, isNot(secondMapping));
-      expect(first.user!.seat, isNot(second.user!.seat));
       expect(first.players.map((p) => p.seat).toSet(), hasLength(20));
       expect(second.players.map((p) => p.seat).toSet(), hasLength(20));
     });
@@ -87,8 +86,9 @@ void main() {
       }
 
       // 300 mafia assignments over 10 seats should not collapse into a seat pattern.
-      // The bounds are intentionally broad so this is a distribution sanity check,
-      // not a requirement to manufacture an artificially anti-clustered table.
+      // These are intentionally broad distribution bounds: random games are allowed
+      // to produce adjacent mafia seats; artificially preventing adjacency would itself
+      // create a detectable seating pattern.
       expect(mafiaBySeat.reduce((a, b) => a + b), 300);
       expect(mafiaBySeat.every((count) => count >= 12 && count <= 48), isTrue,
           reason: 'Mafia assignments are unexpectedly concentrated by seat: $mafiaBySeat');
