@@ -1,14 +1,14 @@
-import '../../core/models/app_models.dart';
+import '../../core/models/app_models.dart' as app;
 import '../lobbies/lobby_system.dart';
 
 /// Data-only store catalog. UI is intentionally untouched.
-const avatarStoreItems = <AvatarItem>[
-  AvatarItem(id: 'avatar_shadow', name: 'سایه شب', priceDiamonds: 100, assetPath: 'assets/images/avatar_shadow.svg', currency: DiamondType.blue),
-  AvatarItem(id: 'avatar_detective', name: 'بازرس', priceDiamonds: 200, assetPath: 'assets/images/avatar_detective.svg', currency: DiamondType.blue),
-  AvatarItem(id: 'avatar_crimson', name: 'قرمز مرموز', priceDiamonds: 500, assetPath: 'assets/images/avatar_crimson.svg', currency: DiamondType.adult),
-  AvatarItem(id: 'avatar_gold', name: 'طلایی رادیکال', priceDiamonds: 200, assetPath: 'assets/images/avatar_gold.svg', currency: DiamondType.radical, vipOnly: true),
-  AvatarItem(id: 'avatar_noir', name: 'نوآر', priceDiamonds: 500, assetPath: 'assets/images/avatar_noir.svg', currency: DiamondType.radical, vipOnly: true),
-  AvatarItem(id: 'avatar_teen', name: 'نوجوان رادیکال', priceDiamonds: 150, assetPath: 'assets/images/avatar_gold.svg', currency: DiamondType.teen),
+const avatarStoreItems = <app.AvatarItem>[
+  app.AvatarItem(id: 'avatar_shadow', name: 'سایه شب', priceDiamonds: 100, assetPath: 'assets/images/avatar_shadow.svg', currency: app.DiamondType.blue),
+  app.AvatarItem(id: 'avatar_detective', name: 'بازرس', priceDiamonds: 200, assetPath: 'assets/images/avatar_detective.svg', currency: app.DiamondType.blue),
+  app.AvatarItem(id: 'avatar_crimson', name: 'قرمز مرموز', priceDiamonds: 500, assetPath: 'assets/images/avatar_crimson.svg', currency: app.DiamondType.adult),
+  app.AvatarItem(id: 'avatar_gold', name: 'طلایی رادیکال', priceDiamonds: 200, assetPath: 'assets/images/avatar_gold.svg', currency: app.DiamondType.radical, vipOnly: true),
+  app.AvatarItem(id: 'avatar_noir', name: 'نوآر', priceDiamonds: 500, assetPath: 'assets/images/avatar_noir.svg', currency: app.DiamondType.radical, vipOnly: true),
+  app.AvatarItem(id: 'avatar_teen', name: 'نوجوان رادیکال', priceDiamonds: 150, assetPath: 'assets/images/avatar_gold.svg', currency: app.DiamondType.teen),
 ];
 
 const radicalDiamondStoreItems = <LobbyStoreItem>[
