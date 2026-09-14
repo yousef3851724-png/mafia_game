@@ -49,7 +49,7 @@ class LobbyPlayerLabel {
 }
 
 class LobbyMessage {
-  final String id; final String lobbyId; final String senderId; final String senderName; final String text; final DateTime sentAt; final bool system; final String? emoji; final String? sticker; final Set<String> reactions;
+  final String id; final String lobbyId; final String senderId; final String senderName; final String text; final DateTime? sentAt; final bool system; final String? emoji; final String? sticker; final Set<String> reactions;
   const LobbyMessage({required this.id, required this.lobbyId, required this.senderId, required this.senderName, required this.text, required this.sentAt, this.system = false, this.emoji, this.sticker, this.reactions = const {}});
   LobbyMessage react(String reaction) => LobbyMessage(id: id, lobbyId: lobbyId, senderId: senderId, senderName: senderName, text: text, sentAt: sentAt, system: system, emoji: emoji, sticker: sticker, reactions: {...reactions, reaction});
 }
