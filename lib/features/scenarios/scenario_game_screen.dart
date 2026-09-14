@@ -8,6 +8,38 @@ import '../game/game_state.dart';
 import 'custom_scenario_system.dart';
 import 'scenario_catalog.dart';
 
+/// Geometry shared by the table widget and its layout tests.
+class GameTableLayout {
+  static const double canvasSize = 800;
+  static const double seatWidth = 96;
+  static const double seatHeight = 104;
+  static const double tableDiameter = 300;
+  static const double radiusX = 310;
+  static const double radiusY = 290;
+
+  static List<Offset> offsetsFor(int playerCount) {
+    final count = playerCount.clamp(1, 20);
+    return List.generate(count, (index) {
+      final angle = -math.pi / 2 + (math.pi * 2 * index / count);
+      return Offset(
+        radiusX * math.cos(angle),
+        radiusY * math.sin(angle),
+      );
+    }, growable: false);
+  }
+
+  static Rect seatRect(Offset offset) => Rect.fromCenter(
+        center: Offset(canvasSize / 2, canvasSize / 2) + offset,
+        width: seatWidth,
+        height: seatHeight,
+      );
+
+  static bool fitsCanvas(Offset offset) {
+    final rect = seatRect(offset);
+    return rect.left >= 0 && rect.top >= 0 && rect.right <= canvasSize && rect.bottom <= canvasSize;
+  }
+}
+
 class ScenarioGameScreen extends ConsumerStatefulWidget {
   final ScenarioDefinition? scenario;
   final CustomScenario? customScenario;
@@ -52,26 +84,38 @@ class _ScenarioGameScreenState extends ConsumerState<ScenarioGameScreen> {
       child: Scaffold(
         backgroundColor: RadicalTheme.ink,
         body: SafeArea(
-          child: Column(
-            children: [
-              _Header(title: title, game: game),
-              _PhaseBanner(game: game),
-              Expanded(
-                child: _GameTable(
-                  players: game.players,
-                  selectedId: game.selectedPlayerId,
-                  night: night,
-                  enabled: game.user?.alive ?? false,
-                  onSelect: controller.selectPlayer,
+          child: LayoutBuilder(
+            builder: (context, viewport) {
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 8),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: viewport.maxHeight),
+                  child: Column(
+                    children: [
+                      _Header(title: title, game: game),
+                      _PhaseBanner(game: game),
+                      SizedBox(
+                        height: math.min(460, math.max(340, viewport.maxHeight * .48)),
+                        child: _GameTable(
+                          players: game.players,
+                          selectedId: game.selectedPlayerId,
+                          night: night,
+                          enabled: game.user?.alive ?? false,
+                          onSelect: controller.selectPlayer,
+                        ),
+                      ),
+                      _ActionBar(
+                        game: game,
+                        onNight: controller.performNightAction,
+                        onDiscussEnd: controller.startVoting,
+                        onVote: controller.castVote,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              _ActionBar(
-                game: game,
-                onNight: controller.performNightAction,
-                onDiscussEnd: controller.startVoting,
-                onVote: controller.castVote,
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),
@@ -106,20 +150,18 @@ class _Header extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 2),
-                Text(phase, style: const TextStyle(color: RadicalTheme.gold, fontSize: 11, fontWeight: FontWeight.w800)),
+                Text(phase, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: RadicalTheme.gold, fontSize: 11, fontWeight: FontWeight.w800)),
               ],
             ),
           ),
+          const SizedBox(width: 6),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
-            decoration: BoxDecoration(
-              color: RadicalTheme.panel2,
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: RadicalTheme.gold.withValues(alpha: .28)),
-            ),
-            child: Text('${game.alivePlayers.length}/${game.players.length}', style: const TextStyle(color: RadicalTheme.goldBright, fontWeight: FontWeight.w900)),
+            constraints: const BoxConstraints(minWidth: 54),
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
+            decoration: BoxDecoration(color: RadicalTheme.panel2, borderRadius: BorderRadius.circular(15), border: Border.all(color: RadicalTheme.gold.withValues(alpha: .28))),
+            child: Text('${game.alivePlayers.length}/${game.players.length}', textAlign: TextAlign.center, style: const TextStyle(color: RadicalTheme.goldBright, fontWeight: FontWeight.w900)),
           ),
         ],
       ),
@@ -146,21 +188,18 @@ class _PhaseBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: accent.withValues(alpha: .11)),
-            child: Icon(ended ? Icons.emoji_events_rounded : night ? Icons.nights_stay_rounded : Icons.wb_sunny_rounded, color: accent),
-          ),
+          Container(width: 42, height: 42, decoration: BoxDecoration(shape: BoxShape.circle, color: accent.withValues(alpha: .11)), child: Icon(ended ? Icons.emoji_events_rounded : night ? Icons.nights_stay_rounded : Icons.wb_sunny_rounded, color: accent)),
           const SizedBox(width: 10),
           Expanded(child: Text(game.message, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w900, height: 1.35))),
-          if (!ended)
+          if (!ended) ...[
+            const SizedBox(width: 7),
             Container(
-              margin: const EdgeInsets.only(right: 7),
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+              constraints: const BoxConstraints(minWidth: 48),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
               decoration: BoxDecoration(color: accent.withValues(alpha: .09), borderRadius: BorderRadius.circular(10), border: Border.all(color: accent.withValues(alpha: .22))),
-              child: Text('${game.secondsLeft}s', style: TextStyle(color: accent, fontWeight: FontWeight.w900)),
+              child: Text('${game.secondsLeft}s', textAlign: TextAlign.center, style: TextStyle(color: accent, fontWeight: FontWeight.w900)),
             ),
+          ],
         ],
       ),
     );
@@ -178,50 +217,51 @@ class _GameTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final count = players.length.clamp(1, 20);
+    final offsets = GameTableLayout.offsetsFor(count);
     return LayoutBuilder(
       builder: (context, constraints) {
-        final table = (constraints.maxWidth * .46).clamp(190.0, 275.0).toDouble();
-        final rx = table / 2 + 30;
-        final ry = table / 2 + 24;
-        return Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: table + 35,
-              height: table + 35,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: (night ? RadicalTheme.violet : RadicalTheme.crimson).withValues(alpha: .12), blurRadius: 42, spreadRadius: 5)],
+        final scale = math.min(constraints.maxWidth / GameTableLayout.canvasSize, constraints.maxHeight / GameTableLayout.canvasSize).clamp(.35, 1.0);
+        return Center(
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: SizedBox(
+              width: GameTableLayout.canvasSize,
+              height: GameTableLayout.canvasSize,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: GameTableLayout.tableDiameter + 35,
+                    height: GameTableLayout.tableDiameter + 35,
+                    decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [BoxShadow(color: (night ? RadicalTheme.violet : RadicalTheme.crimson).withValues(alpha: .12), blurRadius: 42, spreadRadius: 5)]),
+                  ),
+                  Container(
+                    width: GameTableLayout.tableDiameter,
+                    height: GameTableLayout.tableDiameter,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(colors: night ? const [Color(0xFF292744), Color(0xFF121925), RadicalTheme.ink] : const [Color(0xFF48221E), Color(0xFF1C1210), RadicalTheme.ink]),
+                      border: Border.all(color: (night ? RadicalTheme.gold : RadicalTheme.crimsonBright).withValues(alpha: .50), width: 2),
+                    ),
+                    child: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      Icon(night ? Icons.nights_stay_rounded : Icons.wb_sunny_rounded, color: RadicalTheme.goldBright, size: 29),
+                      const SizedBox(height: 5),
+                      const Text('MAFIA', style: TextStyle(color: RadicalTheme.goldBright, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 4)),
+                      Text(night ? 'NIGHT TABLE' : 'DAY TABLE', style: const TextStyle(color: RadicalTheme.smoke, fontSize: 9, letterSpacing: 2)),
+                    ])),
+                  ),
+                  for (var i = 0; i < count; i++)
+                    _Seat(
+                      player: players[i],
+                      selected: players[i].id == selectedId,
+                      onTap: enabled && players[i].alive && !players[i].isUser ? () => onSelect(players[i].id) : null,
+                      offset: offsets[i],
+                    ),
+                ],
               ),
             ),
-            Container(
-              width: table,
-              height: table,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(colors: night ? const [Color(0xFF292744), Color(0xFF121925), RadicalTheme.ink] : const [Color(0xFF48221E), Color(0xFF1C1210), RadicalTheme.ink]),
-                border: Border.all(color: (night ? RadicalTheme.gold : RadicalTheme.crimsonBright).withValues(alpha: .50), width: 2),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(night ? Icons.nights_stay_rounded : Icons.wb_sunny_rounded, color: RadicalTheme.goldBright, size: 29),
-                    const SizedBox(height: 5),
-                    const Text('MAFIA', style: TextStyle(color: RadicalTheme.goldBright, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 4)),
-                    Text(night ? 'NIGHT TABLE' : 'DAY TABLE', style: const TextStyle(color: RadicalTheme.smoke, fontSize: 9, letterSpacing: 2)),
-                  ],
-                ),
-              ),
-            ),
-            for (var i = 0; i < players.length; i++)
-              _Seat(
-                player: players[i],
-                selected: players[i].id == selectedId,
-                onTap: enabled && players[i].alive && !players[i].isUser ? () => onSelect(players[i].id) : null,
-                offset: Offset(rx * math.cos(-math.pi / 2 + math.pi * 2 * i / players.length), ry * math.sin(-math.pi / 2 + math.pi * 2 * i / players.length)),
-              ),
-          ],
+          ),
         );
       },
     );
@@ -239,7 +279,7 @@ class _Seat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = player.isUser ? RadicalTheme.gold : RadicalTheme.crimson;
-    final initial = player.name.isEmpty ? '?' : player.name.substring(0, 1);
+    final initial = player.name.isEmpty ? '?' : player.name.characters.first;
     final badges = <Widget>[];
     if (player.isLeader) badges.add(_SeatBadge(label: '👑 لیدر', color: RadicalTheme.gold));
     if (player.isStaff) badges.add(_SeatBadge(label: '◆ رادیکال', color: RadicalTheme.violet));
@@ -250,28 +290,16 @@ class _Seat extends StatelessWidget {
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 220),
-          width: 92,
+          width: GameTableLayout.seatWidth,
+          height: GameTableLayout.seatHeight,
           padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: selected ? RadicalTheme.gold.withValues(alpha: .12) : Colors.transparent,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: selected ? RadicalTheme.goldBright : Colors.transparent, width: 1.5),
-            boxShadow: selected ? [BoxShadow(color: accent.withValues(alpha: .22), blurRadius: 15)] : const [],
-          ),
+          decoration: BoxDecoration(color: selected ? RadicalTheme.gold.withValues(alpha: .12) : Colors.transparent, borderRadius: BorderRadius.circular(18), border: Border.all(color: selected ? RadicalTheme.goldBright : Colors.transparent, width: 1.5), boxShadow: selected ? [BoxShadow(color: accent.withValues(alpha: .22), blurRadius: 15)] : const []),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Opacity(
-                opacity: player.alive ? 1 : .30,
-                child: Container(
-                  width: 54,
-                  height: 54,
-                  decoration: BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: [accent.withValues(alpha: .95), RadicalTheme.panel2])),
-                  child: Center(child: Text(initial, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900))),
-                ),
-              ),
+              Opacity(opacity: player.alive ? 1 : .30, child: Container(width: 54, height: 54, decoration: BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: [accent.withValues(alpha: .95), RadicalTheme.panel2])), child: Center(child: Text(initial, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900))))),
               const SizedBox(height: 3),
-              Text(player.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9, fontWeight: player.isUser ? FontWeight.w900 : FontWeight.w700, color: player.alive ? (player.isUser ? RadicalTheme.goldBright : Colors.white) : RadicalTheme.smoke)),
+              Text(player.name, maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: TextStyle(fontSize: 9, fontWeight: player.isUser ? FontWeight.w900 : FontWeight.w700, color: player.alive ? (player.isUser ? RadicalTheme.goldBright : Colors.white) : RadicalTheme.smoke)),
               if (badges.isNotEmpty) ...[
                 const SizedBox(height: 2),
                 Wrap(spacing: 2, runSpacing: 2, alignment: WrapAlignment.center, children: badges),
@@ -308,10 +336,10 @@ class _ActionBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (game.phase == GamePhase.ended) {
-      return _Panel(child: Column(children: [const Icon(Icons.emoji_events_rounded, color: RadicalTheme.goldBright, size: 34), const SizedBox(height: 6), Text('برنده: ${game.winner ?? 'نامشخص'}', style: const TextStyle(fontWeight: FontWeight.w900))]));
+      return _Panel(child: Column(children: [const Icon(Icons.emoji_events_rounded, color: RadicalTheme.goldBright, size: 34), const SizedBox(height: 6), Text('برنده: ${game.winner ?? 'نامشخص'}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w900))]));
     }
     if (!(game.user?.alive ?? false)) {
-      return _Panel(child: Row(children: [const Icon(Icons.visibility_rounded, color: RadicalTheme.smoke), const SizedBox(width: 9), const Expanded(child: Text('شما حذف شده‌اید؛ بازی را به‌عنوان ناظر دنبال کنید.', style: TextStyle(color: RadicalTheme.smoke, fontSize: 11))), Text('${game.secondsLeft}s', style: const TextStyle(color: RadicalTheme.gold, fontWeight: FontWeight.w900))]));
+      return _Panel(child: Row(children: [const Icon(Icons.visibility_rounded, color: RadicalTheme.smoke), const SizedBox(width: 9), const Expanded(child: Text('شما حذف شده‌اید؛ بازی را به‌عنوان ناظر دنبال کنید.', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: RadicalTheme.smoke, fontSize: 11))), Text('${game.secondsLeft}s', style: const TextStyle(color: RadicalTheme.gold, fontWeight: FontWeight.w900))]));
     }
     if (game.phase == GamePhase.night) {
       final action = switch (game.availableAction) {
@@ -340,13 +368,19 @@ class _BottomAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _Panel(
-        child: Row(
-          children: [
-            Container(width: 46, height: 46, decoration: BoxDecoration(color: RadicalTheme.gold.withValues(alpha: .10), borderRadius: BorderRadius.circular(14)), child: Icon(icon, color: RadicalTheme.goldBright)),
-            const SizedBox(width: 10),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(hint, style: const TextStyle(color: RadicalTheme.smoke, fontSize: 10)), const SizedBox(height: 2), Text('$timer ثانیه', style: const TextStyle(color: RadicalTheme.gold, fontWeight: FontWeight.w900))])),
-            FilledButton.icon(onPressed: enabled ? onPressed : null, icon: Icon(icon, size: 18), label: Text(label)),
-          ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = constraints.maxWidth < 340;
+            final action = FilledButton.icon(onPressed: enabled ? onPressed : null, icon: Icon(icon, size: 18), label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis));
+            if (compact) {
+              return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                Row(children: [Container(width: 42, height: 42, decoration: BoxDecoration(color: RadicalTheme.gold.withValues(alpha: .10), borderRadius: BorderRadius.circular(13)), child: Icon(icon, color: RadicalTheme.goldBright)), const SizedBox(width: 9), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(hint, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: RadicalTheme.smoke, fontSize: 10)), const SizedBox(height: 2), Text('$timer ثانیه', style: const TextStyle(color: RadicalTheme.gold, fontWeight: FontWeight.w900))]))]),
+                const SizedBox(height: 9),
+                SizedBox(height: 44, child: action),
+              ]);
+            }
+            return Row(children: [Container(width: 46, height: 46, decoration: BoxDecoration(color: RadicalTheme.gold.withValues(alpha: .10), borderRadius: BorderRadius.circular(14)), child: Icon(icon, color: RadicalTheme.goldBright)), const SizedBox(width: 10), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(hint, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: RadicalTheme.smoke, fontSize: 10)), const SizedBox(height: 2), Text('$timer ثانیه', style: const TextStyle(color: RadicalTheme.gold, fontWeight: FontWeight.w900))])), action]);
+          },
         ),
       );
 }
@@ -355,10 +389,5 @@ class _Panel extends StatelessWidget {
   final Widget child;
   const _Panel({required this.child});
   @override
-  Widget build(BuildContext context) => Container(
-        margin: const EdgeInsets.fromLTRB(14, 8, 14, 10),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: RadicalTheme.panel, borderRadius: BorderRadius.circular(20), border: Border.all(color: RadicalTheme.line)),
-        child: child,
-      );
+  Widget build(BuildContext context) => Container(margin: const EdgeInsets.fromLTRB(14, 8, 14, 10), padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: RadicalTheme.panel, borderRadius: BorderRadius.circular(20), border: Border.all(color: RadicalTheme.line)), child: child);
 }
