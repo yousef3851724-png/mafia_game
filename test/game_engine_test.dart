@@ -73,6 +73,6 @@ void main() {
     expect(updated.alive, isFalse);
     expect(updated.votesReceived, 2);
     expect(updated.avatar.id, 'avatar_shadow');
-    expect(updated.appRole, roleForName('شهروند'));
+    expect(updated.appRole.name, 'شهروند');
   });
 }
