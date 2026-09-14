@@ -21,6 +21,8 @@ class GamePlayer {
   final bool alive;
   final int votesReceived;
   final PlayerAvatar avatar;
+  final bool isLeader;
+  final bool isStaff;
 
   const GamePlayer({
     required this.id,
@@ -32,9 +34,16 @@ class GamePlayer {
     required this.alive,
     required this.avatar,
     this.votesReceived = 0,
+    this.isLeader = false,
+    this.isStaff = false,
   });
 
-  GamePlayer copyWith({bool? alive, int? votesReceived}) => GamePlayer(
+  GamePlayer copyWith({
+    bool? alive,
+    int? votesReceived,
+    bool? isLeader,
+    bool? isStaff,
+  }) => GamePlayer(
         id: id,
         name: name,
         role: role,
@@ -44,6 +53,8 @@ class GamePlayer {
         alive: alive ?? this.alive,
         votesReceived: votesReceived ?? this.votesReceived,
         avatar: avatar,
+        isLeader: isLeader ?? this.isLeader,
+        isStaff: isStaff ?? this.isStaff,
       );
 }
 
@@ -120,6 +131,8 @@ class GameController extends AutoDisposeNotifier<GameState> {
         seat: index + 1,
         isUser: index == 0,
         alive: true,
+        isLeader: index == 0,
+        isStaff: index == 1,
         avatar: PlayerAvatar(id: avatarId, displayName: name, assetPath: null, imageUrl: null, female: females.contains(name), seed: index + 1),
       );
     });
