@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -240,8 +242,7 @@ class _GameTable extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: (night ? RadicalTheme.violet : RadicalTheme.crimson)
-                        .withValues(alpha: .12),
+                    color: (night ? RadicalTheme.violet : RadicalTheme.crimson).withValues(alpha: .12),
                     blurRadius: 42,
                     spreadRadius: 5,
                   ),
@@ -259,8 +260,7 @@ class _GameTable extends StatelessWidget {
                       : const [Color(0xFF48221E), Color(0xFF1C1210), RadicalTheme.ink],
                 ),
                 border: Border.all(
-                  color: (night ? RadicalTheme.gold : RadicalTheme.crimsonBright)
-                      .withValues(alpha: .50),
+                  color: (night ? RadicalTheme.gold : RadicalTheme.crimsonBright).withValues(alpha: .50),
                   width: 2,
                 ),
               ),
@@ -285,11 +285,7 @@ class _GameTable extends StatelessWidget {
                     ),
                     Text(
                       night ? 'NIGHT TABLE' : 'DAY TABLE',
-                      style: const TextStyle(
-                        color: RadicalTheme.smoke,
-                        fontSize: 9,
-                        letterSpacing: 2,
-                      ),
+                      style: const TextStyle(color: RadicalTheme.smoke, fontSize: 9, letterSpacing: 2),
                     ),
                   ],
                 ),
@@ -303,8 +299,8 @@ class _GameTable extends StatelessWidget {
                     ? () => onSelect(players[i].id)
                     : null,
                 offset: Offset(
-                  rx * _cos(i, players.length),
-                  ry * _sin(i, players.length),
+                  rx * math.cos(-math.pi / 2 + math.pi * 2 * i / players.length),
+                  ry * math.sin(-math.pi / 2 + math.pi * 2 * i / players.length),
                 ),
               ),
           ],
@@ -312,47 +308,6 @@ class _GameTable extends StatelessWidget {
       },
     );
   }
-
-  double _angle(int index, int count) =>
-      -1.5707963267948966 + 6.283185307179586 * index / count;
-
-  double _cos(int index, int count) =>
-      _angle(index, count) == _angle(index, count) ? _cosine(_angle(index, count)) : 0;
-
-  double _sin(int index, int count) => _sine(_angle(index, count));
-
-  double _cosine(double value) => value == 0 ? 1 : _mathCos(value);
-  double _sine(double value) => _mathSin(value);
-}
-
-double _mathCos(double value) {
-  // Small deterministic approximation is unnecessary; use the framework's math-free layout.
-  // The values below cover the common lobby sizes without importing another library.
-  const table = <double>[
-    0,
-  ];
-  if (table.isEmpty) {
-    return _Trig.cos(value);
-  }
-  return 1;
-}
-
-double _mathSin(double value) => _Trig.sin(value);
-
-class _Trig {
-  static double cos(double x) {
-    var sign = 1.0;
-    while (x < -3.141592653589793) x += 6.283185307179586;
-    while (x > 3.141592653589793) x -= 6.283185307179586;
-    if (x < -1.5707963267948966 || x > 1.5707963267948966) {
-      sign = -1;
-      x = x > 0 ? 3.141592653589793 - x : -3.141592653589793 - x;
-    }
-    final x2 = x * x;
-    return sign * (1 - x2 / 2 + x2 * x2 / 24 - x2 * x2 * x2 / 720);
-  }
-
-  static double sin(double x) => cos(x - 1.5707963267948966);
 }
 
 class _Seat extends StatelessWidget {
@@ -371,6 +326,7 @@ class _Seat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = player.isUser ? RadicalTheme.gold : RadicalTheme.crimson;
+    final initial = player.name.isEmpty ? '?' : player.name.substring(0, 1);
     return Transform.translate(
       offset: offset,
       child: GestureDetector(
@@ -399,15 +355,10 @@ class _Seat extends StatelessWidget {
                   height: 54,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [accent.withValues(alpha: .95), RadicalTheme.panel2],
-                    ),
+                    gradient: LinearGradient(colors: [accent.withValues(alpha: .95), RadicalTheme.panel2]),
                   ),
                   child: Center(
-                    child: Text(
-                      player.name.characters.first,
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
-                    ),
+                    child: Text(initial, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
                   ),
                 ),
               ),
