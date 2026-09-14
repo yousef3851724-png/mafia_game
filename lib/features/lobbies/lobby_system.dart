@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/radical_theme.dart';
+
 enum LobbyMode { friendly, ranked }
 enum LobbyAge { teen, adult }
 enum LobbyLabel { radical, pros, newcomers, vip }
@@ -22,10 +24,10 @@ class LobbyCategory {
 
 class LobbyCatalog {
   LobbyCatalog._();
-  static const friendlyTeen = LobbyCategory(mode: LobbyMode.friendly, age: LobbyAge.teen, title: 'دوستانه • نوجوان', description: 'بدون رتبه و امتیاز؛ فضای مناسب زیر ۱۸ سال.', primary: Color(0xFF69C6B2), diamond: DiamondType.teen);
-  static const friendlyAdult = LobbyCategory(mode: LobbyMode.friendly, age: LobbyAge.adult, title: 'دوستانه • بزرگسال', description: 'دورهمی آزاد با محتوای کامل مافیا.', primary: Color(0xFF5BA7D9), diamond: DiamondType.blue);
-  static const rankedTeen = LobbyCategory(mode: LobbyMode.ranked, age: LobbyAge.teen, title: 'امتیازی • نوجوان', description: 'رقابتی و رتبه‌ای با محتوای مناسب زیر ۱۸ سال.', primary: Color(0xFFB5D56A), diamond: DiamondType.teen);
-  static const rankedAdult = LobbyCategory(mode: LobbyMode.ranked, age: LobbyAge.adult, title: 'امتیازی • بزرگسال', description: 'لیگ، رتبه و سناریوهای کامل مافیا.', primary: Color(0xFFE3B873), diamond: DiamondType.radical);
+  static const friendlyTeen = LobbyCategory(mode: LobbyMode.friendly, age: LobbyAge.teen, title: 'دوستانه • نوجوان', description: 'بدون رتبه و امتیاز؛ فضای مناسب زیر ۱۸ سال.', primary: RadicalTheme.violet, diamond: DiamondType.teen);
+  static const friendlyAdult = LobbyCategory(mode: LobbyMode.friendly, age: LobbyAge.adult, title: 'دوستانه • بزرگسال', description: 'دورهمی آزاد با محتوای کامل مافیا.', primary: RadicalTheme.gold, diamond: DiamondType.blue);
+  static const rankedTeen = LobbyCategory(mode: LobbyMode.ranked, age: LobbyAge.teen, title: 'امتیازی • نوجوان', description: 'رقابتی و رتبه‌ای با محتوای مناسب زیر ۱۸ سال.', primary: RadicalTheme.crimsonBright, diamond: DiamondType.teen);
+  static const rankedAdult = LobbyCategory(mode: LobbyMode.ranked, age: LobbyAge.adult, title: 'امتیازی • بزرگسال', description: 'لیگ، رتبه و سناریوهای کامل مافیا.', primary: RadicalTheme.goldBright, diamond: DiamondType.radical);
   static const all = [friendlyTeen, friendlyAdult, rankedTeen, rankedAdult];
   static LobbyCategory of(LobbyMode mode, LobbyAge age) => all.firstWhere((item) => item.mode == mode && item.age == age);
   static bool canEnter({required LobbyCategory category, required LobbyAge playerAge, required bool isStaff}) => playerAge == category.age || isStaff;
@@ -35,10 +37,10 @@ class LobbyLabelDefinition { final LobbyLabel id; final String title; final Icon
 class LobbyLabels {
   LobbyLabels._();
   static const all = [
-    LobbyLabelDefinition(LobbyLabel.radical, 'لابی رادیکال', Icons.whatshot_rounded, Color(0xFFE3B873)),
-    LobbyLabelDefinition(LobbyLabel.pros, 'لابی حرفه‌ای‌ها', Icons.workspace_premium_rounded, Color(0xFF9A72D9)),
-    LobbyLabelDefinition(LobbyLabel.newcomers, 'لابی تازه‌کارها', Icons.school_rounded, Color(0xFF69C6B2)),
-    LobbyLabelDefinition(LobbyLabel.vip, 'لابی VIP', Icons.diamond_rounded, Color(0xFFFFDFA0)),
+    LobbyLabelDefinition(LobbyLabel.radical, 'لابی رادیکال', Icons.whatshot_rounded, RadicalTheme.goldBright),
+    LobbyLabelDefinition(LobbyLabel.pros, 'لابی حرفه‌ای‌ها', Icons.workspace_premium_rounded, RadicalTheme.violet),
+    LobbyLabelDefinition(LobbyLabel.newcomers, 'لابی تازه‌کارها', Icons.school_rounded, RadicalTheme.smoke),
+    LobbyLabelDefinition(LobbyLabel.vip, 'لابی VIP', Icons.diamond_rounded, RadicalTheme.gold),
   ];
   static LobbyLabelDefinition of(LobbyLabel id) => all.firstWhere((item) => item.id == id);
 }
@@ -59,95 +61,16 @@ class LobbyChatMessage {
   final LobbyChatMessageType type;
   final Map<String, List<String>> reactions;
 
-  const LobbyChatMessage({
-    required this.id,
-    required this.lobbyId,
-    required this.senderId,
-    required this.senderName,
-    required this.content,
-    required this.sentAt,
-    this.type = LobbyChatMessageType.text,
-    this.reactions = const <String, List<String>>{},
-  });
-
+  const LobbyChatMessage({required this.id, required this.lobbyId, required this.senderId, required this.senderName, required this.content, required this.sentAt, this.type = LobbyChatMessageType.text, this.reactions = const <String, List<String>>{}});
   String get text => content;
   String? get emoji => type == LobbyChatMessageType.emoji ? content : null;
   String? get sticker => type == LobbyChatMessageType.sticker ? content : null;
   bool get system => type == LobbyChatMessageType.system;
-
-  LobbyChatMessage copyWith({
-    String? id,
-    String? lobbyId,
-    String? senderId,
-    String? senderName,
-    String? content,
-    Object? sentAt = _keep,
-    LobbyChatMessageType? type,
-    Map<String, List<String>>? reactions,
-  }) {
-    return LobbyChatMessage(
-      id: id ?? this.id,
-      lobbyId: lobbyId ?? this.lobbyId,
-      senderId: senderId ?? this.senderId,
-      senderName: senderName ?? this.senderName,
-      content: content ?? this.content,
-      sentAt: identical(sentAt, _keep) ? this.sentAt : sentAt as DateTime?,
-      type: type ?? this.type,
-      reactions: _copyReactions(reactions ?? this.reactions),
-    );
-  }
-
-  LobbyChatMessage react(String reaction, String playerId) {
-    final updated = _copyReactions(reactions);
-    final users = [...(updated[reaction] ?? const <String>[])];
-    if (!users.contains(playerId)) users.add(playerId);
-    updated[reaction] = List.unmodifiable(users);
-    return copyWith(reactions: updated);
-  }
-
-  Map<String, dynamic> toMap() => {
-    'id': id,
-    'lobbyId': lobbyId,
-    'senderId': senderId,
-    'senderName': senderName,
-    'content': content,
-    'sentAt': sentAt?.millisecondsSinceEpoch,
-    'type': type.name,
-    'reactions': reactions.map((key, value) => MapEntry(key, List<String>.from(value))),
-  };
-
-  factory LobbyChatMessage.fromMap(Map<String, dynamic> map) {
-    final rawReactions = map['reactions'];
-    final parsedReactions = <String, List<String>>{};
-    if (rawReactions is Map) {
-      for (final entry in rawReactions.entries) {
-        final users = entry.value is List ? List<String>.from(entry.value as List) : <String>[];
-        parsedReactions[entry.key.toString()] = List.unmodifiable(users);
-      }
-    }
-    final rawType = map['type']?.toString();
-    final type = LobbyChatMessageType.values.firstWhere(
-      (value) => value.name == rawType,
-      orElse: () => LobbyChatMessageType.text,
-    );
-    final rawSentAt = map['sentAt'];
-    final milliseconds = rawSentAt is num ? rawSentAt.toInt() : int.tryParse(rawSentAt?.toString() ?? '');
-    return LobbyChatMessage(
-      id: map['id']?.toString() ?? '',
-      lobbyId: map['lobbyId']?.toString() ?? '',
-      senderId: map['senderId']?.toString() ?? '',
-      senderName: map['senderName']?.toString() ?? '',
-      content: map['content']?.toString() ?? '',
-      sentAt: milliseconds == null ? null : DateTime.fromMillisecondsSinceEpoch(milliseconds),
-      type: type,
-      reactions: parsedReactions,
-    );
-  }
-
-  static Map<String, List<String>> _copyReactions(Map<String, List<String>> source) => {
-    for (final entry in source.entries) entry.key: List.unmodifiable(entry.value),
-  };
-
+  LobbyChatMessage copyWith({String? id, String? lobbyId, String? senderId, String? senderName, String? content, Object? sentAt = _keep, LobbyChatMessageType? type, Map<String, List<String>>? reactions}) => LobbyChatMessage(id: id ?? this.id, lobbyId: lobbyId ?? this.lobbyId, senderId: senderId ?? this.senderId, senderName: senderName ?? this.senderName, content: content ?? this.content, sentAt: identical(sentAt, _keep) ? this.sentAt : sentAt as DateTime?, type: type ?? this.type, reactions: _copyReactions(reactions ?? this.reactions));
+  LobbyChatMessage react(String reaction, String playerId) { final updated = _copyReactions(reactions); final users = [...(updated[reaction] ?? const <String>[])]; if (!users.contains(playerId)) users.add(playerId); updated[reaction] = List.unmodifiable(users); return copyWith(reactions: updated); }
+  Map<String, dynamic> toMap() => {'id': id, 'lobbyId': lobbyId, 'senderId': senderId, 'senderName': senderName, 'content': content, 'sentAt': sentAt?.millisecondsSinceEpoch, 'type': type.name, 'reactions': reactions.map((key, value) => MapEntry(key, List<String>.from(value)))};
+  factory LobbyChatMessage.fromMap(Map<String, dynamic> map) { final rawReactions = map['reactions']; final parsedReactions = <String, List<String>>{}; if (rawReactions is Map) { for (final entry in rawReactions.entries) { final users = entry.value is List ? List<String>.from(entry.value as List) : <String>[]; parsedReactions[entry.key.toString()] = List.unmodifiable(users); } } final rawType = map['type']?.toString(); final type = LobbyChatMessageType.values.firstWhere((value) => value.name == rawType, orElse: () => LobbyChatMessageType.text); final rawSentAt = map['sentAt']; final milliseconds = rawSentAt is num ? rawSentAt.toInt() : int.tryParse(rawSentAt?.toString() ?? ''); return LobbyChatMessage(id: map['id']?.toString() ?? '', lobbyId: map['lobbyId']?.toString() ?? '', senderId: map['senderId']?.toString() ?? '', senderName: map['senderName']?.toString() ?? '', content: map['content']?.toString() ?? '', sentAt: milliseconds == null ? null : DateTime.fromMillisecondsSinceEpoch(milliseconds), type: type, reactions: parsedReactions); }
+  static Map<String, List<String>> _copyReactions(Map<String, List<String>> source) => {for (final entry in source.entries) entry.key: List.unmodifiable(entry.value)};
   static const _keep = Object();
 }
 
@@ -160,21 +83,8 @@ class LobbyChatStore {
   static void seed(String lobbyId, String ownerName) { if (_messages.containsKey(lobbyId)) return; _messages[lobbyId] = [LobbyChatMessage(id: '${lobbyId}_system_start', lobbyId: lobbyId, senderId: 'system', senderName: 'سیستم', content: '$ownerName لابی را ساخت.', sentAt: DateTime.now(), type: LobbyChatMessageType.system)]; }
   static bool canRead(String lobbyId, String playerId, LobbyDefinition lobby) => lobby.id == lobbyId && lobby.hasPlayer(playerId);
   static bool canWrite(String lobbyId, String playerId, LobbyDefinition lobby) => canRead(lobbyId, playerId, lobby) && lobby.permissionsFor(playerId).contains(LobbyPermission.sendChat);
-  static LobbyChatMessage? send({required LobbyDefinition lobby, required String senderId, required String senderName, String text = '', String? emoji, String? sticker}) {
-    if (!canWrite(lobby.id, senderId, lobby)) return null;
-    if (text.trim().isEmpty && emoji == null && sticker == null) return null;
-    final type = emoji != null ? LobbyChatMessageType.emoji : sticker != null ? LobbyChatMessageType.sticker : LobbyChatMessageType.text;
-    final content = emoji ?? sticker ?? text.trim();
-    final message = LobbyChatMessage(id: '${lobby.id}_${DateTime.now().microsecondsSinceEpoch}', lobbyId: lobby.id, senderId: senderId, senderName: senderName, content: content, sentAt: DateTime.now(), type: type);
-    _messages.putIfAbsent(lobby.id, () => <LobbyChatMessage>[]).add(message);
-    return message;
-  }
-  static bool react({required LobbyDefinition lobby, required String playerId, required String messageId, required String reaction}) {
-    if (!canRead(lobby.id, playerId, lobby) || !lobby.permissionsFor(playerId).contains(LobbyPermission.react)) return false;
-    final list = _messages[lobby.id]; if (list == null) return false;
-    final index = list.indexWhere((m) => m.id == messageId); if (index < 0) return false;
-    list[index] = list[index].react(reaction, playerId); return true;
-  }
+  static LobbyChatMessage? send({required LobbyDefinition lobby, required String senderId, required String senderName, String text = '', String? emoji, String? sticker}) { if (!canWrite(lobby.id, senderId, lobby)) return null; if (text.trim().isEmpty && emoji == null && sticker == null) return null; final type = emoji != null ? LobbyChatMessageType.emoji : sticker != null ? LobbyChatMessageType.sticker : LobbyChatMessageType.text; final content = emoji ?? sticker ?? text.trim(); final message = LobbyChatMessage(id: '${lobby.id}_${DateTime.now().microsecondsSinceEpoch}', lobbyId: lobby.id, senderId: senderId, senderName: senderName, content: content, sentAt: DateTime.now(), type: type); _messages.putIfAbsent(lobby.id, () => <LobbyChatMessage>[]).add(message); return message; }
+  static bool react({required LobbyDefinition lobby, required String playerId, required String messageId, required String reaction}) { if (!canRead(lobby.id, playerId, lobby) || !lobby.permissionsFor(playerId).contains(LobbyPermission.react)) return false; final list = _messages[lobby.id]; if (list == null) return false; final index = list.indexWhere((m) => m.id == messageId); if (index < 0) return false; list[index] = list[index].react(reaction, playerId); return true; }
 }
 
 class LobbyDefinition {
@@ -183,39 +93,16 @@ class LobbyDefinition {
   LobbyDefinition copyWith({String? name, LobbyCategory? category, LobbyLabel? label, String? ownerId, bool? locked, bool? staffOnly, List<LobbyPlayerLabel>? players}) => LobbyDefinition(id: id, name: name ?? this.name, category: category ?? this.category, label: label ?? this.label, ownerId: ownerId ?? this.ownerId, locked: locked ?? this.locked, staffOnly: staffOnly ?? this.staffOnly, players: players ?? this.players);
   bool hasPlayer(String playerId) => players.any((player) => player.playerId == playerId);
   LobbyPlayerLabel? player(String playerId) => players.where((p) => p.playerId == playerId).firstOrNull;
-  Set<LobbyPermission> permissionsFor(String playerId) {
-    final member = player(playerId); if (member == null) return const {};
-    if (member.isStaff && staffOnly) return LobbyPermission.values.toSet();
-    if (member.isLeader) return const {LobbyPermission.viewChat, LobbyPermission.sendChat, LobbyPermission.react, LobbyPermission.kick, LobbyPermission.lock, LobbyPermission.startGame};
-    return const {LobbyPermission.viewChat, LobbyPermission.sendChat, LobbyPermission.react};
-  }
+  Set<LobbyPermission> permissionsFor(String playerId) { final member = player(playerId); if (member == null) return const {}; if (member.isStaff && staffOnly) return LobbyPermission.values.toSet(); if (member.isLeader) return const {LobbyPermission.viewChat, LobbyPermission.sendChat, LobbyPermission.react, LobbyPermission.kick, LobbyPermission.lock, LobbyPermission.startGame}; return const {LobbyPermission.viewChat, LobbyPermission.sendChat, LobbyPermission.react}; }
 }
 
 class LobbyEngine {
   const LobbyEngine();
   bool canJoin(LobbyDefinition lobby, LobbyPlayerLabel player) => !lobby.staffOnly || player.isStaff;
-  LobbyDefinition join(LobbyDefinition lobby, LobbyPlayerLabel player) {
-    if (lobby.locked || !canJoin(lobby, player)) throw StateError('Player cannot join this lobby.');
-    if (lobby.hasPlayer(player.playerId)) return lobby;
-    return lobby.copyWith(players: [...lobby.players, player]);
-  }
-  LobbyDefinition leave(LobbyDefinition lobby, String playerId) {
-    final remaining = lobby.players.where((p) => p.playerId != playerId).toList(growable: false);
-    if (remaining.isEmpty) return lobby.copyWith(players: const []);
-    if (lobby.ownerId == playerId) {
-      final nextLeader = remaining.first;
-      return lobby.copyWith(ownerId: nextLeader.playerId, players: remaining.map((p) => p.playerId == nextLeader.playerId ? LobbyPlayerLabel(playerId: p.playerId, playerName: p.playerName, avatarAsset: p.avatarAsset, isLeader: true, isStaff: p.isStaff, rating: p.rating, groupLabels: p.groupLabels) : p).toList(growable: false));
-    }
-    return lobby.copyWith(players: remaining);
-  }
-  LobbyDefinition kick(LobbyDefinition lobby, String actorId, String targetId) {
-    if (!lobby.permissionsFor(actorId).contains(LobbyPermission.kick) || actorId == targetId) throw StateError('Kick permission denied.');
-    return leave(lobby, targetId);
-  }
-  LobbyDefinition setLocked(LobbyDefinition lobby, String actorId, bool locked) {
-    if (!lobby.permissionsFor(actorId).contains(LobbyPermission.lock)) throw StateError('Lock permission denied.');
-    return lobby.copyWith(locked: locked);
-  }
+  LobbyDefinition join(LobbyDefinition lobby, LobbyPlayerLabel player) { if (lobby.locked || !canJoin(lobby, player)) throw StateError('Player cannot join this lobby.'); if (lobby.hasPlayer(player.playerId)) return lobby; return lobby.copyWith(players: [...lobby.players, player]); }
+  LobbyDefinition leave(LobbyDefinition lobby, String playerId) { final remaining = lobby.players.where((p) => p.playerId != playerId).toList(growable: false); if (remaining.isEmpty) return lobby.copyWith(players: const []); if (lobby.ownerId == playerId) { final nextLeader = remaining.first; return lobby.copyWith(ownerId: nextLeader.playerId, players: remaining.map((p) => p.playerId == nextLeader.playerId ? LobbyPlayerLabel(playerId: p.playerId, playerName: p.playerName, avatarAsset: p.avatarAsset, isLeader: true, isStaff: p.isStaff, rating: p.rating, groupLabels: p.groupLabels) : p).toList(growable: false)); } return lobby.copyWith(players: remaining); }
+  LobbyDefinition kick(LobbyDefinition lobby, String actorId, String targetId) { if (!lobby.permissionsFor(actorId).contains(LobbyPermission.kick) || actorId == targetId) throw StateError('Kick permission denied.'); return leave(lobby, targetId); }
+  LobbyDefinition setLocked(LobbyDefinition lobby, String actorId, bool locked) { if (!lobby.permissionsFor(actorId).contains(LobbyPermission.lock)) throw StateError('Lock permission denied.'); return lobby.copyWith(locked: locked); }
 }
 
 class RadicalStaffDirectory {
@@ -229,23 +116,10 @@ class RadicalDiamondDefinition { final DiamondType type; final String name; fina
 class RadicalDiamonds {
   RadicalDiamonds._();
   static const all = [
-    RadicalDiamondDefinition(type: DiamondType.blue, name: 'الماس آبی', emoji: '💎', primary: Color(0xFF55A9FF), secondary: Color(0xFF9BD2FF), usage: 'خریدهای عادی و لابی‌های دوستانه بزرگسال'),
-    RadicalDiamondDefinition(type: DiamondType.radical, name: 'الماس رادیکال', emoji: '◆', primary: Color(0xFF9A72D9), secondary: Color(0xFFFFDFA0), usage: 'لابی‌های امتیازی، VIP و سناریوهای ویژه'),
-    RadicalDiamondDefinition(type: DiamondType.teen, name: 'الماس سبز نوجوانان', emoji: '✦', primary: Color(0xFF62D89A), secondary: Color(0xFFBFE7D1), usage: 'فقط لابی‌های نوجوانان'),
-    RadicalDiamondDefinition(type: DiamondType.adult, name: 'الماس قرمز بزرگسالان', emoji: '◆', primary: Color(0xFFED4D67), secondary: Color(0xFFFFDFA0), usage: 'فقط لابی‌های بزرگسالان و محتوای بزرگسال'),
+    RadicalDiamondDefinition(type: DiamondType.blue, name: 'الماس رادیکال', emoji: '◆', primary: RadicalTheme.gold, secondary: RadicalTheme.goldBright, usage: 'لابی‌های دوستانه'),
+    RadicalDiamondDefinition(type: DiamondType.radical, name: 'الماس رادیکال', emoji: '◆', primary: RadicalTheme.violet, secondary: RadicalTheme.goldBright, usage: 'لابی‌های امتیازی و VIP'),
+    RadicalDiamondDefinition(type: DiamondType.teen, name: 'الماس رادیکال نوجوان', emoji: '✦', primary: RadicalTheme.violet, secondary: RadicalTheme.goldBright, usage: 'لابی‌های نوجوانان'),
+    RadicalDiamondDefinition(type: DiamondType.adult, name: 'الماس رادیکال بزرگسال', emoji: '◆', primary: RadicalTheme.crimsonBright, secondary: RadicalTheme.goldBright, usage: 'لابی‌های بزرگسالان'),
   ];
   static RadicalDiamondDefinition of(DiamondType type) => all.firstWhere((item) => item.type == type);
-  static bool supports(LobbyCategory category, DiamondType type) => switch (category.mode) {
-    LobbyMode.friendly => category.age == LobbyAge.teen ? type == DiamondType.teen : type == DiamondType.blue,
-    LobbyMode.ranked => type == DiamondType.radical || (category.age == LobbyAge.teen && type == DiamondType.teen) || (category.age == LobbyAge.adult && type == DiamondType.adult),
-  };
 }
-
-class LobbyStoreItem { final String id; final String name; final int price; final DiamondType currency; final bool vip; const LobbyStoreItem({required this.id, required this.name, required this.price, required this.currency, this.vip = false}); }
-class LobbyStoreCatalog {
-  LobbyStoreCatalog._();
-  static const regular = [LobbyStoreItem(id: 'avatar_basic', name: 'آواتار کلاسیک', price: 100, currency: DiamondType.blue), LobbyStoreItem(id: 'sticker_party', name: 'استیکر دورهمی', price: 50, currency: DiamondType.blue), LobbyStoreItem(id: 'teen_sticker_pack', name: 'پک استیکر نوجوان', price: 75, currency: DiamondType.teen)];
-  static const vip = [LobbyStoreItem(id: 'avatar_radical', name: 'آواتار رادیکال', price: 100, currency: DiamondType.radical, vip: true), LobbyStoreItem(id: 'lobby_vip', name: 'ورود VIP', price: 250, currency: DiamondType.radical, vip: true), LobbyStoreItem(id: 'scenario_special', name: 'سناریوی ویژه', price: 500, currency: DiamondType.radical, vip: true), LobbyStoreItem(id: 'adult_scenario_pack', name: 'پک سناریوی بزرگسال', price: 450, currency: DiamondType.adult, vip: true)];
-}
-
-extension _FirstOrNull<T> on Iterable<T> { T? get firstOrNull => isEmpty ? null : first; }
