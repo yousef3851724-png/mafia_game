@@ -398,22 +398,27 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
   }
 
   Widget _message(LobbyChatMessage message) {
+    final isSystem = message.type == LobbyChatMessageType.system;
+    final prefix = switch (message.type) {
+      LobbyChatMessageType.text => '${message.senderName}: ',
+      LobbyChatMessageType.emoji => '${message.senderName}: ',
+      LobbyChatMessageType.sticker => '${message.senderName}: ',
+      LobbyChatMessageType.system => '⚙️ ',
+    };
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Align(
-        alignment: message.system ? Alignment.center : Alignment.centerRight,
+        alignment: isSystem ? Alignment.center : Alignment.centerRight,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
           decoration: BoxDecoration(
-            color: message.system ? RadicalTheme.panel3 : RadicalTheme.panel2,
+            color: isSystem ? RadicalTheme.panel3 : RadicalTheme.panel2,
             borderRadius: BorderRadius.circular(13),
           ),
           child: Text(
-            message.system
-                ? '⚙️ ${message.content}'
-                : '${message.senderName}: ${message.content}',
+            '$prefix${message.content}',
             style: TextStyle(
-              color: message.system ? RadicalTheme.smoke : Colors.white,
+              color: isSystem ? RadicalTheme.smoke : Colors.white,
               fontSize: 12,
               fontWeight: FontWeight.w700,
             ),
