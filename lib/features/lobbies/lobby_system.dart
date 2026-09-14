@@ -5,6 +5,7 @@ enum LobbyAge { teen, adult }
 enum LobbyLabel { radical, pros, newcomers, vip }
 enum DiamondType { blue, radical, teen, adult }
 enum LobbyPermission { viewChat, sendChat, react, kick, lock, startGame, viewStats, admin }
+enum LobbyChatMessageType { text, emoji, sticker, system }
 
 class LobbyCategory {
   final LobbyMode mode;
@@ -48,31 +49,131 @@ class LobbyPlayerLabel {
   bool hasGroupLabel(LobbyLabel label) => groupLabels.contains(label);
 }
 
-class LobbyMessage {
-  final String id; final String lobbyId; final String senderId; final String senderName; final String text; final DateTime? sentAt; final bool system; final String? emoji; final String? sticker; final Set<String> reactions;
-  const LobbyMessage({required this.id, required this.lobbyId, required this.senderId, required this.senderName, required this.text, required this.sentAt, this.system = false, this.emoji, this.sticker, this.reactions = const {}});
-  LobbyMessage react(String reaction) => LobbyMessage(id: id, lobbyId: lobbyId, senderId: senderId, senderName: senderName, text: text, sentAt: sentAt, system: system, emoji: emoji, sticker: sticker, reactions: {...reactions, reaction});
+class LobbyChatMessage {
+  final String id;
+  final String lobbyId;
+  final String senderId;
+  final String senderName;
+  final String content;
+  final DateTime? sentAt;
+  final LobbyChatMessageType type;
+  final Map<String, List<String>> reactions;
+
+  const LobbyChatMessage({
+    required this.id,
+    required this.lobbyId,
+    required this.senderId,
+    required this.senderName,
+    required this.content,
+    required this.sentAt,
+    this.type = LobbyChatMessageType.text,
+    this.reactions = const <String, List<String>>{},
+  });
+
+  String get text => content;
+  String? get emoji => type == LobbyChatMessageType.emoji ? content : null;
+  String? get sticker => type == LobbyChatMessageType.sticker ? content : null;
+  bool get system => type == LobbyChatMessageType.system;
+
+  LobbyChatMessage copyWith({
+    String? id,
+    String? lobbyId,
+    String? senderId,
+    String? senderName,
+    String? content,
+    Object? sentAt = _keep,
+    LobbyChatMessageType? type,
+    Map<String, List<String>>? reactions,
+  }) {
+    return LobbyChatMessage(
+      id: id ?? this.id,
+      lobbyId: lobbyId ?? this.lobbyId,
+      senderId: senderId ?? this.senderId,
+      senderName: senderName ?? this.senderName,
+      content: content ?? this.content,
+      sentAt: identical(sentAt, _keep) ? this.sentAt : sentAt as DateTime?,
+      type: type ?? this.type,
+      reactions: _copyReactions(reactions ?? this.reactions),
+    );
+  }
+
+  LobbyChatMessage react(String reaction, String playerId) {
+    final updated = _copyReactions(reactions);
+    final users = [...(updated[reaction] ?? const <String>[])];
+    if (!users.contains(playerId)) users.add(playerId);
+    updated[reaction] = List.unmodifiable(users);
+    return copyWith(reactions: updated);
+  }
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'lobbyId': lobbyId,
+    'senderId': senderId,
+    'senderName': senderName,
+    'content': content,
+    'sentAt': sentAt?.millisecondsSinceEpoch,
+    'type': type.name,
+    'reactions': reactions.map((key, value) => MapEntry(key, List<String>.from(value))),
+  };
+
+  factory LobbyChatMessage.fromMap(Map<String, dynamic> map) {
+    final rawReactions = map['reactions'];
+    final parsedReactions = <String, List<String>>{};
+    if (rawReactions is Map) {
+      for (final entry in rawReactions.entries) {
+        final users = entry.value is List ? List<String>.from(entry.value as List) : <String>[];
+        parsedReactions[entry.key.toString()] = List.unmodifiable(users);
+      }
+    }
+    final rawType = map['type']?.toString();
+    final type = LobbyChatMessageType.values.firstWhere(
+      (value) => value.name == rawType,
+      orElse: () => LobbyChatMessageType.text,
+    );
+    final rawSentAt = map['sentAt'];
+    final milliseconds = rawSentAt is num ? rawSentAt.toInt() : int.tryParse(rawSentAt?.toString() ?? '');
+    return LobbyChatMessage(
+      id: map['id']?.toString() ?? '',
+      lobbyId: map['lobbyId']?.toString() ?? '',
+      senderId: map['senderId']?.toString() ?? '',
+      senderName: map['senderName']?.toString() ?? '',
+      content: map['content']?.toString() ?? '',
+      sentAt: milliseconds == null ? null : DateTime.fromMillisecondsSinceEpoch(milliseconds),
+      type: type,
+      reactions: parsedReactions,
+    );
+  }
+
+  static Map<String, List<String>> _copyReactions(Map<String, List<String>> source) => {
+    for (final entry in source.entries) entry.key: List.unmodifiable(entry.value),
+  };
+
+  static const _keep = Object();
 }
+
+typedef LobbyMessage = LobbyChatMessage;
 
 class LobbyChatStore {
   LobbyChatStore._();
-  static final Map<String, List<LobbyMessage>> _messages = {};
-  static List<LobbyMessage> messagesFor(String lobbyId) => List.unmodifiable(_messages[lobbyId] ?? const []);
-  static void seed(String lobbyId, String ownerName) { if (_messages.containsKey(lobbyId)) return; _messages[lobbyId] = [LobbyMessage(id: '${lobbyId}_system_start', lobbyId: lobbyId, senderId: 'system', senderName: 'سیستم', text: '$ownerName لابی را ساخت.', sentAt: DateTime.now(), system: true)]; }
+  static final Map<String, List<LobbyChatMessage>> _messages = {};
+  static List<LobbyChatMessage> messagesFor(String lobbyId) => List.unmodifiable(_messages[lobbyId] ?? const []);
+  static void seed(String lobbyId, String ownerName) { if (_messages.containsKey(lobbyId)) return; _messages[lobbyId] = [LobbyChatMessage(id: '${lobbyId}_system_start', lobbyId: lobbyId, senderId: 'system', senderName: 'سیستم', content: '$ownerName لابی را ساخت.', sentAt: DateTime.now(), type: LobbyChatMessageType.system)]; }
   static bool canRead(String lobbyId, String playerId, LobbyDefinition lobby) => lobby.id == lobbyId && lobby.hasPlayer(playerId);
   static bool canWrite(String lobbyId, String playerId, LobbyDefinition lobby) => canRead(lobbyId, playerId, lobby) && lobby.permissionsFor(playerId).contains(LobbyPermission.sendChat);
-  static LobbyMessage? send({required LobbyDefinition lobby, required String senderId, required String senderName, String text = '', String? emoji, String? sticker}) {
+  static LobbyChatMessage? send({required LobbyDefinition lobby, required String senderId, required String senderName, String text = '', String? emoji, String? sticker}) {
     if (!canWrite(lobby.id, senderId, lobby)) return null;
     if (text.trim().isEmpty && emoji == null && sticker == null) return null;
-    final message = LobbyMessage(id: '${lobby.id}_${DateTime.now().microsecondsSinceEpoch}', lobbyId: lobby.id, senderId: senderId, senderName: senderName, text: text.trim(), sentAt: DateTime.now(), emoji: emoji, sticker: sticker);
-    _messages.putIfAbsent(lobby.id, () => <LobbyMessage>[]).add(message);
+    final type = emoji != null ? LobbyChatMessageType.emoji : sticker != null ? LobbyChatMessageType.sticker : LobbyChatMessageType.text;
+    final content = emoji ?? sticker ?? text.trim();
+    final message = LobbyChatMessage(id: '${lobby.id}_${DateTime.now().microsecondsSinceEpoch}', lobbyId: lobby.id, senderId: senderId, senderName: senderName, content: content, sentAt: DateTime.now(), type: type);
+    _messages.putIfAbsent(lobby.id, () => <LobbyChatMessage>[]).add(message);
     return message;
   }
   static bool react({required LobbyDefinition lobby, required String playerId, required String messageId, required String reaction}) {
     if (!canRead(lobby.id, playerId, lobby) || !lobby.permissionsFor(playerId).contains(LobbyPermission.react)) return false;
     final list = _messages[lobby.id]; if (list == null) return false;
     final index = list.indexWhere((m) => m.id == messageId); if (index < 0) return false;
-    list[index] = list[index].react(reaction); return true;
+    list[index] = list[index].react(reaction, playerId); return true;
   }
 }
 
