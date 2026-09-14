@@ -3,7 +3,6 @@ import '../lobbies/lobby_system.dart';
 import '../scenarios/scenario_catalog.dart';
 
 enum GameActionType { selectTarget, nightAction, openVoting, castVote, timeout }
-
 enum GameEngineError { none, invalidPlayerCount, invalidScenario, invalidAge, invalidDiamond, invalidPhase, deadPlayer, missingTarget, unauthorized }
 
 class GameEngineRules {
@@ -105,8 +104,4 @@ class GameEngine {
     if (rating >= 500) return 'Silver';
     return 'Bronze';
   }
-}
-
-extension<T> on Iterable<T> {
-  T? get firstOrNull => isEmpty ? null : first;
 }
