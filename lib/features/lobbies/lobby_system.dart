@@ -1,3 +1,5 @@
+import 'lobby_domain.dart';
+
 export 'lobby_domain.dart';
 
 /// Backwards-compatible facade for the lobby chat API.
