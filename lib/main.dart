@@ -14,14 +14,13 @@ class MafiaRadicalApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radical = RadicalTheme.dark();
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'مافیا رادیکال',
-      theme: radical,
-      darkTheme: radical,
+      theme: RadicalTheme.dark(),
+      darkTheme: RadicalTheme.dark(),
       themeMode: ThemeMode.dark,
       home: const CinematicHomeScreen(),
+      debugShowCheckedModeBanner: false,
+      title: 'مافیا رادیکال',
     );
   }
 }
