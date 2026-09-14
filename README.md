@@ -1,773 +1,279 @@
 # 🐺 Mafia Radical
 
-## بازی مافیا رادیکال
+اپلیکیشن Flutter برای اجرای حرفه‌ای بازی مافیا، مدیریت لابی، تخصیص نقش، جریان شب/روز، رأی‌گیری و نمایش نتیجه بازی.
 
-Mafia Radical یک اپلیکیشن حرفه‌ای موبایل برای بازی مافیا و مدیریت بازی توسط گرداننده است.
+**Current release:** `1.0.0+3`
 
-این پروژه فقط یک رابط کاربری ساده نیست؛ هدف آن ایجاد یک اکوسیستم کامل برای:
-- اجرای بازی مافیا
-- مدیریت لابی
-- مدیریت بازیکنان
-- مدیریت نقش‌ها و سناریوها
-- رأی‌گیری
-- سیستم دوستانه
-- سیستم امتیازی
-- فصل‌ها و جوایز
-- آواتار و فریم
-- باشگاه
-- اقتصاد درون‌برنامه‌ای
-- قابلیت‌های هوش مصنوعی به‌عنوان دستیار
-- و در آینده اتصال به سرور آنلاین
+## وضعیت نسخه نهایی
 
-است.
+- ✅ Home → Scenario → Game flow
+- ✅ تخصیص نقش واقعاً تصادفی
+- ✅ Leader و Radical Staff روی میز
+- ✅ چیدمان پایدار تا ۲۰ بازیکن
+- ✅ Game Engine برای شب، روز، رأی‌گیری و برد
+- ✅ تست‌های Flutter و تحلیل CI
+- ✅ Android launcher branding
+- ✅ Production signing workflow جداگانه و امن
 
 ---
 
-# ⚠️ مهم: این README سند مرجع پروژه است
+## 🧱 ساختار پروژه
 
-این فایل مشخص‌کننده معماری، هدف و قابلیت‌های نهایی Mafia Radical است.
-
-ممکن است در نسخه فعلی repository بعضی پوشه‌ها، فایل‌ها یا قابلیت‌ها هنوز ساخته نشده باشند یا خالی باشند.
-
-خالی بودن یک فایل یا پوشه به معنی اشتباه بودن معماری نیست.
-
-توسعه‌دهنده یا AI نباید صرفاً به دلیل وجود نداشتن یک فایل، ساختار پروژه را حذف یا تغییر دهد.
-
-اگر قابلیتی در این README تعریف شده ولی هنوز پیاده‌سازی نشده است، باید آن قابلیت به‌عنوان **TODO / Planned Feature** در نظر گرفته شود و پیاده‌سازی آن مطابق معماری پروژه انجام شود.
-
----
-
-# 🎯 هدف اصلی
-
-هدف پروژه ساخت یک Mafia App حرفه‌ای، مدرن، قابل توسعه و قابل انتشار برای Android است.
-
-اولویت‌های پروژه:
-
-1. پایداری
-2. معماری تمیز
-3. قابلیت توسعه
-4. رابط کاربری حرفه‌ای
-5. پشتیبانی کامل فارسی و RTL
-6. عملکرد مناسب روی گوشی‌های میان‌رده
-7. قابلیت استفاده آفلاین
-8. آماده بودن معماری برای اتصال به سرور
-9. امنیت اطلاعات
-10. جلوگیری از وابستگی غیرضروری به سرویس‌های آنلاین
-
----
-
-# 📱 پلتفرم
-
-پلتفرم اصلی:
-
-- Android
-
-فناوری اصلی:
-
-- Flutter
-- Dart
-
-زبان رابط کاربری:
-
-- فارسی
-- English
-
-جهت رابط:
-
-- RTL برای فارسی
-- LTR برای انگلیسی
-
----
-
-# 🎨 هویت بصری
-
-Mafia Radical باید دارای ظاهر:
-
-- Dark
-- Professional
-- Modern
-- Cinematic
-- Radical
-- Mafia-themed
-
-باشد.
-
-رنگ‌ها می‌توانند بر اساس فضای تاریک، قرمز، طلایی، مشکی و رنگ‌های مکمل طراحی شوند.
-
-طراحی نباید کپی مستقیم اپلیکیشن‌های موجود باشد.
-
-هدف ایجاد هویت بصری اختصاصی برای Mafia Radical است.
-
----
-
-# 🧱 معماری پروژه
-
-ساختار پیشنهادی اصلی:
-
-lib/
-
-├── core/
-│   ├── constants/
-│   ├── errors/
-│   ├── logger/
-│   ├── router/
-│   ├── theme/
-│   ├── services/
-│   ├── storage/
+```text
+mafia_game/
+├── .github/
+│   └── workflows/
+│       ├── build.yml
+│       ├── integrate-scenario-lobby.yml
+│       └── release.yml
+├── android/
+│   ├── app/
+│   │   ├── build.gradle.kts
+│   │   └── src/
+│   │       ├── debug/AndroidManifest.xml
+│   │       └── main/
+│   │           ├── AndroidManifest.xml
+│   │           ├── kotlin/com/yousef/mafia_radical/MainActivity.kt
+│   │           └── res/
+│   │               ├── drawable/
+│   │               ├── drawable-v21/
+│   │               └── mipmap-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}/
+│   └── ... Flutter/Gradle project files
+├── assets/
+│   └── images/
+├── lib/
+│   ├── main.dart
+│   ├── core/
+│   │   ├── constants/
+│   │   │   ├── app_assets.dart
+│   │   │   ├── app_theme.dart
+│   │   │   └── frame_catalog.dart
+│   │   ├── game_manager.dart
+│   │   ├── models/
+│   │   │   ├── app_models.dart
+│   │   │   └── game_models.dart
+│   │   ├── theme/
+│   │   │   └── radical_theme.dart
+│   │   └── widgets/
+│   │       ├── avatar_frame_widget.dart
+│   │       ├── branding/
+│   │       └── frames/
 │   ├── database/
-│   ├── dependency_injection/
-│   └── widgets/
-│
-├── features/
-│   ├── game/
-│   ├── lobby/
-│   ├── scenarios/
-│   ├── roles/
-│   ├── cosmetics/
-│   ├── club/
-│   ├── profile/
-│   ├── economy/
-│   ├── seasons/
-│   ├── rewards/
-│   ├── ai/
-│   ├── authentication/
-│   └── settings/
-│
-└── main.dart
+│   └── features/
+│       ├── cosmetics/
+│       ├── game/
+│       │   ├── data/
+│       │   ├── domain/
+│       │   ├── presentation/
+│       │   ├── game_engine.dart
+│       │   ├── game_module.dart
+│       │   ├── game_state.dart
+│       │   └── player_avatar.dart
+│       ├── gameplay/
+│       ├── home/
+│       ├── lobbies/
+│       ├── lobby/
+│       ├── pass_and_play/
+│       ├── scenarios/
+│       ├── setup/
+│       ├── store/
+│       └── victory/
+├── scripts/
+│   └── setup_game_feature.sh
+├── .gitignore
+├── .metadata
+├── analysis_options.yaml
+├── BUILD_RELEASE_TRIGGER.md
+├── BUILD_RELEASE_TRIGGER_2.md
+├── CHANGELOG.md
+├── pubspec.yaml
+└── README.md
+```
+
+### نقش فایل‌های کلیدی
+
+| مسیر | مسئولیت |
+|---|---|
+| `lib/main.dart` | bootstrap برنامه، `ProviderScope`، Theme و Home screen |
+| `lib/core/constants/app_assets.dart` | مسیرها و ثابت‌های asset |
+| `lib/core/constants/app_theme.dart` | رنگ‌ها و ثابت‌های بصری پایه |
+| `lib/core/constants/frame_catalog.dart` | کاتالوگ فریم‌های آواتار |
+| `lib/core/models/app_models.dart` | مدل‌های عمومی اپ، تیم، سن، label و wallet |
+| `lib/core/models/game_models.dart` | مدل‌های بازی، Player، Role و Team |
+| `lib/core/game_manager.dart` | هماهنگ‌کننده سطح بالای جریان بازی |
+| `lib/core/theme/radical_theme.dart` | Material theme و visual system اصلی |
+| `lib/core/widgets/avatar_frame_widget.dart` | رندر آواتار و frame |
+| `lib/features/game/game_engine.dart` | قوانین و عملیات اصلی Game Engine |
+| `lib/features/game/game_state.dart` | state و transitionهای بازی |
+| `lib/features/game/game_module.dart` | wiring/module مربوط به Game feature |
+| `lib/features/game/player_avatar.dart` | نمایش avatar بازیکن در Game feature |
+| `lib/features/game/domain/` | entity و serviceهای domain؛ شامل engine دامنه |
+| `lib/features/game/data/` | لایه data/repository برای Game feature |
+| `lib/features/game/presentation/` | screen و widgetهای UI مربوط به بازی |
+| `lib/features/home/` | صفحه Home و شروع جریان بازی |
+| `lib/features/scenarios/` | انتخاب و نمایش سناریوها و عناصر مرتبط |
+| `lib/features/setup/` | تنظیم بازیکنان و شروع session |
+| `lib/features/pass_and_play/` | نمایش امن نقش‌ها به بازیکنان در حالت pass-and-play |
+| `lib/features/lobbies/` | state و سیستم لابی/برچسب‌ها/اقتصاد لابی |
+| `lib/features/lobby/` | اجزای جریان لابی |
+| `lib/features/gameplay/` | اجزای gameplay presentation/logic |
+| `lib/features/victory/` | نمایش تیم/نتیجه برنده |
+| `lib/features/cosmetics/` | قابلیت‌های ظاهری و cosmetics |
+| `lib/features/store/` | بخش فروشگاه |
+| `lib/database/` | زیرساخت ذخیره‌سازی database |
+| `assets/images/` | تصاویر و assetهای اپ |
+| `android/app/build.gradle.kts` | Android application config، versioning و release signing |
+| `.github/workflows/build.yml` | CI: analyze، test، build APK و provenance |
+| `.github/workflows/integrate-scenario-lobby.yml` | CI integration سناریو/لابی |
+| `.github/workflows/release.yml` | production signed APK + signature verification + GitHub Release |
+| `pubspec.yaml` | package name، version، dependencies و asset/icon/splash config |
+| `CHANGELOG.md` | تاریخچه release |
+
+> ساختار واقعی repository مبناست؛ README صرفاً معماری فرضی نیست. پوشه‌های `data/`, `domain/` و `presentation/` به‌صورت feature-oriented نگه‌داری شده‌اند تا رشد پروژه بدون مخلوط شدن UI و منطق بازی ممکن باشد.
 
 ---
 
-# 🎮 Game System
+## 🎮 جریان اصلی بازی
 
-سیستم اصلی بازی مسئول مدیریت:
+```text
+Home
+  ↓
+Scenario Selection
+  ↓
+Setup / Lobby
+  ↓
+Random Role Assignment
+  ↓
+Game Table
+  ↓
+Night → Day → Voting → Resolution
+  ↓
+Victory
+```
 
-- بازیکنان
-- نقش‌ها
-- تیم‌ها
-- وضعیت بازی
-- شب و روز
-- رأی‌گیری
-- حذف بازیکن
-- اکشن نقش‌ها
-- نتیجه بازی
-- تاریخچه بازی
-- مدیریت گرداننده
-
-است.
-
----
-
-# 👥 Player System
-
-هر بازیکن می‌تواند اطلاعاتی مانند موارد زیر داشته باشد:
-
-- ID
-- نام
-- Avatar
-- Frame
-- وضعیت آنلاین
-- Host بودن
-- تیم
-- نقش
-- رأی
-- امتیاز
-- آمار بازی
-- سطح
-- جوایز
-
-اطلاعات حساس نقش بازیکن نباید به بازیکنان دیگر نمایش داده شود.
+تخصیص نقش تصادفی است؛ قرار گرفتن چند بازیکن Mafia در صندلی‌های مجاور یک نتیجه معتبر تصادفی است و به معنی الگوی ثابت نیست.
 
 ---
 
-# 🏠 Lobby System
+## 🧪 اجرای محلی
 
-لابی مرکز اصلی آماده‌سازی بازی است.
+### پیش‌نیازها
 
-قابلیت‌ها:
+- Flutter stable
+- Dart مطابق constraint موجود در `pubspec.yaml`
+- Java 17
+- Android SDK
+- Android SDK/Gradle سازگار با نسخه Flutter نصب‌شده
 
-- ساخت لابی
-- ورود به لابی
-- خروج از لابی
-- تعیین Host
-- مدیریت بازیکنان
-- تعیین تعداد بازیکنان
-- انتخاب سناریو
-- انتخاب Deck
-- تنظیم قوانین
-- شروع بازی
-- قفل کردن لابی
-- مدیریت دسترسی بازیکنان
+### نصب dependencyها
 
-Host باید بتواند تنظیمات مجاز لابی را کنترل کند.
+```bash
+flutter pub get
+```
 
----
+### تحلیل
 
-# 🃏 Deck System
+```bash
+flutter analyze --no-fatal-infos --no-fatal-warnings
+```
 
-Deckها باید قابل توسعه باشند.
+### تست
 
-Deck دوستانه باید بتواند بر اساس تعداد بازیکنان ارتقا پیدا کند.
+```bash
+flutter test
+```
 
-برای مثال:
+### اجرای توسعه‌ای
 
-- Deck کوچک
-- Deck متوسط
-- Deck بزرگ
-- Deck حرفه‌ای
+```bash
+flutter run
+```
 
-ترکیب نقش‌ها باید با تعداد بازیکنان سازگار باشد.
+### ساخت APK تست/CI
 
-Deckها باید توسط سازنده لابی قابل انتخاب و در محدوده قوانین بازی قابل تنظیم باشند.
+```bash
+flutter build apk --release
+```
 
----
+خروجی:
 
-# 🤝 Friendly Mode
-
-حالت دوستانه برای بازی بدون تمرکز اصلی روی رقابت رتبه‌ای طراحی می‌شود.
-
-ویژگی‌ها:
-
-- بازی دوستانه
-- Deck قابل تنظیم
-- قابلیت اجرای سناریو توسط Host
-- امکان تغییر تنظیمات قبل از شروع
-- پاداش‌های مخصوص
-- آمار جداگانه
+```text
+build/app/outputs/flutter-apk/app-release.apk
+```
 
 ---
 
-# 🏆 Ranked Mode
+## 📦 Release Android
 
-حالت امتیازی برای بازیکنانی است که می‌خواهند در سیستم رقابتی شرکت کنند.
+نسخه فعلی:
 
-ویژگی‌ها:
+```text
+versionName: 1.0.0
+versionCode: 3
+```
 
-- امتیاز
-- رتبه
-- جدول رده‌بندی
-- آمار برد و باخت
-- فصل‌های رقابتی
-- پاداش‌های فصلی
+آیکون از `assets/images/app_icon.png` تولید می‌شود و تنظیمات launcher/splash در `pubspec.yaml` قرار دارد. Android همچنین resourceهای launcher تولیدشده را در `android/app/src/main/res/` نگه می‌دارد.
 
-سیستم رتبه‌بندی باید قابل توسعه باشد.
+### امضای production
 
----
+کلید release نباید داخل repository قرار بگیرد. workflow تولیدی از چهار GitHub Actions secret استفاده می‌کند:
 
-# 🌎 Season System
+```text
+MAFIA_RELEASE_KEYSTORE_BASE64
+MAFIA_RELEASE_STORE_PASSWORD
+MAFIA_RELEASE_KEY_ALIAS
+MAFIA_RELEASE_KEY_PASSWORD
+```
 
-Mafia Radical دارای سیستم فصل است.
+سپس:
 
-هر Season می‌تواند شامل:
+1. keystore فقط داخل runner ساخته می‌شود.
+2. `android/key.properties` موقت ساخته می‌شود.
+3. APK با release keystore build می‌شود.
+4. `apksigner verify --verbose` اجرا می‌شود.
+5. provenance attestation تولید می‌شود.
+6. APK به GitHub Release متصل به tag منتشر می‌شود.
+7. فایل‌های حساس در پایان job حذف می‌شوند.
 
-- مدت زمان مشخص
-- جدول رتبه‌بندی
-- مأموریت‌ها
-- جوایز
-- سکه
-- آیتم‌های ویژه
-- رتبه‌های فصلی
+برای release واقعی، tag را به شکل زیر ایجاد کنید:
 
-باشد.
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
 
-در پایان فصل می‌توان به بهترین بازیکنان Friendly و Ranked پاداش سروری اختصاص داد.
+یا workflow `Production Android Release` را به‌صورت دستی اجرا کنید.
 
----
-
-# 🪙 Economy System
-
-اقتصاد بازی باید قابل توسعه باشد.
-
-واحد اصلی اقتصاد:
-
-## 💎 Diamond
-
-الماس می‌تواند برای مواردی مانند:
-
-- آواتار
-- فریم
-- Sticker
-- آیتم‌های تزئینی
-- امکانات ظاهری
-- آیتم‌های ویژه
-
-استفاده شود.
-
-اقتصاد بازی باید در یک سیستم مرکزی مدیریت شود و موجودی کاربر نباید فقط در UI نگهداری شود.
+**نکته امنیتی:** keystore، password و `key.properties` نباید commit شوند.
 
 ---
 
-# 👤 Cosmetics System
+## 🔐 CI
 
-سیستم Cosmetics شامل:
+`build.yml` برای هر push به `main` این مراحل را اجرا می‌کند:
 
-- Avatar
-- Frame
-- Sticker
-- GIF
-- Badge
-- Profile decorations
+1. Checkout
+2. Java 17
+3. Flutter stable
+4. `flutter doctor`
+5. `flutter pub get`
+6. `flutter analyze`
+7. `flutter test`
+8. `flutter build apk --release`
+9. وجود APK را verify می‌کند
+10. provenance attestation تولید می‌کند
+11. APK را به عنوان artifact ذخیره می‌کند
 
-است.
-
-فریم‌ها باید طراحی اختصاصی Mafia Radical داشته باشند.
-
-نمونه سبک‌های مورد نظر:
-
-- قاب گرد
-- الماس
-- شعله
-- افکت نور
-- گرادیان
-- افکت بنفش
-- افکت قرمز
-- مار
-- گرگ
-- عناصر سینمایی
-
-سیستم Cosmetics باید طوری طراحی شود که اضافه کردن آیتم جدید بدون تغییر معماری اصلی امکان‌پذیر باشد.
+برای production signing از `release.yml` استفاده می‌شود؛ این دو مسیر عمداً جدا هستند تا CI معمولی به secret release key وابسته نباشد.
 
 ---
 
-# 🐺 Radical Branding
+## 🧭 نسخه‌های آینده
 
-هویت برند Mafia Radical باید مستقل باشد.
-
-عناصر بصری پیشنهادی:
-
-- Wolf
-- Mafia
-- Shadow
-- Fire
-- Diamond
-- Gold
-- Red
-- Dark UI
-
-استفاده از عناصر گرافیکی باید با هویت اختصاصی Radical انجام شود.
+مواردی مثل authentication آنلاین، matchmaking، economy سروری، ranked/season backend، AI assistant و همگام‌سازی چنددستگاهی در معماری README قدیمی پروژه مطرح شده بودند، اما نباید با قابلیت‌های فعلی APK اشتباه گرفته شوند. این موارد **planned/future** هستند مگر اینکه در کد جاری پیاده‌سازی شده باشند.
 
 ---
 
-# 🏛️ Club
+## 📄 License
 
-بخش Club یکی از بخش‌های اصلی اپلیکیشن است.
-
-Club می‌تواند شامل:
-
-- پروفایل
-- سطح
-- آمار
-- دستاوردها
-- آیتم‌ها
-- افتخارات
-- رتبه
-- فصل
-- جوایز
-
-باشد.
-
-طراحی Club نباید کپی مستقیم اپلیکیشن‌های مشابه باشد.
-
----
-
-# 🤖 AI System
-
-هوش مصنوعی یکی از قابلیت‌های مهم Mafia Radical است.
-
-اما:
-
-## AI نباید به‌صورت خودکار جای بازیکن یا گرداننده تصمیم‌گیری کند.
-
-AI باید نقش دستیار داشته باشد.
-
-قابلیت‌های احتمالی:
-
-- پیشنهاد سناریو
-- پیشنهاد Deck
-- کمک به Host
-- تحلیل آمار
-- پیشنهاد ترکیب نقش‌ها
-- توضیح قوانین
-- کمک به مدیریت بازی
-- تحلیل روند بازی
-- پیشنهاد تنظیمات مناسب برای تعداد بازیکنان
-
-تمام تصمیم‌های مهم بازی باید تحت کنترل سیستم بازی و Host باقی بماند.
-
----
-
-# 🎭 Scenarios
-
-سیستم سناریو باید Modular باشد.
-
-سناریوهای موردنظر:
-
-- Classic
-- Advanced
-- Modern
-- Jack
-- Joker
-- Prosecutor
-- Zombie 20 Players
-- Serial Killer
-- Custom Scenarios
-
-سناریوها باید مستقل از UI باشند.
-
-هر Scenario باید بتواند:
-
-- نقش‌ها
-- تیم‌ها
-- قوانین
-- اکشن‌ها
-- شرایط برد
-- محدودیت‌ها
-
-را تعریف کند.
-
----
-
-# 🔪 Serial Killer
-
-Serial Killer می‌تواند به‌عنوان یک نقش مستقل طراحی شود.
-
-این نقش الزاماً نباید وابسته به تیم Mafia باشد.
-
-معماری Role System باید امکان ساخت Independent Roles را فراهم کند.
-
----
-
-# 🧟 Zombie Scenario
-
-یک سناریوی اختصاصی برای بازی‌های بزرگ‌تر، از جمله بازی 20 نفره، در نظر گرفته می‌شود.
-
-این سناریو باید مستقل از سناریوهای معمول طراحی شود.
-
----
-
-# 🛠️ Custom Scenario
-
-یکی از اهداف مهم پروژه، امکان ایجاد سناریوهای سفارشی است.
-
-کاربر یا Host در محدوده قوانین سیستم بتواند:
-
-- نقش انتخاب کند
-- تعداد نقش‌ها را مشخص کند
-- تیم‌ها را تنظیم کند
-- قوانین سناریو را تنظیم کند
-- شرایط برد را تعیین کند
-
----
-
-# 🗳️ Voting System
-
-سیستم Vote باید شامل:
-
-- ثبت رأی
-- اعتبارسنجی رأی
-- شمارش رأی
-- نمایش نتیجه
-- جلوگیری از رأی غیرمجاز
-- ثبت تاریخچه
-
-باشد.
-
-در حالت آنلاین، رأی‌گیری باید توسط Server نیز اعتبارسنجی شود.
-
----
-
-# 💾 Local Storage
-
-اپلیکیشن باید Offline-first طراحی شود.
-
-اطلاعاتی مانند:
-
-- تنظیمات
-- پروفایل محلی
-- وضعیت اولیه بازی
-- Cache
-- تنظیمات UI
-
-می‌توانند در Local Storage نگهداری شوند.
-
-برای داده‌های ساختاریافته‌تر می‌توان از SQLite استفاده کرد.
-
----
-
-# 🌐 Server Architecture
-
-نسخه فعلی می‌تواند Offline-first باشد، اما معماری باید برای اتصال به Server آماده باشد.
-
-Server آینده می‌تواند مسئول:
-
-- Authentication
-- Lobby
-- Multiplayer
-- Matchmaking
-- Ranking
-- Seasons
-- Rewards
-- Economy
-- Anti-cheat
-- Cloud data
-
-باشد.
-
-نباید منطق بازی آنلاین به شکلی نوشته شود که بعداً مجبور به بازنویسی کامل پروژه شویم.
-
----
-
-# 🔐 Security
-
-اطلاعات مهم بازی باید محافظت شوند.
-
-به‌خصوص:
-
-- Role
-- Secret actions
-- Votes
-- Economy
-- Rewards
-- Authentication data
-
-در نسخه آنلاین نباید فقط به Client اعتماد شود.
-
----
-
-# 🌍 Localization
-
-زبان اصلی:
-
-Persian (fa-IR)
-
-زبان دوم:
-
-English (en-US)
-
-تمام متن‌های قابل نمایش باید از سیستم Localization عبور کنند.
-
-از Hard-code کردن متن‌های UI تا حد امکان خودداری شود.
-
----
-
-# 🎨 Theme
-
-Theme مرکزی باید در:
-
-lib/core/theme/
-
-قرار داشته باشد.
-
-تمام صفحات باید از Theme مرکزی استفاده کنند.
-
-از تعریف رنگ‌ها و TextStyleهای تکراری در هر صفحه خودداری شود.
-
----
-
-# 🧭 Routing
-
-تمام Navigationهای اصلی باید از Router مرکزی استفاده کنند.
-
-مسیرهای پیشنهادی:
-
-- Splash
-- Home
-- Login
-- Profile
-- Lobby
-- Game
-- Scenarios
-- Cosmetics
-- Club
-- Seasons
-- Rewards
-- Settings
-
----
-
-# 🧪 Testing
-
-پروژه باید قابلیت تست داشته باشد.
-
-حداقل تست‌های مهم:
-
-- Game logic
-- Role logic
-- Voting
-- Deck validation
-- Lobby
-- Economy
-- Season
-- Local storage
-- Repository
-
-UI نیز در مراحل بعدی باید Widget Test داشته باشد.
-
----
-
-# ⚡ Performance
-
-اپلیکیشن باید برای گوشی‌های Android میان‌رده نیز مناسب باشد.
-
-موارد مهم:
-
-- جلوگیری از rebuild غیرضروری
-- مدیریت صحیح state
-- Lazy loading
-- Cache
-- کاهش حجم Asset
-- بهینه‌سازی تصاویر
-- جلوگیری از memory leak
-- مدیریت صحیح animation
-
----
-
-# 🧩 State Management
-
-مدیریت State باید ساختاریافته باشد.
-
-استفاده از Riverpod / BLoC در بخش‌های مختلف پروژه مجاز است، اما نباید بدون دلیل چند سیستم State Management مختلف در یک feature ترکیب شوند.
-
-هر Feature باید الگوی مشخصی داشته باشد.
-
----
-
-# 📦 Dependencies
-
-Dependency جدید فقط در صورت نیاز واقعی اضافه شود.
-
-قبل از اضافه کردن package جدید:
-
-1. بررسی شود آیا Flutter/Dart قابلیت داخلی آن را دارد.
-2. بررسی شود آیا package واقعاً نگهداری می‌شود.
-3. بررسی شود آیا package با نسخه Flutter پروژه سازگار است.
-4. از dependencyهای غیرضروری جلوگیری شود.
-
----
-
-# 🚫 قوانین مهم توسعه
-
-AI یا Developer نباید:
-
-- فایل‌های سالم را بدون دلیل حذف کند.
-- معماری پروژه را بدون دلیل تغییر دهد.
-- Featureهای تعریف‌شده را حذف کند.
-- منطق بازی را داخل Widgetها قرار دهد.
-- اطلاعات حساس Role را در UI عمومی نگهداری کند.
-- متن‌های UI را بدون Localization هاردکد کند.
-- برای هر Feature یک معماری کاملاً متفاوت ایجاد کند.
-- dependency غیرضروری اضافه کند.
-- فقط برای حذف warning، منطق برنامه را خراب کند.
-
----
-
-# ⚠️ درباره Flutter Analyze
-
-`flutter analyze` ممکن است در مراحل توسعه Warning یا Lint گزارش کند.
-
-Warning باید بررسی و در صورت امکان اصلاح شود.
-
-اما:
-
-**برای صفر کردن Warning نباید معماری یا منطق صحیح پروژه قربانی شود.**
-
-موارد deprecated باید طبق API جدید Flutter اصلاح شوند.
-
-مثلاً اگر Flutter API جدیدی برای جایگزینی یک API قدیمی ارائه کرده باشد، کد باید به API جدید منتقل شود.
-
----
-
-# 🏗️ Development Status
-
-وضعیت پروژه:
-
-## Phase 1
-- [x] ایجاد پروژه Flutter
-- [x] پایه معماری
-- [x] Theme
-- [x] Routing
-- [x] Local Storage پایه
-- [ ] تکمیل UI اصلی
-
-## Phase 2
-- [ ] Game Engine
-- [ ] Player System
-- [ ] Role System
-- [ ] Scenario System
-- [ ] Deck System
-- [ ] Lobby
-
-## Phase 3
-- [ ] Friendly Mode
-- [ ] Ranked Mode
-- [ ] Voting
-- [ ] Statistics
-
-## Phase 4
-- [ ] Cosmetics
-- [ ] Club
-- [ ] Economy
-- [ ] Diamonds
-- [ ] Rewards
-
-## Phase 5
-- [ ] Seasons
-- [ ] Leaderboards
-- [ ] Seasonal Rewards
-
-## Phase 6
-- [ ] AI Assistant
-- [ ] Custom Scenarios
-- [ ] Advanced Game Management
-
-## Phase 7
-- [ ] Server
-- [ ] Authentication
-- [ ] Online Lobby
-- [ ] Multiplayer
-- [ ] Ranking Server
-
-## Phase 8
-- [ ] Optimization
-- [ ] Security Audit
-- [ ] Android Release
-- [ ] Store Preparation
-
----
-
-# 🧠 Source of Truth
-
-در صورت اختلاف بین فایل‌های ناقص پروژه و این سند:
-
-1. کد موجود بررسی شود.
-2. معماری فعلی حفظ شود مگر اینکه مشکل واقعی داشته باشد.
-3. Featureهای تعریف‌شده در این README حذف نشوند.
-4. قابلیت‌های پیاده‌سازی‌نشده به‌عنوان TODO در نظر گرفته شوند.
-5. قبل از تغییر معماری اصلی، دلیل فنی مشخص شود.
-
----
-
-# 🚀 اصول نهایی
-
-Mafia Radical باید:
-
-**Professional**
-
-**Modular**
-
-**Scalable**
-
-**Offline-first**
-
-**Server-ready**
-
-**RTL-first**
-
-**Secure**
-
-**Performance-focused**
-
-و **قابل انتشار روی Android** باشد.
-
-این پروژه قرار نیست فقط یک Demo باشد.
-
-هدف، ساخت یک محصول کامل و قابل توسعه است.
+در صورت انتشار عمومی، مجوز پروژه را به‌صورت صریح در `LICENSE` اضافه کنید.
