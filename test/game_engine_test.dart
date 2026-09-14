@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:mafia_game/core/models/app_models.dart';
 import 'package:mafia_game/features/game/game_state.dart';
+import 'package:mafia_game/features/game/player_avatar.dart';
 
 void main() {
   test('game engine creates a valid lobby table with leader and Radical staff badges', () {
