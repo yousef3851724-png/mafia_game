@@ -30,69 +30,93 @@ class CinematicHomeScreen extends StatelessWidget {
             const _AmbientBackground(),
             SafeArea(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 18, 20, 34),
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(18, 14, 18, 30),
                 children: [
                   Row(
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'مافیا رادیکال',
-                              style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: -.5,
-                              ),
+                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: -.4,
+                                  ),
                             ),
-                            SizedBox(height: 3),
-                            Text(
+                            const SizedBox(height: 3),
+                            const Text(
                               'شب شروع می‌شود؛ اعتماد تمام می‌شود.',
-                              style: TextStyle(color: RadicalTheme.smoke),
+                              style: TextStyle(color: RadicalTheme.smoke, fontSize: 12),
                             ),
                           ],
                         ),
                       ),
                       Container(
-                        width: 54,
-                        height: 54,
+                        width: 48,
+                        height: 48,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: RadicalTheme.panel,
-                          border: Border.all(color: RadicalTheme.gold.withOpacity(.45)),
+                          border: Border.all(color: RadicalTheme.gold.withOpacity(.35)),
+                          boxShadow: const [
+                            BoxShadow(color: Color(0x44000000), blurRadius: 18, offset: Offset(0, 7)),
+                          ],
                         ),
                         child: const Icon(Icons.person_rounded, color: RadicalTheme.goldBright),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 22),
-                  const Center(child: MafiaRadicalWordmark(width: 330)),
-                  const SizedBox(height: 12),
-                  const Center(child: MafiaRadicalLogo(size: 92)),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'میزگرد رادیکال',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 23, fontWeight: FontWeight.w900),
-                  ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    'یک میز. چند مظنون. هیچ‌کس قابل اعتماد نیست.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: RadicalTheme.smoke),
-                  ),
-                  const SizedBox(height: 20),
-                  const _TablePreview(),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
                   Container(
-                    padding: const EdgeInsets.all(18),
+                    padding: const EdgeInsets.fromLTRB(18, 20, 18, 18),
                     decoration: BoxDecoration(
-                      color: RadicalTheme.panel.withOpacity(.92),
-                      borderRadius: BorderRadius.circular(26),
-                      border: Border.all(color: RadicalTheme.gold.withOpacity(.28)),
+                      gradient: LinearGradient(
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                        colors: [
+                          RadicalTheme.panel2.withOpacity(.96),
+                          RadicalTheme.panel.withOpacity(.94),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(color: RadicalTheme.gold.withOpacity(.22)),
                       boxShadow: const [
-                        BoxShadow(color: Color(0x66000000), blurRadius: 28, offset: Offset(0, 14)),
+                        BoxShadow(color: Color(0x70000000), blurRadius: 30, offset: Offset(0, 16)),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        const MafiaRadicalWordmark(width: 290),
+                        const SizedBox(height: 8),
+                        const MafiaRadicalLogo(size: 88),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'میزگرد رادیکال',
+                          style: TextStyle(fontSize: 23, fontWeight: FontWeight.w900),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'یک میز. چند مظنون. هیچ‌کس قابل اعتماد نیست.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: RadicalTheme.smoke, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  const _TablePreview(),
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(17),
+                    decoration: BoxDecoration(
+                      color: RadicalTheme.panel.withOpacity(.94),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: RadicalTheme.gold.withOpacity(.26)),
+                      boxShadow: const [
+                        BoxShadow(color: Color(0x66000000), blurRadius: 26, offset: Offset(0, 12)),
                       ],
                     ),
                     child: Column(
@@ -102,18 +126,18 @@ class CinematicHomeScreen extends StatelessWidget {
                           children: [
                             Icon(Icons.local_fire_department_rounded, color: RadicalTheme.crimsonBright),
                             SizedBox(width: 8),
-                            Text('آماده‌ی بازی هستی؟', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+                            Text('آماده‌ی بازی هستی؟', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900)),
                           ],
                         ),
-                        const SizedBox(height: 7),
+                        const SizedBox(height: 6),
                         const Text(
                           'سناریو را انتخاب کن و بازیکن‌ها را دور میز بچین.',
-                          style: TextStyle(color: RadicalTheme.smoke, height: 1.4),
+                          style: TextStyle(color: RadicalTheme.smoke, height: 1.45, fontSize: 12),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 14),
                         SizedBox(
                           width: double.infinity,
-                          height: 54,
+                          height: 52,
                           child: FilledButton.icon(
                             onPressed: () => _openLobby(context),
                             icon: const Icon(Icons.play_arrow_rounded),
@@ -123,7 +147,7 @@ class CinematicHomeScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
                   const Row(
                     children: [
                       Expanded(child: _Feature(icon: Icons.groups_rounded, title: 'میزگرد', text: 'چیدمان دایره‌ای')),
@@ -147,10 +171,7 @@ class _AmbientBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
-      child: CustomPaint(
-        size: Size.infinite,
-        painter: _AmbientPainter(),
-      ),
+      child: CustomPaint(size: Size.infinite, painter: _AmbientPainter()),
     );
   }
 }
@@ -159,10 +180,12 @@ class _AmbientPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..style = PaintingStyle.fill;
-    paint.color = RadicalTheme.crimson.withOpacity(.07);
-    canvas.drawCircle(Offset(size.width * .15, size.height * .18), size.width * .42, paint);
-    paint.color = RadicalTheme.gold.withOpacity(.045);
-    canvas.drawCircle(Offset(size.width * .9, size.height * .52), size.width * .48, paint);
+    paint.color = RadicalTheme.crimson.withOpacity(.06);
+    canvas.drawCircle(Offset(size.width * .08, size.height * .16), size.width * .48, paint);
+    paint.color = RadicalTheme.gold.withOpacity(.035);
+    canvas.drawCircle(Offset(size.width * .94, size.height * .52), size.width * .54, paint);
+    paint.color = RadicalTheme.violet.withOpacity(.025);
+    canvas.drawCircle(Offset(size.width * .45, size.height * .9), size.width * .42, paint);
   }
 
   @override
@@ -175,7 +198,7 @@ class _TablePreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1.12,
+      aspectRatio: 1.14,
       child: LayoutBuilder(
         builder: (_, constraints) {
           final center = Offset(constraints.maxWidth / 2, constraints.maxHeight / 2);
@@ -184,32 +207,35 @@ class _TablePreview extends StatelessWidget {
             alignment: Alignment.center,
             children: [
               Container(
-                width: radius * 1.95,
-                height: radius * 1.95,
+                width: radius * 2.08,
+                height: radius * 2.08,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: RadicalTheme.gold.withOpacity(.04),
-                  border: Border.all(color: RadicalTheme.gold.withOpacity(.14), width: 1.5),
+                  color: RadicalTheme.gold.withOpacity(.025),
+                  border: Border.all(color: RadicalTheme.gold.withOpacity(.12), width: 1.5),
                 ),
               ),
               Container(
-                width: radius * 1.48,
-                height: radius * 1.48,
+                width: radius * 1.5,
+                height: radius * 1.5,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: RadialGradient(
+                  gradient: const RadialGradient(
                     colors: [RadicalTheme.panel2, RadicalTheme.ink],
                   ),
-                  border: Border.all(color: RadicalTheme.gold.withOpacity(.45), width: 2),
-                  boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 25, spreadRadius: 4)],
+                  border: Border.all(color: RadicalTheme.gold.withOpacity(.48), width: 2),
+                  boxShadow: const [
+                    BoxShadow(color: Color(0x66000000), blurRadius: 28, spreadRadius: 2),
+                  ],
                 ),
                 child: const Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.visibility_off_rounded, color: RadicalTheme.crimsonBright, size: 30),
+                      Icon(Icons.visibility_off_rounded, color: RadicalTheme.crimsonBright, size: 29),
                       SizedBox(height: 6),
                       Text('شب اول', style: TextStyle(fontWeight: FontWeight.w900)),
+                      SizedBox(height: 2),
                       Text('میز در انتظار', style: TextStyle(color: RadicalTheme.smoke, fontSize: 11)),
                     ],
                   ),
@@ -230,7 +256,13 @@ class _TablePreview extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: RadicalTheme.ink,
-                      border: Border.all(color: index == 0 ? RadicalTheme.goldBright : RadicalTheme.line, width: index == 0 ? 2 : 1),
+                      border: Border.all(
+                        color: index == 0 ? RadicalTheme.goldBright : RadicalTheme.line,
+                        width: index == 0 ? 2 : 1,
+                      ),
+                      boxShadow: const [
+                        BoxShadow(color: Color(0x44000000), blurRadius: 12, offset: Offset(0, 5)),
+                      ],
                     ),
                     child: RealisticAvatar(
                       role: index == 5 ? 'مافیا' : 'شهروند',
@@ -258,16 +290,16 @@ class _Feature extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: RadicalTheme.panel.withOpacity(.78),
+        color: RadicalTheme.panel.withOpacity(.82),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: RadicalTheme.line),
       ),
       child: Row(
         children: [
-          Icon(icon, color: RadicalTheme.goldBright, size: 25),
-          const SizedBox(width: 10),
+          Icon(icon, color: RadicalTheme.goldBright, size: 24),
+          const SizedBox(width: 9),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
