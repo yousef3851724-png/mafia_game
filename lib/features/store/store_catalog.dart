@@ -1,4 +1,5 @@
 import '../../core/models/app_models.dart';
+import '../lobbies/lobby_system.dart';
 
 /// Data-only store catalog. UI is intentionally untouched.
 const avatarStoreItems = <AvatarItem>[
