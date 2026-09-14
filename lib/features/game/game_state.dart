@@ -171,14 +171,14 @@ class GameController extends AutoDisposeNotifier<GameState> {
     if (_isMafia(userRole)) {
       mafiaTargetId = targetId;
     } else if (mafia != null) {
-      final candidates = alive.where((p) => !p.isUser && !_isMafia(p.role)).toList();
+      final candidates = alive.where((p) => !_isMafia(p.role)).toList();
       if (candidates.isNotEmpty) mafiaTargetId = candidates[_random.nextInt(candidates.length)].id;
     }
 
     if (userRole == 'دکتر' || userRole == 'محافظ') {
       saveTargetId = targetId;
     } else if (doctor != null) {
-      final candidates = alive.where((p) => !p.isUser && p.id != doctor.id).toList();
+      final candidates = alive.where((p) => p.id != doctor.id).toList();
       if (candidates.isNotEmpty) saveTargetId = candidates[_random.nextInt(candidates.length)].id;
     }
 
@@ -317,14 +317,16 @@ class GameController extends AutoDisposeNotifier<GameState> {
       _enterDay();
       return;
     }
-    final candidates = alive.where((p) => !p.isUser && !_isMafia(p.role)).toList();
+    // NPC mafia may target the user; the player is a valid night target when alive.
+    final candidates = alive.where((p) => !_isMafia(p.role)).toList();
     if (candidates.isEmpty) {
       state = state.copyWith(nightActionDone: true);
       _enterDay();
       return;
     }
     final target = candidates[_random.nextInt(candidates.length)];
-    final saveCandidates = alive.where((p) => !p.isUser && p.id != doctor?.id).toList();
+    // NPC doctors may also save the user, but never themselves.
+    final saveCandidates = alive.where((p) => p.id != doctor?.id).toList();
     final saved = doctor == null || saveCandidates.isEmpty ? null : saveCandidates[_random.nextInt(saveCandidates.length)];
     if (target.id == saved?.id) {
       state = state.copyWith(nightActionDone: true, message: 'امشب کسی به دلیل نجات دکتر کشته نشد.');
