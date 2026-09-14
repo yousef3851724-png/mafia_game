@@ -125,13 +125,13 @@ class RadicalTheme {
       switchTheme: SwitchThemeData(
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) return const Color(0x88E3B873);
-          return panel3;
+          return panel2;
         }),
         thumbColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) return goldBright;
-          return smoke;
+          return gold;
         }),
-        trackOutlineColor: WidgetStatePropertyAll(Color(0x55E3B873)),
+        trackOutlineColor: const WidgetStatePropertyAll(Color(0x66E3B873)),
         overlayColor: const WidgetStatePropertyAll(Color(0x18E3B873)),
       ),
       navigationBarTheme: const NavigationBarThemeData(
@@ -140,9 +140,7 @@ class RadicalTheme {
         height: 72,
         elevation: 12,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        labelTextStyle: WidgetStatePropertyAll(
-          TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
-        ),
+        labelTextStyle: WidgetStatePropertyAll(TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
@@ -168,24 +166,15 @@ class RadicalTheme {
         filled: true,
         fillColor: panel,
         contentPadding: const EdgeInsets.symmetric(horizontal: 17, vertical: 16),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(17),
-          borderSide: const BorderSide(color: line),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(17),
-          borderSide: const BorderSide(color: line),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(17),
-          borderSide: const BorderSide(color: Color(0xCCE3B873), width: 1.4),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(17), borderSide: const BorderSide(color: line)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(17), borderSide: const BorderSide(color: line)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(17), borderSide: const BorderSide(color: Color(0xCCE3B873), width: 1.4)),
         labelStyle: const TextStyle(color: smoke),
       ),
       sliderTheme: const SliderThemeData(
         activeTrackColor: gold,
         thumbColor: goldBright,
-        inactiveTrackColor: Color(0x30FFFFFF),
+        inactiveTrackColor: Color(0x553B3030),
         overlayColor: Color(0x18E3B873),
         valueIndicatorColor: panel3,
         valueIndicatorTextStyle: TextStyle(color: goldBright, fontWeight: FontWeight.w900),
@@ -205,9 +194,7 @@ class RadicalTheme {
       color: accent ? const Color(0xFF241C18) : panel,
       borderRadius: BorderRadius.circular(radius),
       border: Border.all(color: accent ? const Color(0x55E3B873) : line),
-      boxShadow: const [
-        BoxShadow(color: Color(0x45000000), blurRadius: 24, offset: Offset(0, 12)),
-      ],
+      boxShadow: const [BoxShadow(color: Color(0x45000000), blurRadius: 24, offset: Offset(0, 12))],
     );
   }
 
@@ -218,7 +205,7 @@ class RadicalTheme {
         Text(title, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w900)),
         if (subtitle != null) ...[
           const SizedBox(height: 4),
-          Text(subtitle, style: const TextStyle(color: smoke, fontSize: 13, height: 1.35)),
+          Text(subtitle, style: const TextStyle(color: smoke, fontSize: 12)),
         ],
       ],
     );
