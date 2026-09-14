@@ -1,3 +1,4 @@
+import 'classes_screen.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -36,7 +37,7 @@ class _CinematicHomeScreenState extends State<CinematicHomeScreen>
   void _openLobby() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => const LobbyHubScreen(ownerId: 'local_creator'),
+        builder: (_) => const ClassesScreen(),
       ),
     );
   }
