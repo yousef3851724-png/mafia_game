@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 enum MafiaLogoScenario { classic, darkCity, western, halloween, prison, cyberpunk }
@@ -33,18 +35,22 @@ class _MafiaRadicalLogoState extends State<MafiaRadicalLogo> with SingleTickerPr
       animation: _pulse,
       builder: (context, _) {
         final glow = Curves.easeInOut.transform(_pulse.value);
-        return SizedBox(
-          width: widget.size,
-          height: widget.size,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(color: const Color(0xFFE3B873).withValues(alpha: .12 + glow * .18), blurRadius: 22 + glow * 10, spreadRadius: 1 + glow * 3),
-                BoxShadow(color: const Color(0xFF9E263D).withValues(alpha: .10 + glow * .12), blurRadius: 28),
-              ],
+        final scale = 0.985 + glow * .015;
+        return Transform.scale(
+          scale: scale,
+          child: SizedBox(
+            width: widget.size,
+            height: widget.size,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(color: const Color(0xFFE3B873).withValues(alpha: .12 + glow * .18), blurRadius: 22 + glow * 10, spreadRadius: 1 + glow * 3),
+                  BoxShadow(color: const Color(0xFF9E263D).withValues(alpha: .10 + glow * .12), blurRadius: 28),
+                ],
+              ),
+              child: CustomPaint(painter: _RadicalLogoPainter(glowValue: glow, scenario: widget.scenario)),
             ),
-            child: CustomPaint(painter: _RadicalLogoPainter(glowValue: glow, scenario: widget.scenario)),
           ),
         );
       },
@@ -66,6 +72,19 @@ class _RadicalLogoPainter extends CustomPainter {
 
     final bg = Paint()..shader = _scenarioGradient().createShader(rect);
     canvas.drawOval(rect, bg);
+
+    // Subtle orbiting gold particles keep the mark alive without competing with the icon.
+    for (var i = 0; i < 14; i++) {
+      final angle = (math.pi * 2 * i / 14) + glowValue * .55;
+      final radius = w * (.36 + (i.isEven ? .025 : .0));
+      final point = Offset(
+        center.dx + math.cos(angle) * radius,
+        center.dy + math.sin(angle) * radius,
+      );
+      final alpha = (.18 + glowValue * .34) * (i.isEven ? 1 : .62);
+      final particle = Paint()..color = const Color(0xFFFFDFA0).withValues(alpha: alpha);
+      canvas.drawCircle(point, i.isEven ? 1.25 + glowValue * .7 : .8 + glowValue * .35, particle);
+    }
 
     final border = Paint()
       ..style = PaintingStyle.stroke
