@@ -55,7 +55,7 @@ jobs:
           storePassword=$STORE_PASSWORD
           keyPassword=$KEY_PASSWORD
           keyAlias=$KEY_ALIAS
-          storeFile=mafia-release.jks
+          storeFile=../mafia-release.jks
           EOF
 
       - name: Get dependencies
