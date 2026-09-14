@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mafia_game/features/lobbies/lobby_system.dart';
+import 'package:mafia_radical/features/lobbies/lobby_system.dart';
 
 void main() {
   group('LobbyChatMessage Tests', () {

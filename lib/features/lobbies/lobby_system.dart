@@ -3,11 +3,7 @@ enum LobbyChatMessageType {
   emoji,
   system,
 }
-enum LobbyChatMessageType {
-  text,
-  emoji,
-  system,
-}
+
 
 class LobbyChatMessage {
   final String id;
