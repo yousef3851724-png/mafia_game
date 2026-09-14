@@ -1,17 +1,19 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 import '../../core/theme/radical_theme.dart';
-import '../../core/widgets/branding/game_logo_widget.dart';
-import '../../core/widgets/branding/mafia_radical_wordmark.dart';
-import '../scenarios/realistic_avatar.dart';
 import '../scenarios/scenario_lobby_screen.dart';
 
-class CinematicHomeScreen extends StatelessWidget {
+class CinematicHomeScreen extends StatefulWidget {
   const CinematicHomeScreen({super.key});
 
-  void _openLobby(BuildContext context) {
+  @override
+  State<CinematicHomeScreen> createState() => _CinematicHomeScreenState();
+}
+
+class _CinematicHomeScreenState extends State<CinematicHomeScreen> {
+  int _selected = 0;
+
+  void _openLobby() {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => const ScenarioLobbyScreen(ownerId: 'local_creator'),
@@ -25,289 +27,322 @@ class CinematicHomeScreen extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: RadicalTheme.ink,
-        body: Stack(
-          children: [
-            const _AmbientBackground(),
-            SafeArea(
-              child: ListView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(18, 14, 18, 30),
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'مافیا رادیکال',
-                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: -.4,
-                                  ),
-                            ),
-                            const SizedBox(height: 3),
-                            const Text(
-                              'شب شروع می‌شود؛ اعتماد تمام می‌شود.',
-                              style: TextStyle(color: RadicalTheme.smoke, fontSize: 12),
-                            ),
-                          ],
+        body: SafeArea(
+          child: Column(
+            children: [
+              _Header(onBack: () => Navigator.of(context).maybePop()),
+              Expanded(
+                child: ListView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 18),
+                  children: [
+                    const SizedBox(height: 4),
+                    _ScenarioCard(
+                      title: 'تکاور',
+                      description: 'سناریوی ۱ نفره با نقش تکاور؛ مناسب دوستانه و امتیازی.',
+                      icon: Icons.style_rounded,
+                      iconColor: const Color(0xFF68707E),
+                      selected: _selected == 0,
+                      onTap: () => setState(() => _selected = 0),
+                      badges: const [
+                        _Badge(icon: Icons.star_rounded, label: 'کلاسیک'),
+                        _Badge(icon: Icons.people_alt_rounded, label: '۱۰-۱۰ نفر'),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    _ScenarioCard(
+                      title: 'مذاکره',
+                      description: 'سناریوی ۱۰ نفره با نقش مذاکره؛ مناسب دوستانه و امتیازی.',
+                      icon: Icons.auto_awesome_rounded,
+                      iconColor: const Color(0xFFF1F2F5),
+                      selected: _selected == 1,
+                      onTap: () => setState(() => _selected = 1),
+                      badges: const [
+                        _Badge(icon: Icons.bolt_rounded, label: 'مدرن'),
+                        _Badge(icon: Icons.people_alt_rounded, label: '۱۰-۱۰ نفر'),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    _ScenarioCard(
+                      title: 'ساخت سناریوی دست‌ساز',
+                      description: '۵۰ 💎 • دوستانه • ظرفیت ۸ تا ۲۰ نفر',
+                      icon: Icons.edit_rounded,
+                      iconColor: RadicalTheme.violet,
+                      selected: _selected == 2,
+                      onTap: () => setState(() => _selected = 2),
+                      trailing: const Icon(Icons.arrow_back_ios_new_rounded, color: RadicalTheme.smoke, size: 17),
+                    ),
+                    const SizedBox(height: 22),
+                    const Text(
+                      'انتخاب فعلی',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: RadicalTheme.smoke),
+                    ),
+                    const SizedBox(height: 9),
+                    _CurrentSelection(),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'تعداد ثابت: ۱۰ نفر',
+                      textAlign: TextAlign.right,
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+                    ),
+                    const SizedBox(height: 10),
+                    const _InfoBox(),
+                    const SizedBox(height: 18),
+                    SizedBox(
+                      height: 56,
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: _openLobby,
+                        icon: const Icon(Icons.play_arrow_rounded, size: 24),
+                        label: const Text(
+                          'ساخت لابی و شروع بازی',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                        ),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: RadicalTheme.goldBright,
+                          foregroundColor: RadicalTheme.ink,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(17)),
                         ),
                       ),
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: RadicalTheme.panel,
-                          border: Border.all(color: RadicalTheme.gold.withOpacity(.35)),
-                          boxShadow: const [
-                            BoxShadow(color: Color(0x44000000), blurRadius: 18, offset: Offset(0, 7)),
-                          ],
-                        ),
-                        child: const Icon(Icons.person_rounded, color: RadicalTheme.goldBright),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(18, 20, 18, 18),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topRight,
-                        end: Alignment.bottomLeft,
-                        colors: [
-                          RadicalTheme.panel2.withOpacity(.96),
-                          RadicalTheme.panel.withOpacity(.94),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: RadicalTheme.gold.withOpacity(.22)),
-                      boxShadow: const [
-                        BoxShadow(color: Color(0x70000000), blurRadius: 30, offset: Offset(0, 16)),
-                      ],
                     ),
-                    child: Column(
-                      children: [
-                        const MafiaRadicalWordmark(width: 290),
-                        const SizedBox(height: 8),
-                        const MafiaRadicalLogo(size: 88),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'میزگرد رادیکال',
-                          style: TextStyle(fontSize: 23, fontWeight: FontWeight.w900),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'یک میز. چند مظنون. هیچ‌کس قابل اعتماد نیست.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: RadicalTheme.smoke, fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  const _TablePreview(),
-                  const SizedBox(height: 14),
-                  Container(
-                    padding: const EdgeInsets.all(17),
-                    decoration: BoxDecoration(
-                      color: RadicalTheme.panel.withOpacity(.94),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: RadicalTheme.gold.withOpacity(.26)),
-                      boxShadow: const [
-                        BoxShadow(color: Color(0x66000000), blurRadius: 26, offset: Offset(0, 12)),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Row(
-                          children: [
-                            Icon(Icons.local_fire_department_rounded, color: RadicalTheme.crimsonBright),
-                            SizedBox(width: 8),
-                            Text('آماده‌ی بازی هستی؟', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900)),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        const Text(
-                          'سناریو را انتخاب کن و بازیکن‌ها را دور میز بچین.',
-                          style: TextStyle(color: RadicalTheme.smoke, height: 1.45, fontSize: 12),
-                        ),
-                        const SizedBox(height: 14),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: FilledButton.icon(
-                            onPressed: () => _openLobby(context),
-                            icon: const Icon(Icons.play_arrow_rounded),
-                            label: const Text('ورود به میز بازی', style: TextStyle(fontWeight: FontWeight.w900)),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Row(
-                    children: [
-                      Expanded(child: _Feature(icon: Icons.groups_rounded, title: 'میزگرد', text: 'چیدمان دایره‌ای')),
-                      SizedBox(width: 10),
-                      Expanded(child: _Feature(icon: Icons.nights_stay_rounded, title: 'شب و روز', text: 'فضای سینمایی')),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _AmbientBackground extends StatelessWidget {
-  const _AmbientBackground();
+class _Header extends StatelessWidget {
+  final VoidCallback onBack;
+
+  const _Header({required this.onBack});
 
   @override
   Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: CustomPaint(size: Size.infinite, painter: _AmbientPainter()),
-    );
-  }
-}
-
-class _AmbientPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-    paint.color = RadicalTheme.crimson.withOpacity(.06);
-    canvas.drawCircle(Offset(size.width * .08, size.height * .16), size.width * .48, paint);
-    paint.color = RadicalTheme.gold.withOpacity(.035);
-    canvas.drawCircle(Offset(size.width * .94, size.height * .52), size.width * .54, paint);
-    paint.color = RadicalTheme.violet.withOpacity(.025);
-    canvas.drawCircle(Offset(size.width * .45, size.height * .9), size.width * .42, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _TablePreview extends StatelessWidget {
-  const _TablePreview();
-
-  @override
-  Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1.14,
-      child: LayoutBuilder(
-        builder: (_, constraints) {
-          final center = Offset(constraints.maxWidth / 2, constraints.maxHeight / 2);
-          final radius = math.min(constraints.maxWidth, constraints.maxHeight) * .34;
-          return Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                width: radius * 2.08,
-                height: radius * 2.08,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: RadicalTheme.gold.withOpacity(.025),
-                  border: Border.all(color: RadicalTheme.gold.withOpacity(.12), width: 1.5),
-                ),
-              ),
-              Container(
-                width: radius * 1.5,
-                height: radius * 1.5,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const RadialGradient(
-                    colors: [RadicalTheme.panel2, RadicalTheme.ink],
-                  ),
-                  border: Border.all(color: RadicalTheme.gold.withOpacity(.48), width: 2),
-                  boxShadow: const [
-                    BoxShadow(color: Color(0x66000000), blurRadius: 28, spreadRadius: 2),
-                  ],
-                ),
-                child: const Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.visibility_off_rounded, color: RadicalTheme.crimsonBright, size: 29),
-                      SizedBox(height: 6),
-                      Text('شب اول', style: TextStyle(fontWeight: FontWeight.w900)),
-                      SizedBox(height: 2),
-                      Text('میز در انتظار', style: TextStyle(color: RadicalTheme.smoke, fontSize: 11)),
-                    ],
-                  ),
-                ),
-              ),
-              ...List.generate(8, (index) {
-                final angle = -math.pi / 2 + index * (math.pi * 2 / 8);
-                final x = center.dx + math.cos(angle) * radius;
-                final y = center.dy + math.sin(angle) * radius;
-                final female = index.isOdd;
-                return Positioned(
-                  left: x - 27,
-                  top: y - 27,
-                  child: Container(
-                    width: 54,
-                    height: 54,
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: RadicalTheme.ink,
-                      border: Border.all(
-                        color: index == 0 ? RadicalTheme.goldBright : RadicalTheme.line,
-                        width: index == 0 ? 2 : 1,
-                      ),
-                      boxShadow: const [
-                        BoxShadow(color: Color(0x44000000), blurRadius: 12, offset: Offset(0, 5)),
-                      ],
-                    ),
-                    child: RealisticAvatar(
-                      role: index == 5 ? 'مافیا' : 'شهروند',
-                      female: female,
-                      size: 50,
-                    ),
-                  ),
-                );
-              }),
-            ],
-          );
-        },
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 12, 16, 8),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: onBack,
+            icon: const Icon(Icons.arrow_forward_ios_rounded, size: 19),
+            tooltip: 'بازگشت',
+            color: Colors.white,
+          ),
+          const SizedBox(width: 2),
+          const Expanded(
+            child: Text(
+              'انتخاب سناریو و شروع بازی',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            ),
+          ),
+          Container(
+            height: 38,
+            padding: const EdgeInsets.symmetric(horizontal: 11),
+            decoration: BoxDecoration(
+              color: RadicalTheme.panel2,
+              borderRadius: BorderRadius.circular(13),
+              border: Border.all(color: RadicalTheme.line),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.diamond_rounded, color: Color(0xFF55A9FF), size: 19),
+                SizedBox(width: 7),
+                Text('100', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _Feature extends StatelessWidget {
-  final IconData icon;
+class _ScenarioCard extends StatelessWidget {
   final String title;
-  final String text;
+  final String description;
+  final IconData icon;
+  final Color iconColor;
+  final bool selected;
+  final VoidCallback onTap;
+  final List<_Badge>? badges;
+  final Widget? trailing;
 
-  const _Feature({required this.icon, required this.title, required this.text});
+  const _ScenarioCard({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.iconColor,
+    required this.selected,
+    required this.onTap,
+    this.badges,
+    this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.fromLTRB(15, 16, 15, 15),
+          decoration: BoxDecoration(
+            color: selected ? const Color(0xFF171A20) : RadicalTheme.panel,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: selected ? RadicalTheme.gold.withValues(alpha: .60) : RadicalTheme.line,
+              width: selected ? 1.3 : 1,
+            ),
+            boxShadow: const [
+              BoxShadow(color: Color(0x52000000), blurRadius: 20, offset: Offset(0, 8)),
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(title, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900)),
+                        ),
+                        if (trailing != null) trailing!,
+                      ],
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      description,
+                      style: const TextStyle(color: RadicalTheme.smoke, fontSize: 12.5, height: 1.55),
+                    ),
+                    if (badges != null) ...[
+                      const SizedBox(height: 13),
+                      Wrap(spacing: 7, runSpacing: 7, children: badges!),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 14),
+              Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  color: RadicalTheme.ink,
+                  borderRadius: BorderRadius.circular(17),
+                  border: Border.all(color: iconColor.withValues(alpha: .25)),
+                ),
+                child: Icon(icon, color: iconColor, size: 29),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Badge extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _Badge({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+      decoration: BoxDecoration(
+        color: RadicalTheme.panel3,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: RadicalTheme.line),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: RadicalTheme.goldBright),
+          const SizedBox(width: 5),
+          Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
+        ],
+      ),
+    );
+  }
+}
+
+class _CurrentSelection extends StatelessWidget {
+  const _CurrentSelection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: RadicalTheme.panel,
+        borderRadius: BorderRadius.circular(17),
+        border: Border.all(color: RadicalTheme.line),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: const Color(0xFF392418),
+              borderRadius: BorderRadius.circular(13),
+            ),
+            child: const Icon(Icons.verified_user_rounded, color: Color(0xFFFF9A42), size: 23),
+          ),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('بازپرس', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+                SizedBox(height: 3),
+                Text('۱۰ تا ۱۰ نفر • امتیازی', style: TextStyle(color: RadicalTheme.smoke, fontSize: 12)),
+              ],
+            ),
+          ),
+          Icon(Icons.check_circle_rounded, color: RadicalTheme.goldBright, size: 21),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoBox extends StatelessWidget {
+  const _InfoBox();
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: RadicalTheme.panel.withOpacity(.82),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: RadicalTheme.line),
+        color: const Color(0xFF10271D),
+        borderRadius: BorderRadius.circular(17),
+        border: Border.all(color: const Color(0xFF245A40)),
       ),
-      child: Row(
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: RadicalTheme.goldBright, size: 24),
-          const SizedBox(width: 9),
+          Icon(Icons.emoji_events_rounded, color: Color(0xFF62D89A), size: 24),
+          SizedBox(width: 10),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.w900)),
-                const SizedBox(height: 2),
-                Text(text, style: const TextStyle(color: RadicalTheme.smoke, fontSize: 11)),
-              ],
+            child: Text(
+              'امتیازی: این حالت دقیقاً ۱۰ نفره است و برای رقابت رتبه‌ای طراحی شده.',
+              style: TextStyle(color: Color(0xFFBFE7D1), fontSize: 12, height: 1.55, fontWeight: FontWeight.w700),
             ),
           ),
         ],
