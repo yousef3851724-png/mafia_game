@@ -11,4 +11,13 @@ class LobbyChatStore {
   }
   static bool canRead(String id, String player, LobbyDefinition lobby) => lobby.id == id && lobby.hasPlayer(player);
   static bool canWrite(String id, String player, LobbyDefinition lobby) => canRead(id, player, lobby) && lobby.permissionsFor(player).contains(LobbyPermission.sendChat);
+  static LobbyChatMessage? send({required LobbyDefinition lobby, required String senderId, required String senderName, String text = '', String? emoji, String? sticker}) {
+    if (!canWrite(lobby.id, senderId, lobby)) return null;
+    final content = emoji ?? sticker ?? text.trim();
+    if (content.isEmpty) return null;
+    final type = emoji != null ? LobbyChatMessageType.emoji : sticker != null ? LobbyChatMessageType.sticker : LobbyChatMessageType.text;
+    final message = LobbyChatMessage(id: '${lobby.id}_${DateTime.now().microsecondsSinceEpoch}', lobbyId: lobby.id, senderId: senderId, senderName: senderName, content: content, sentAt: DateTime.now(), type: type);
+    _messages.putIfAbsent(lobby.id, () => <LobbyChatMessage>[]).add(message);
+    return message;
+  }
 }
