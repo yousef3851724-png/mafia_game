@@ -1,7 +1,7 @@
 name: mafia_radical
 description: "مافیا رادیکال - اپلیکیشن مدیریت بازی مافیا"
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
