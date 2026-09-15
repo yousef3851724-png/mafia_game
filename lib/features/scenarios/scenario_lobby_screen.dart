@@ -33,10 +33,12 @@ class _ScenarioLobbyScreenState extends State<ScenarioLobbyScreen> {
   }
 
   List<ScenarioDefinition> get _availableScenarios => ScenarioCatalog.forMode(_mode);
+
   ScenarioDefinition? get _selectedScenario {
     final id = _selectedScenarioId;
     return id == null ? null : ScenarioCatalog.byId(id);
   }
+
   CustomScenario? get _selectedCustom {
     final id = _selectedCustomId;
     if (id == null) return null;
@@ -66,13 +68,22 @@ class _ScenarioLobbyScreenState extends State<ScenarioLobbyScreen> {
           ),
           const SizedBox(height: 18),
           Text('تعداد بازیکن: $_playerCount'),
-          Slider(min: 6, max: 20, divisions: 14, value: _playerCount.toDouble(), onChanged: (value) => setState(() => _playerCount = value.round())),
+          Slider(
+            min: 6,
+            max: 20,
+            divisions: 14,
+            value: _playerCount.toDouble(),
+            onChanged: (value) => setState(() => _playerCount = value.round()),
+          ),
           const SizedBox(height: 10),
           if (_availableScenarios.isNotEmpty)
             DropdownButtonFormField<String>(
               value: _selectedScenarioId,
               decoration: const InputDecoration(labelText: 'سناریو'),
-              items: [for (final scenario in _availableScenarios) DropdownMenuItem(value: scenario.id, child: Text(scenario.title))],
+              items: [
+                for (final scenario in _availableScenarios)
+                  DropdownMenuItem(value: scenario.id, child: Text(scenario.title)),
+              ],
               onChanged: (value) => setState(() => _selectedScenarioId = value),
             ),
           if (_customScenarios.isNotEmpty) ...[
@@ -80,7 +91,10 @@ class _ScenarioLobbyScreenState extends State<ScenarioLobbyScreen> {
             DropdownButtonFormField<String>(
               value: _selectedCustomId,
               decoration: const InputDecoration(labelText: 'سناریوی اختصاصی'),
-              items: [for (final scenario in _customScenarios) DropdownMenuItem(value: scenario.id, child: Text(scenario.title))],
+              items: [
+                for (final scenario in _customScenarios)
+                  DropdownMenuItem(value: scenario.id, child: Text(scenario.name)),
+              ],
               onChanged: (value) => setState(() => _selectedCustomId = value),
             ),
           ],
@@ -90,7 +104,16 @@ class _ScenarioLobbyScreenState extends State<ScenarioLobbyScreen> {
               final scenario = _selectedScenario;
               final custom = _selectedCustom;
               if (scenario == null && custom == null) return;
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => RadicalGameScreen(scenario: scenario, customScenario: custom, playerCount: _playerCount)));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => RadicalGameScreen(
+                    scenario: scenario,
+                    customScenario: custom,
+                    playerCount: _playerCount,
+                    mode: _mode,
+                  ),
+                ),
+              );
             },
             icon: const Icon(Icons.play_arrow_rounded),
             label: const Text('شروع بازی'),
