@@ -7,5 +7,7 @@ class LobbyCreationScreen extends StatelessWidget {
   const LobbyCreationScreen({super.key, required this.ownerId});
 
   @override
-  Widget build(BuildContext context) => CustomScenarioBuilderScreen(ownerId: ownerId);
+  Widget build(BuildContext context) {
+    return ScenarioLobbyScreen(ownerId: ownerId);
+  }
 }
