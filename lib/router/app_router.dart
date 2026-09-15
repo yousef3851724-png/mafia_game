@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../screens/splash/splash_screen.dart';
+import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/home/home_screen.dart';
-import '../core/theme/radical_theme.dart';
 
 /// نام‌های مسیر به‌صورت متمرکز.
 class RadicalRoutes {
@@ -10,9 +9,9 @@ class RadicalRoutes {
   static const splash = '/';
   static const onboarding = '/onboarding';
   static const home = '/home';
+  // مسیرهای لابی در مرحله اتصال flow بازی به Router اضافه می‌شوند.
 }
 
-/// Router مرکزی Radical.
 final GoRouter radicalRouter = GoRouter(
   initialLocation: RadicalRoutes.splash,
   debugLogDiagnostics: true,
@@ -25,7 +24,7 @@ final GoRouter radicalRouter = GoRouter(
     GoRoute(
       path: RadicalRoutes.onboarding,
       name: 'onboarding',
-      builder: (context, state) => const _OnboardingRouteScreen(),
+      builder: (context, state) => const OnboardingScreen(),
     ),
     GoRoute(
       path: RadicalRoutes.home,
@@ -34,22 +33,3 @@ final GoRouter radicalRouter = GoRouter(
     ),
   ],
 );
-
-/// آداپتور موقتِ قابل‌اجرا برای مسیر onboarding.
-/// در مرحله‌ی onboarding کامل با صفحه‌ی نهایی جایگزین می‌شود.
-class _OnboardingRouteScreen extends StatelessWidget {
-  const _OnboardingRouteScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: RadicalTheme.ink,
-      body: Center(
-        child: FilledButton(
-          onPressed: () => context.go(RadicalRoutes.home),
-          child: const Text('ورود به مافیا رادیکال'),
-        ),
-      ),
-    );
-  }
-}
