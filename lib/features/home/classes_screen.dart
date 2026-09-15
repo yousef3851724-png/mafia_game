@@ -47,7 +47,9 @@ class ClassesScreen extends ConsumerWidget {
                       Icons.groups_rounded,
                       const Color(0xFF1E88E5),
                       () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const LobbyHubScreen(ownerId: 'local_creator')),
+                        MaterialPageRoute(
+                          builder: (_) => const LobbyHubScreen(ownerId: 'local_creator'),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -58,7 +60,9 @@ class ClassesScreen extends ConsumerWidget {
                       Icons.military_tech_rounded,
                       RadicalTheme.goldBright,
                       () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const LobbyHubScreen(ownerId: 'local_creator')),
+                        MaterialPageRoute(
+                          builder: (_) => const LobbyHubScreen(ownerId: 'local_creator'),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -69,7 +73,9 @@ class ClassesScreen extends ConsumerWidget {
                       Icons.auto_stories_rounded,
                       RadicalTheme.crimsonBright,
                       () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const ScenarioSelectionScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => const ScenarioSelectionScreen(),
+                        ),
                       ),
                   ],
                 ),
@@ -107,8 +113,21 @@ class ClassesScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                  Text(sub, style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 12)),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    sub,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.6),
+                      fontSize: 12,
+                    ),
+                  ),
                 ],
               ),
             ),
