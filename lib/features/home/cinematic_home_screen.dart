@@ -41,13 +41,35 @@ class _CinematicHomeScreenState extends State<CinematicHomeScreen>
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
   }
 
-  void _openFriendly() => _open(const ClassesScreen());
+  void _openScenarios() => _open(const ClassesScreen());
   void _openRanked() => _open(const LobbyHubScreen(ownerId: 'local_creator'));
   void _openStore() => _open(const StoreScreen());
   void _openProfile() => _open(const ProfileScreen());
 
   @override
   Widget build(BuildContext context) {
+    final pages = <Widget>[
+      _HomePage(
+        scenario: _scenario,
+        onScenarioChanged: (value) => setState(() => _scenario = value),
+        onStart: _openScenarios,
+        onStore: _openStore,
+        onRanked: _openRanked,
+        onScenarios: _openScenarios,
+        onProfile: _openProfile,
+      ),
+      _ModePage(
+        title: 'رقابتی',
+        subtitle: 'رنک، امتیاز و رقابت جدی روی میز رادیکال.',
+        icon: Icons.emoji_events_rounded,
+        accent: RadicalTheme.violet,
+        actionLabel: 'ورود به بازی رقابتی',
+        onAction: _openRanked,
+      ),
+      const StoreScreen(),
+      const ProfileScreen(),
+    ];
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -56,39 +78,7 @@ class _CinematicHomeScreenState extends State<CinematicHomeScreen>
           children: [
             Positioned.fill(child: _ParticleField(animation: _ambient)),
             SafeArea(
-              child: IndexedStack(
-                index: _selected,
-                children: [
-                  _HomePage(
-                    ambient: _ambient,
-                    scenario: _scenario,
-                    onScenarioChanged: (value) => setState(() => _scenario = value),
-                    onStart: _openFriendly,
-                    onStore: _openStore,
-                    onRanked: _openRanked,
-                    onFriendly: _openFriendly,
-                    onProfile: _openProfile,
-                  ),
-                  const StoreScreen(),
-                  _ModePage(
-                    title: 'بازی امتیازی',
-                    subtitle: 'رنک، امتیاز و رقابت جدی روی میز رادیکال.',
-                    icon: Icons.emoji_events_rounded,
-                    accent: RadicalTheme.crimsonBright,
-                    actionLabel: 'ورود به بازی امتیازی',
-                    onAction: _openRanked,
-                  ),
-                  _ModePage(
-                    title: 'بازی دوستانه',
-                    subtitle: 'لابی بساز، دوستانت را جمع کن و بدون فشار رتبه بازی کن.',
-                    icon: Icons.groups_rounded,
-                    accent: RadicalTheme.goldBright,
-                    actionLabel: 'ورود به بازی دوستانه',
-                    onAction: _openFriendly,
-                  ),
-                  const ProfileScreen(),
-                ],
-              ),
+              child: IndexedStack(index: _selected, children: pages),
             ),
           ],
         ),
@@ -102,23 +92,21 @@ class _CinematicHomeScreenState extends State<CinematicHomeScreen>
 }
 
 class _HomePage extends StatelessWidget {
-  final Animation<double> ambient;
   final int scenario;
   final ValueChanged<int> onScenarioChanged;
   final VoidCallback onStart;
   final VoidCallback onStore;
   final VoidCallback onRanked;
-  final VoidCallback onFriendly;
+  final VoidCallback onScenarios;
   final VoidCallback onProfile;
 
   const _HomePage({
-    required this.ambient,
     required this.scenario,
     required this.onScenarioChanged,
     required this.onStart,
     required this.onStore,
     required this.onRanked,
-    required this.onFriendly,
+    required this.onScenarios,
     required this.onProfile,
   });
 
@@ -126,72 +114,82 @@ class _HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+      padding: const EdgeInsets.fromLTRB(30, 20, 30, 24),
       children: [
-        const Align(alignment: Alignment.topLeft, child: _DiamondBadge()),
-        const SizedBox(height: 8),
+        const Align(
+          alignment: Alignment.topLeft,
+          child: _DiamondBadge(),
+        ),
+        const SizedBox(height: 34),
         const Center(
           child: MafiaRadicalLogo(
-            size: 126,
+            size: 150,
             scenario: MafiaLogoScenario.classic,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         const Text(
           'مافیا رادیکال',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: RadicalTheme.goldBright,
-            fontSize: 30,
+            fontSize: 31,
+            height: 1.05,
             fontWeight: FontWeight.w900,
-            shadows: [Shadow(color: Color(0x66E3B873), blurRadius: 18)],
+            shadows: [
+              Shadow(color: Color(0x66E3B873), blurRadius: 18),
+            ],
           ),
         ),
-        const SizedBox(height: 5),
+        const SizedBox(height: 9),
         const Text(
           'شب، راز، رأی و یک میز که هیچ‌کس در آن امن نیست.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: RadicalTheme.smoke, fontSize: 12.5),
+          style: TextStyle(
+            color: RadicalTheme.smoke,
+            fontSize: 13.5,
+            height: 1.35,
+          ),
         ),
-        const SizedBox(height: 22),
-        _AnimatedCard(
-          delay: 0,
-          child: _PrimaryButton(onPressed: onStart),
+        const SizedBox(height: 25),
+        _PrimaryButton(onPressed: onStart),
+        const SizedBox(height: 24),
+        const Align(
+          alignment: Alignment.centerRight,
+          child: Text(
+            'دسترسی سریع',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+          ),
         ),
-        const SizedBox(height: 18),
-        const Text(
-          'دسترسی سریع',
-          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
-        ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         GridView.count(
           crossAxisCount: 2,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: 1.62,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 1.52,
           children: [
             _QuickTile(
               icon: Icons.storefront_rounded,
               title: 'فروشگاه',
               subtitle: 'آواتار و آیتم',
-              accent: RadicalTheme.gold,
+              accent: RadicalTheme.goldBright,
               onTap: onStore,
             ),
             _QuickTile(
               icon: Icons.emoji_events_rounded,
-              title: 'امتیازی',
+              title: 'رقابتی',
               subtitle: 'امتیاز و رتبه',
-              accent: RadicalTheme.crimsonBright,
+              accent: RadicalTheme.violet,
               onTap: onRanked,
             ),
             _QuickTile(
-              icon: Icons.groups_rounded,
-              title: 'دوستانه',
-              subtitle: 'لابی و بازی آزاد',
+              icon: Icons.auto_awesome_rounded,
+              title: 'سناریوها',
+              subtitle: 'بازی‌های بیشتر',
               accent: RadicalTheme.violet,
-              onTap: onFriendly,
+              onTap: onScenarios,
             ),
             _QuickTile(
               icon: Icons.person_rounded,
@@ -202,14 +200,8 @@ class _HomePage extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 18),
-        _AnimatedCard(
-          delay: 180,
-          child: _ScenarioPreview(
-            selected: scenario,
-            onChanged: onScenarioChanged,
-          ),
-        ),
+        const SizedBox(height: 24),
+        _ScenarioPreview(selected: scenario, onChanged: onScenarioChanged),
       ],
     );
   }
@@ -221,18 +213,21 @@ class _DiamondBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
       decoration: BoxDecoration(
         color: RadicalTheme.panel2,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(17),
         border: Border.all(color: RadicalTheme.line),
       ),
       child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.diamond_rounded, color: RadicalTheme.goldBright, size: 18),
-          SizedBox(width: 6),
-          Text('100', style: TextStyle(fontWeight: FontWeight.w900)),
+          Text(
+            '100',
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+          ),
+          SizedBox(width: 7),
+          Icon(Icons.diamond_rounded, color: RadicalTheme.goldBright, size: 19),
         ],
       ),
     );
@@ -253,27 +248,28 @@ class _PrimaryButtonState extends State<_PrimaryButton> {
   @override
   Widget build(BuildContext context) {
     return AnimatedScale(
-      scale: _down ? .965 : 1,
-      duration: const Duration(milliseconds: 110),
+      scale: _down ? .975 : 1,
+      duration: const Duration(milliseconds: 100),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: widget.onPressed,
           onHighlightChanged: (value) => setState(() => _down = value),
-          borderRadius: BorderRadius.circular(20),
-          splashColor: RadicalTheme.goldBright.withValues(alpha: .30),
-          highlightColor: RadicalTheme.gold.withValues(alpha: .12),
+          borderRadius: BorderRadius.circular(23),
+          splashColor: RadicalTheme.goldBright.withValues(alpha: .28),
           child: Ink(
-            height: 64,
+            height: 72,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
+                begin: Alignment.centerRight,
+                end: Alignment.centerLeft,
                 colors: [RadicalTheme.goldBright, RadicalTheme.gold],
               ),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(23),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x55E3B873),
-                  blurRadius: 30,
+                  blurRadius: 28,
                   offset: Offset(0, 9),
                 ),
               ],
@@ -281,16 +277,16 @@ class _PrimaryButtonState extends State<_PrimaryButton> {
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.play_arrow_rounded, color: RadicalTheme.ink, size: 27),
-                SizedBox(width: 9),
                 Text(
                   'شروع بازی / ورود به میز',
                   style: TextStyle(
                     color: RadicalTheme.ink,
-                    fontSize: 17,
+                    fontSize: 20,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
+                SizedBox(width: 11),
+                Icon(Icons.play_arrow_rounded, color: RadicalTheme.ink, size: 29),
               ],
             ),
           ),
@@ -325,47 +321,57 @@ class _QuickTileState extends State<_QuickTile> {
   @override
   Widget build(BuildContext context) {
     return AnimatedScale(
-      scale: _down ? .965 : 1,
+      scale: _down ? .97 : 1,
       duration: const Duration(milliseconds: 100),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: widget.onTap,
-          borderRadius: BorderRadius.circular(19),
-          splashColor: widget.accent.withValues(alpha: .18),
-          highlightColor: widget.accent.withValues(alpha: .06),
           onHighlightChanged: (value) => setState(() => _down = value),
+          borderRadius: BorderRadius.circular(21),
+          splashColor: widget.accent.withValues(alpha: .18),
           child: Ink(
-            padding: const EdgeInsets.all(13),
+            padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
               color: RadicalTheme.panel,
-              borderRadius: BorderRadius.circular(19),
+              borderRadius: BorderRadius.circular(21),
               border: Border.all(color: widget.accent.withValues(alpha: .18)),
             ),
             child: Row(
               children: [
                 Container(
-                  width: 42,
-                  height: 42,
+                  width: 46,
+                  height: 46,
                   decoration: BoxDecoration(
                     color: widget.accent.withValues(alpha: .10),
-                    borderRadius: BorderRadius.circular(13),
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                  child: Icon(widget.icon, color: widget.accent, size: 22),
+                  child: Icon(widget.icon, color: widget.accent, size: 24),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 11),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(widget.title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14)),
-                      const SizedBox(height: 3),
-                      Text(widget.subtitle, style: const TextStyle(color: RadicalTheme.smoke, fontSize: 10.5)),
+                      Text(
+                        widget.title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.subtitle,
+                        style: const TextStyle(
+                          color: RadicalTheme.smoke,
+                          fontSize: 11,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_left_rounded, color: RadicalTheme.smoke, size: 18),
               ],
             ),
           ),
@@ -378,6 +384,7 @@ class _QuickTileState extends State<_QuickTile> {
 class _ScenarioPreview extends StatelessWidget {
   final int selected;
   final ValueChanged<int> onChanged;
+
   const _ScenarioPreview({required this.selected, required this.onChanged});
 
   @override
@@ -387,14 +394,21 @@ class _ScenarioPreview extends StatelessWidget {
       ('مذاکره', '۱۰ نفر • مدرن', Icons.auto_awesome_rounded),
       ('سناریوی دست‌ساز', '۵۰ 💎 • دوستانه', Icons.edit_rounded),
     ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('سناریوی سریع', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900)),
-        const SizedBox(height: 9),
+        const Align(
+          alignment: Alignment.centerRight,
+          child: Text(
+            'سناریوی سریع',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+          ),
+        ),
+        const SizedBox(height: 11),
         ...items.asMap().entries.map(
           (entry) => Padding(
-            padding: EdgeInsets.only(bottom: entry.key == 2 ? 0 : 8),
+            padding: EdgeInsets.only(bottom: entry.key == 2 ? 0 : 9),
             child: _ScenarioRow(
               title: entry.value.$1,
               subtitle: entry.value.$2,
@@ -415,7 +429,14 @@ class _ScenarioRow extends StatelessWidget {
   final IconData icon;
   final bool selected;
   final VoidCallback onTap;
-  const _ScenarioRow({required this.title, required this.subtitle, required this.icon, required this.selected, required this.onTap});
+
+  const _ScenarioRow({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -423,31 +444,49 @@ class _ScenarioRow extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(17),
         splashColor: RadicalTheme.goldBright.withValues(alpha: .12),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          padding: const EdgeInsets.all(11),
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
             color: selected ? const Color(0xFF211B13) : RadicalTheme.panel,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: selected ? RadicalTheme.gold.withValues(alpha: .55) : RadicalTheme.line),
+            borderRadius: BorderRadius.circular(17),
+            border: Border.all(
+              color: selected
+                  ? RadicalTheme.gold.withValues(alpha: .55)
+                  : RadicalTheme.line,
+            ),
           ),
           child: Row(
             children: [
-              Icon(icon, color: selected ? RadicalTheme.goldBright : RadicalTheme.smoke, size: 20),
-              const SizedBox(width: 10),
+              Icon(
+                icon,
+                color: selected ? RadicalTheme.goldBright : RadicalTheme.smoke,
+                size: 21,
+              ),
+              const SizedBox(width: 11),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13)),
-                    const SizedBox(height: 2),
-                    Text(subtitle, style: const TextStyle(color: RadicalTheme.smoke, fontSize: 10.5)),
+                    Text(
+                      title,
+                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(color: RadicalTheme.smoke, fontSize: 11),
+                    ),
                   ],
                 ),
               ),
-              Icon(selected ? Icons.check_circle_rounded : Icons.chevron_left_rounded, color: selected ? RadicalTheme.goldBright : RadicalTheme.smoke, size: 19),
+              Icon(
+                selected ? Icons.check_circle_rounded : Icons.chevron_left_rounded,
+                color: selected ? RadicalTheme.goldBright : RadicalTheme.smoke,
+                size: 20,
+              ),
             ],
           ),
         ),
@@ -476,15 +515,24 @@ class _ModePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(18, 30, 18, 28),
+      padding: const EdgeInsets.fromLTRB(24, 32, 24, 28),
       children: [
-        const Center(child: MafiaRadicalLogo(size: 92, scenario: MafiaLogoScenario.classic)),
-        const SizedBox(height: 18),
-        Icon(icon, size: 54, color: accent),
+        const SizedBox(height: 20),
+        const Center(child: MafiaRadicalLogo(size: 110)),
+        const SizedBox(height: 20),
+        Icon(icon, size: 52, color: accent),
         const SizedBox(height: 14),
-        Text(title, textAlign: TextAlign.center, style: TextStyle(color: accent, fontSize: 28, fontWeight: FontWeight.w900)),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: accent, fontSize: 29, fontWeight: FontWeight.w900),
+        ),
         const SizedBox(height: 10),
-        Text(subtitle, textAlign: TextAlign.center, style: const TextStyle(color: RadicalTheme.smoke, height: 1.5)),
+        Text(
+          subtitle,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: RadicalTheme.smoke, height: 1.5),
+        ),
         const SizedBox(height: 28),
         Container(
           padding: const EdgeInsets.all(20),
@@ -493,9 +541,20 @@ class _ModePage extends StatelessWidget {
             children: [
               const Text('میز رادیکال آماده است', style: TextStyle(fontSize: 21, fontWeight: FontWeight.w900)),
               const SizedBox(height: 8),
-              const Text('سناریو، بازیکن‌ها و جریان بازی را از همین بخش کنترل کن.', textAlign: TextAlign.center, style: TextStyle(color: RadicalTheme.smoke)),
+              const Text(
+                'سناریو، بازیکن‌ها و جریان بازی را از همین بخش کنترل کن.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: RadicalTheme.smoke),
+              ),
               const SizedBox(height: 18),
-              SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: onAction, icon: const Icon(Icons.play_arrow_rounded), label: Text(actionLabel))),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: onAction,
+                  icon: const Icon(Icons.play_arrow_rounded),
+                  label: Text(actionLabel),
+                ),
+              ),
             ],
           ),
         ),
@@ -507,19 +566,20 @@ class _ModePage extends StatelessWidget {
 class _BottomNav extends StatelessWidget {
   final int selected;
   final ValueChanged<int> onChanged;
+
   const _BottomNav({required this.selected, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
     const items = [
-      (Icons.home_rounded, 'صفحه اصلی'),
+      (Icons.home_rounded, 'خانه'),
+      (Icons.emoji_events_rounded, 'رقابتی'),
       (Icons.storefront_rounded, 'فروشگاه'),
-      (Icons.emoji_events_rounded, 'امتیازی'),
-      (Icons.groups_rounded, 'دوستانه'),
       (Icons.person_rounded, 'پروفایل'),
     ];
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(7, 7, 7, 8),
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 9),
       decoration: const BoxDecoration(
         color: Color(0xF0090C12),
         border: Border(top: BorderSide(color: RadicalTheme.line)),
@@ -546,69 +606,44 @@ class _NavItem extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  const _NavItem({required this.icon, required this.label, required this.selected, required this.onTap});
+
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(15),
       splashColor: RadicalTheme.goldBright.withValues(alpha: .14),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(vertical: 7),
         decoration: BoxDecoration(
           color: selected ? RadicalTheme.gold.withValues(alpha: .10) : Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(15),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 20, color: selected ? RadicalTheme.goldBright : RadicalTheme.smoke),
+            Icon(icon, size: 22, color: selected ? RadicalTheme.goldBright : RadicalTheme.smoke),
             const SizedBox(height: 3),
-            Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: selected ? RadicalTheme.goldBright : RadicalTheme.smoke)),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                color: selected ? RadicalTheme.goldBright : RadicalTheme.smoke,
+              ),
+            ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _AnimatedCard extends StatefulWidget {
-  final Widget child;
-  final int delay;
-  const _AnimatedCard({required this.child, required this.delay});
-
-  @override
-  State<_AnimatedCard> createState() => _AnimatedCardState();
-}
-
-class _AnimatedCardState extends State<_AnimatedCard> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 650));
-    Future<void>.delayed(Duration(milliseconds: widget.delay), () {
-      if (mounted) _controller.forward();
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final animation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
-    return FadeTransition(
-      opacity: animation,
-      child: SlideTransition(
-        position: Tween(begin: const Offset(0, .12), end: Offset.zero).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic)),
-        child: widget.child,
       ),
     );
   }
@@ -622,7 +657,10 @@ class _ParticleField extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: animation,
-      builder: (_, __) => CustomPaint(painter: _ParticlePainter(animation.value), size: Size.infinite),
+      builder: (_, __) => CustomPaint(
+        painter: _ParticlePainter(animation.value),
+        size: Size.infinite,
+      ),
     );
   }
 }
@@ -633,7 +671,7 @@ class _ParticlePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = RadicalTheme.gold.withValues(alpha: .065);
+    final paint = Paint()..color = RadicalTheme.gold.withValues(alpha: .055);
     for (var i = 0; i < 26; i++) {
       final seed = i * 37.0;
       final x = (seed * 13.0) % size.width;
