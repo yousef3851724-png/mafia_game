@@ -124,7 +124,7 @@ class RadicalGameScreen extends StatelessWidget {
   }
 
   Widget _seat(String name, bool user, int number, bool female) {
-    final accent = user ? RadicalTheme.gold : RadicalTheme.crimson;
+    final accent = user ? RadicalTheme.gold : RadicalTheme.violet;
     return Column(mainAxisSize: MainAxisSize.min, children: [
       Container(
         width: 58,
@@ -202,7 +202,7 @@ class _Atmosphere extends StatelessWidget {
 class _GlowPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final p = Paint()..shader = RadialGradient(colors: [RadicalTheme.crimson.withValues(alpha: .10), Colors.transparent]).createShader(Rect.fromCircle(center: Offset(size.width * .50, size.height * .43), radius: size.width * .65));
+    final p = Paint()..shader = RadialGradient(colors: [RadicalTheme.violet.withValues(alpha: .10), Colors.transparent]).createShader(Rect.fromCircle(center: Offset(size.width * .50, size.height * .43), radius: size.width * .65));
     canvas.drawCircle(Offset(size.width * .50, size.height * .43), size.width * .65, p);
   }
   @override
@@ -215,7 +215,7 @@ class _TablePainter extends CustomPainter {
     final c = Offset(size.width / 2, size.height / 2);
     final r = size.shortestSide * .34;
     final ring = Paint()..style = PaintingStyle.stroke..strokeWidth = 2..color = RadicalTheme.gold.withValues(alpha: .12);
-    final ring2 = Paint()..style = PaintingStyle.stroke..strokeWidth = 1..color = RadicalTheme.crimson.withValues(alpha: .13);
+    final ring2 = Paint()..style = PaintingStyle.stroke..strokeWidth = 1..color = RadicalTheme.violet.withValues(alpha: .13);
     canvas.drawCircle(c, r, ring);
     canvas.drawCircle(c, r + 30, ring2);
     canvas.drawCircle(c, r + 55, ring2);
