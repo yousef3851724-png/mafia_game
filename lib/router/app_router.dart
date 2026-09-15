@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../screens/splash/splash_screen.dart';
-import '../features/home/cinematic_home_screen.dart';
+import '../screens/home/home_screen.dart';
 import '../core/theme/radical_theme.dart';
 
 /// نام‌های مسیر به‌صورت متمرکز.
@@ -30,14 +30,13 @@ final GoRouter radicalRouter = GoRouter(
     GoRoute(
       path: RadicalRoutes.home,
       name: 'home',
-      builder: (context, state) => const CinematicHomeScreen(),
+      builder: (context, state) => const HomeScreen(),
     ),
   ],
 );
 
 /// آداپتور موقتِ قابل‌اجرا برای مسیر onboarding.
-/// این صفحه عمداً جریان فعلی بازی را دستکاری نمی‌کند و در مرحله‌ی onboarding
-/// کامل با صفحه‌ی نهایی جایگزین می‌شود.
+/// در مرحله‌ی onboarding کامل با صفحه‌ی نهایی جایگزین می‌شود.
 class _OnboardingRouteScreen extends StatelessWidget {
   const _OnboardingRouteScreen();
 
