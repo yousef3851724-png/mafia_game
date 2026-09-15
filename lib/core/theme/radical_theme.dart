@@ -15,6 +15,12 @@ class RadicalTheme {
   static const smoke = Color(0xFF9CA4B5);
   static const line = Color(0x1FFFFFFF);
 
+  // Backward-compatible semantic aliases. The old "crimson" naming is kept
+  // so existing gameplay widgets remain source-compatible while the actual
+  // Radical palette stays strictly black + gold + violet.
+  static const crimson = violet;
+  static const crimsonBright = violetBright;
+
   static ThemeData dark() {
     final scheme = ColorScheme.fromSeed(seedColor: gold, brightness: Brightness.dark).copyWith(
       primary: gold,
