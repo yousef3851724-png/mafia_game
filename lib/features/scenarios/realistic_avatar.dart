@@ -1,20 +1,62 @@
 import 'package:flutter/material.dart';
+import '../../core/models/radical_avatar_catalog.dart';
 import '../../core/widgets/avatar_frame_widget.dart';
 
-/// Role portrait. Network photography is attempted first; the packaged Radical
-/// artwork is always available as an offline fallback so the avatar cannot be empty.
+/// آواتار اصلی رادیکال.
+/// اگر avatarId داده شود، آواتار کاتالوگ همان بازیکن استفاده می‌شود؛
+/// در غیر این صورت رفتار قبلی role-based حفظ می‌شود تا جریان فعلی بازی نشکند.
 class RealisticAvatar extends StatelessWidget {
   final String role;
   final bool female;
   final double size;
   final FrameType? frameType;
   final bool isAlive;
+  final String? avatarId;
 
-  const RealisticAvatar({super.key, required this.role, this.female = false, this.size = 54, this.frameType, this.isAlive = true});
+  const RealisticAvatar({
+    super.key,
+    required this.role,
+    this.female = false,
+    this.size = 54,
+    this.frameType,
+    this.isAlive = true,
+    this.avatarId,
+  });
+
+  RadicalAvatarAsset? get _catalogAvatar {
+    if (avatarId == null || avatarId!.isEmpty) return null;
+    return RadicalAvatarCatalog.byId(avatarId!);
+  }
 
   String get _portraitUrl {
-    final femaleIds = <String, int>{'شهروند': 47, 'دکتر': 49, 'بازپرس': 45, 'کارآگاه': 44, 'مافیا': 43, 'پدرخوانده': 42, 'دلقک': 41, 'جوکر': 40, 'زامبی': 39, 'قاتل مستقل': 38, 'محافظ': 37, 'تکاور': 36};
-    final maleIds = <String, int>{'شهروند': 12, 'دکتر': 13, 'بازپرس': 14, 'کارآگاه': 15, 'مافیا': 16, 'پدرخوانده': 17, 'دلقک': 18, 'جوکر': 19, 'زامبی': 20, 'قاتل مستقل': 21, 'محافظ': 22, 'تکاور': 23};
+    final femaleIds = <String, int>{
+      'شهروند': 47,
+      'دکتر': 49,
+      'بازپرس': 45,
+      'کارآگاه': 44,
+      'مافیا': 43,
+      'پدرخوانده': 42,
+      'دلقک': 41,
+      'جوکر': 40,
+      'زامبی': 39,
+      'قاتل مستقل': 38,
+      'محافظ': 37,
+      'تکاور': 36,
+    };
+    final maleIds = <String, int>{
+      'شهروند': 12,
+      'دکتر': 13,
+      'بازپرس': 14,
+      'کارآگاه': 15,
+      'مافیا': 16,
+      'پدرخوانده': 17,
+      'دلقک': 18,
+      'جوکر': 19,
+      'زامبی': 20,
+      'قاتل مستقل': 21,
+      'محافظ': 22,
+      'تکاور': 23,
+    };
     final id = (female ? femaleIds : maleIds)[role] ?? (female ? 47 : 12);
     return 'https://i.pravatar.cc/256?img=$id';
   }
@@ -62,8 +104,10 @@ class RealisticAvatar extends StatelessWidget {
         size: size,
         frameType: _roleFrame,
         isAlive: isAlive,
-        fallbackInitial: role.isNotEmpty ? role : '?',
+        fallbackInitial: (_catalogAvatar?.displayNameFa ?? role).isNotEmpty
+            ? (_catalogAvatar?.displayNameFa ?? role)
+            : '?',
         imageUrl: _portraitUrl,
-        fallbackAsset: _fallbackAsset,
+        fallbackAsset: _catalogAvatar?.assetPath ?? _fallbackAsset,
       );
 }
