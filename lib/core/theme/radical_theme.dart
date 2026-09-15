@@ -14,12 +14,31 @@ class RadicalTheme {
   static const violetBright = Color(0xFFB98AF2);
   static const smoke = Color(0xFF9CA4B5);
   static const line = Color(0x1FFFFFFF);
+  static const black = ink;
+  static const charcoalLight = panel3;
+  static const textPrimary = Colors.white;
 
-  // Backward-compatible semantic aliases. The old "crimson" naming is kept
-  // so existing gameplay widgets remain source-compatible while the actual
-  // Radical palette stays strictly black + gold + violet.
   static const crimson = violet;
   static const crimsonBright = violetBright;
+
+  static const LinearGradient backgroundGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFF090A10), Color(0xFF120D19), Color(0xFF06070B)],
+  );
+
+  static const LinearGradient goldButtonGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [goldBright, gold, Color(0xFF9E722F)],
+  );
+
+  static List<BoxShadow> goldGlow({double blur = 24, double opacity = .28}) => [
+        BoxShadow(color: gold.withValues(alpha: opacity), blurRadius: blur, spreadRadius: 1),
+        BoxShadow(color: gold.withValues(alpha: opacity * .35), blurRadius: blur * 2, spreadRadius: 2),
+      ];
+
+  static TextTheme get textTheme => dark().textTheme;
 
   static ThemeData dark() {
     final scheme = ColorScheme.fromSeed(seedColor: gold, brightness: Brightness.dark).copyWith(
@@ -80,7 +99,7 @@ class RadicalTheme {
         color: panel3,
         surfaceTintColor: Colors.transparent,
         textStyle: const TextStyle(color: goldBright, fontWeight: FontWeight.w800),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: violet.withValues(alpha: .55))),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Color(0x889A72D9))),
       ),
       navigationBarTheme: const NavigationBarThemeData(
         backgroundColor: Color(0xFF090C12),
@@ -161,13 +180,14 @@ class RadicalTheme {
         boxShadow: const [BoxShadow(color: Color(0x45000000), blurRadius: 24, offset: Offset(0, 12))],
       );
 
+  static BoxDecoration glassCard({bool accent = false, double radius = 22}) => glass(accent: accent, radius: radius);
+
   static Widget sectionTitle(String title, {String? subtitle}) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [Text(title, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w900)), if (subtitle != null) ...[const SizedBox(height: 4), Text(subtitle, style: const TextStyle(color: smoke, fontSize: 12))]],
       );
 }
 
-/// Compatibility aliases used by the earlier home/class screens.
 class RadicalColors {
   RadicalColors._();
   static const backgroundDark = RadicalTheme.ink;
