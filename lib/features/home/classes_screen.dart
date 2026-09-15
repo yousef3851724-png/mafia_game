@@ -74,9 +74,10 @@ class ClassesScreen extends ConsumerWidget {
                       RadicalTheme.crimsonBright,
                       () => Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) => const ScenarioSelectionScreen(),
+                          builder: (_) => const ScenarioSelectionScreen(ownerId: 'local_creator'),
                         ),
                       ),
+                    ),
                   ],
                 ),
               ),
