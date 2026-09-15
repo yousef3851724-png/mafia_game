@@ -1,10 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import '../../core/models/radical_avatar_catalog.dart';
+import '../models/radical_avatar_catalog.dart';
 import '../theme/radical_theme.dart';
 
-/// Avatar renderer shared by home, profile, picker and gameplay.
-/// It keeps the supplied Radical frame tiers in one reusable component.
+/// Shared Radical avatar renderer used by home, profile, picker and gameplay.
 class RadicalAvatarFrame extends StatefulWidget {
   final String avatarAssetPath;
   final RadicalFrameTier tier;
@@ -135,7 +134,11 @@ class _RadicalAvatarFrameState extends State<RadicalAvatarFrame>
                       shape: BoxShape.circle,
                       border: Border.all(color: data.gradientColors.first, width: 1.5),
                     ),
-                    child: Icon(data.badgeIcon, size: widget.size * .15, color: data.gradientColors.first),
+                    child: Icon(
+                      data.badgeIcon,
+                      size: widget.size * .15,
+                      color: data.gradientColors.first,
+                    ),
                   ),
                 ),
             ],
