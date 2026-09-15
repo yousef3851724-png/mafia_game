@@ -2,16 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/providers/app_providers.dart';
+import '../../core/models/radical_avatar_catalog.dart';
 import '../../core/theme/radical_theme.dart';
 import '../../core/widgets/radical_avatar_frame.dart';
 import '../../core/widgets/radical_bottom_nav.dart';
-import '../../features/scenarios/radical_avatar_catalog.dart';
 import '../../features/store/store_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/scenarios/scenario_lobby_screen.dart';
 
-/// صفحه‌ی اصلی اپ بعد از ورود/آنبوردینگ.
-/// ساختار اصلی حفظ شده و از اجزای واقعی پروژه استفاده می‌کند.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -85,11 +83,7 @@ class _HomeContent extends StatelessWidget {
           SizedBox(
             width: 220,
             child: ElevatedButton.icon(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const ScenarioLobbyScreen(ownerId: 'local_creator'),
-                ),
-              ),
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ScenarioLobbyScreen(ownerId: 'local_creator'))),
               icon: const Icon(Icons.play_arrow_rounded),
               label: const Text('ورود به بازی'),
             ),
@@ -163,7 +157,7 @@ class _QuickActionsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final actions = [
+    const actions = [
       (Icons.flash_on, 'شروع سریع'),
       (Icons.people_alt_outlined, 'دوستان'),
       (Icons.event_outlined, 'رویدادها'),
