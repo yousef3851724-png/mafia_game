@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/models/radical_avatar_frame_model.dart';
-import 'radical_avatar_frame.dart';
+import '../../models/radical_avatar_frame_model.dart';
+import '../../core/widgets/radical_avatar_frame.dart';
 
 /// گرید انتخاب آواتار برای پروفایل/ساخت شخصیت.
 /// آواتار انتخاب‌شده با فریم فعلی کاربر پیش‌نمایش داده می‌شود.
