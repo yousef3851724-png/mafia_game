@@ -10,7 +10,6 @@ class GameplayScreen extends StatefulWidget {
 
   @override
   State<GameplayScreen> createState() => _GameplayScreenState();
-}
 
 class _GameplayScreenState extends State<GameplayScreen> {
   late List<Player> _alive;
