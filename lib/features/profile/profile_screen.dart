@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/theme/radical_theme.dart';
+import '../../core/widgets/radical_scaffold.dart';
 import '../scenarios/realistic_avatar.dart';
 
 class ProfileScreen extends StatefulWidget {
