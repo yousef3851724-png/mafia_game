@@ -3,8 +3,8 @@ import '../../core/models/radical_avatar_catalog.dart';
 import '../../core/widgets/avatar_frame_widget.dart';
 
 /// آواتار اصلی رادیکال.
-/// اگر avatarId داده شود، آواتار کاتالوگ همان بازیکن استفاده می‌شود؛
-/// در غیر این صورت رفتار قبلی role-based حفظ می‌شود تا جریان فعلی بازی نشکند.
+/// وقتی avatarId مشخص باشد، فقط دارایی محلی همان آواتار استفاده می‌شود
+/// تا نمایش آواتارهای رادیکال به شبکه یا سرویس شخص ثالث وابسته نباشد.
 class RealisticAvatar extends StatelessWidget {
   final String role;
   final bool female;
@@ -100,14 +100,19 @@ class RealisticAvatar extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => AvatarFrameWidget(
-        size: size,
-        frameType: _roleFrame,
-        isAlive: isAlive,
-        fallbackInitial: (_catalogAvatar?.displayNameFa ?? role).isNotEmpty
-            ? (_catalogAvatar?.displayNameFa ?? role)
-            : '?',
-        imageUrl: _portraitUrl,
-        fallbackAsset: _catalogAvatar?.assetPath ?? _fallbackAsset,
-      );
+  Widget build(BuildContext context) {
+    final catalogAvatar = _catalogAvatar;
+    return AvatarFrameWidget(
+      size: size,
+      frameType: _roleFrame,
+      isAlive: isAlive,
+      fallbackInitial: (catalogAvatar?.displayNameFa ?? role).isNotEmpty
+          ? (catalogAvatar?.displayNameFa ?? role)
+          : '?',
+      // Catalog avatars are local-only. Legacy role-based avatars may still
+      // use the existing network source when no catalog id is supplied.
+      imageUrl: catalogAvatar == null ? _portraitUrl : null,
+      fallbackAsset: catalogAvatar?.assetPath ?? _fallbackAsset,
+    );
+  }
 }
