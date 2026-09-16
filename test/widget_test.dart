@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:mafia_radical/main.dart';
@@ -9,11 +10,16 @@ void main() {
     TestWidgetsFlutterBinding.ensureInitialized();
     SharedPreferences.setMockInitialValues({});
 
-    await tester.pumpWidget(const MafiaRadicalApp());
-    // The cinematic home intentionally contains repeating animations, so
-    // pumpAndSettle() would wait forever. A bounded frame is enough for this
-    // smoke test to verify that the app mounts and builds without exceptions.
-    await tester.pump(const Duration(milliseconds: 250));
+    // main() normally supplies ProviderScope around MafiaRadicalApp. The test
+    // mounts the same production dependency boundary instead of bypassing it.
+    await tester.pumpWidget(
+      const ProviderScope(child: MafiaRadicalApp()),
+    );
+
+    // SplashScreen intentionally waits before routing. Advance past that
+    // timer so the smoke test leaves no pending timers behind.
+    await tester.pump(const Duration(milliseconds: 2000));
+    await tester.pump();
 
     expect(find.byType(MaterialApp), findsOneWidget);
     expect(find.byType(Scaffold), findsOneWidget);
