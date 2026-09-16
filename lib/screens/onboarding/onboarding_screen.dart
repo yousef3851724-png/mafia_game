@@ -1,30 +1,65 @@
+cat > lib/screens/onboarding/onboarding_screen.dart << 'EOF'
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/services/onboarding_service.dart';
-import '../../core/theme/radical_theme.dart';
+import '../../core/providers/app_providers.dart';
 import '../../router/app_router.dart';
+import '../../core/theme/radical_theme.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class _OnboardData {
+  final IconData icon;
+  final String titleFa;
+  final String descriptionFa;
+
+  const _OnboardData({
+    required this.icon,
+    required this.titleFa,
+    required this.descriptionFa,
+  });
+}
+
+const List<_OnboardData> _pages = [
+  _OnboardData(
+    icon: Icons.masks_outlined,
+    titleFa: 'به دنیای مافیا رادیکال خوش اومدی',
+    descriptionFa:
+        'یک بازی اجتماعیِ نقش‌محور برای دورهمی با دوستان؛ هرکس یک نقش مخفی داره و باید حقیقت رو کشف کنه.',
+  ),
+  _OnboardData(
+    icon: Icons.auto_awesome,
+    titleFa: 'نقش‌هایی از دل اسطوره‌های ایرانی',
+    descriptionFa:
+        'از سیمرغ تا دیو سپید؛ هر نقش قدرت و هدف خودش رو داره. با تیم خودت هماهنگ شو یا تنها بازی کن.',
+  ),
+  _OnboardData(
+    icon: Icons.groups_2_outlined,
+    titleFa: 'لابی‌های آنلاین زنده',
+    descriptionFa:
+        'یک لابی بساز یا به یکی بپیوند، شب و روزهای بازی رو با صدای هم‌بازی‌هات تجربه کن.',
+  ),
+  _OnboardData(
+    icon: Icons.diamond_outlined,
+    titleFa: 'اقتصاد سکه و الماس',
+    descriptionFa:
+        'با بازی کردن سکه جمع کن، فریم و شخصیت باز کن و در فروشگاه چیزهای ویژه به‌دست بیار.',
+  ),
+];
+
+class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _controller = PageController();
-  final _service = OnboardingService();
   int _index = 0;
 
-  static const _slides = [
-    (Icons.auto_awesome, 'افسانه وارد شهر شد', 'در مافیا رادیکال، هر بازیکن یک هویت، یک راز و یک تصمیم سرنوشت‌ساز دارد.'),
-    (Icons.groups_rounded, 'اتحاد بساز', 'بازیکنان را بشناس، نشانه‌ها را کنار هم بگذار و در گفت‌وگوها حقیقت را پیدا کن.'),
-    (Icons.visibility_off_rounded, 'نقشت را پنهان کن', 'مافیا، شهروند، کارآگاه و نقش‌های ویژه؛ هیچ‌کس آن چیزی نیست که در نگاه اول به نظر می‌رسد.'),
-    (Icons.local_fire_department_rounded, 'وقت بازی است', 'آواتار، فریم و هویت خودت را انتخاب کن و وارد یک میز واقعی رادیکال شو.'),
-  ];
+  bool get _isLast => _index == _pages.length - 1;
 
   Future<void> _finish() async {
-    await _service.setOnboardingSeen();
+    await ref.read(onboardingServiceProvider).setOnboardingSeen();
     if (!mounted) return;
     context.go(RadicalRoutes.home);
   }
@@ -37,83 +72,127 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final slide = _slides[_index];
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        body: Container(
-          decoration: const BoxDecoration(gradient: RadicalTheme.backgroundGradient),
-          child: SafeArea(
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton(onPressed: _finish, child: const Text('رد کردن')),
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(gradient: RadicalTheme.backgroundGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: TextButton(
+                    onPressed: _finish,
+                    child: Text(
+                      'رد کردن',
+                      style: RadicalTheme.textTheme.bodyMedium,
+                    ),
+                  ),
                 ),
-                Expanded(
-                  child: PageView.builder(
-                    controller: _controller,
-                    itemCount: _slides.length,
-                    onPageChanged: (value) => setState(() => _index = value),
-                    itemBuilder: (context, index) {
-                      final item = _slides[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 30),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 180,
-                              height: 180,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: const RadialGradient(colors: [Color(0xFF33263D), Color(0xFF0B0C11)]),
-                                border: Border.all(color: RadicalTheme.gold.withValues(alpha: .55), width: 1.5),
-                                boxShadow: RadicalTheme.goldGlow(blur: 36, opacity: .22),
-                              ),
-                              child: Icon(item.$1, size: 76, color: RadicalTheme.goldBright),
-                            ),
-                            const SizedBox(height: 44),
-                            Text(item.$2, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineMedium),
-                            const SizedBox(height: 16),
-                            Text(item.$3, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: RadicalTheme.smoke)),
-                          ],
-                        ),
-                      );
+              ),
+              Expanded(
+                child: PageView.builder(
+                  controller: _controller,
+                  itemCount: _pages.length,
+                  onPageChanged: (i) => setState(() => _index = i),
+                  itemBuilder: (context, i) => _OnboardPage(data: _pages[i]),
+                ),
+              ),
+              _Dots(count: _pages.length, activeIndex: _index),
+              const SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_isLast) {
+                        _finish();
+                      } else {
+                        _controller.nextPage(
+                          duration: const Duration(milliseconds: 320),
+                          curve: Curves.easeOut,
+                        );
+                      }
                     },
+                    child: Text(_isLast ? 'بزن بریم' : 'بعدی'),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(_slides.length, (i) => AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: i == _index ? 24 : 7,
-                    height: 7,
-                    decoration: BoxDecoration(
-                      color: i == _index ? RadicalTheme.gold : RadicalTheme.smoke.withValues(alpha: .35),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  )),
-                ),
-                const SizedBox(height: 22),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: _index == _slides.length - 1
-                          ? _finish
-                          : () => _controller.nextPage(duration: const Duration(milliseconds: 320), curve: Curves.easeOutCubic),
-                      child: Text(_index == _slides.length - 1 ? 'شروع بازی' : 'ادامه'),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 32),
+            ],
           ),
         ),
       ),
     );
   }
 }
+
+class _OnboardPage extends StatelessWidget {
+  final _OnboardData data;
+  const _OnboardPage({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 140,
+            height: 140,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: RadicalTheme.glass,
+              border: Border.all(color: RadicalTheme.glassBorder, width: 1.5),
+              boxShadow: RadicalTheme.goldGlow(blur: 24, opacity: 0.2),
+            ),
+            child: Icon(data.icon, size: 62, color: RadicalTheme.gold),
+          ),
+          const SizedBox(height: 36),
+          Text(
+            data.titleFa,
+            textAlign: TextAlign.center,
+            style: RadicalTheme.textTheme.headlineMedium,
+          ),
+          const SizedBox(height: 14),
+          Text(
+            data.descriptionFa,
+            textAlign: TextAlign.center,
+            style: RadicalTheme.textTheme.bodyMedium?.copyWith(height: 1.6),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Dots extends StatelessWidget {
+  final int count;
+  final int activeIndex;
+  const _Dots({required this.count, required this.activeIndex});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(count, (i) {
+        final isActive = i == activeIndex;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: isActive ? 22 : 8,
+          height: 8,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            color: isActive ? RadicalTheme.gold : RadicalTheme.glass,
+          ),
+        );
+      }),
+    );
+  }
+}
+EOF
+echo "✅ onboarding_screen.dart ساخته شد"
