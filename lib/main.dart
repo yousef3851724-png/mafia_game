@@ -1,12 +1,10 @@
+cat > lib/main.dart << 'EOF'
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'core/theme/radical_theme.dart';
 import 'router/app_router.dart';
+import 'core/theme/radical_theme.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
   runApp(const ProviderScope(child: MafiaRadicalApp()));
 }
 
@@ -16,19 +14,20 @@ class MafiaRadicalApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      theme: RadicalTheme.dark(),
-      darkTheme: RadicalTheme.dark(),
-      themeMode: ThemeMode.dark,
-      routerConfig: radicalRouter,
-      debugShowCheckedModeBanner: false,
       title: 'مافیا رادیکال',
+      debugShowCheckedModeBanner: false,
+      theme: RadicalTheme.themeData,
+      routerConfig: radicalRouter,
       locale: const Locale('fa', 'IR'),
       supportedLocales: const [Locale('fa', 'IR'), Locale('en', 'US')],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
+      builder: (context, child) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }
+EOF
+echo "✅ main.dart ساخته شد"
