@@ -1,4 +1,3 @@
-cat > lib/widgets/radical_avatar_frame.dart << 'EOF'
 import 'package:flutter/material.dart';
 import '../models/radical_avatar_frame_model.dart';
 import 'radical_frame_painter.dart';
@@ -58,5 +57,3 @@ class _RadicalAvatarFrameState extends State<RadicalAvatarFrame> {
     );
   }
 }
-EOF
-echo "✅ radical_avatar_frame.dart ساخته شد"
