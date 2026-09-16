@@ -1,7 +1,7 @@
+mkdir -p lib/core/services
+cat > lib/core/services/onboarding_service.dart << 'EOF'
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// سرویس مدیریت وضعیت‌های ماندگار مربوط به شروع اپ:
-/// آیا کاربر آنبوردینگ را دیده؟ آیا نامی برای پروفایل ثبت کرده است؟
 class OnboardingService {
   static const _kHasSeenOnboarding = 'has_seen_onboarding';
   static const _kPlayerName = 'player_display_name';
@@ -26,10 +26,11 @@ class OnboardingService {
     await prefs.setString(_kPlayerName, name);
   }
 
-  /// برای تست/دیباگ: ریست کامل وضعیت شروع اپ
   Future<void> resetAll() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_kHasSeenOnboarding);
     await prefs.remove(_kPlayerName);
   }
 }
+EOF
+echo "✅ onboarding_service.dart ساخته شد"
