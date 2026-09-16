@@ -1,74 +1,144 @@
-cat > lib/widgets/radical_frame_painter.dart << 'EOF'
-import 'dart:math' as math;
+cat > lib/widgets/radical_avatar_frame.dart << 'EOF'
 import 'package:flutter/material.dart';
+import '../models/radical_avatar_frame_model.dart';
+import 'radical_frame_painter.dart';
 
-class RadicalFramePainter extends CustomPainter {
-  final List<Color> gradientColors;
-  final Color glowColor;
-  final double strokeWidth;
-  final double rotationRadians;
+class RadicalAvatarFrame extends StatefulWidget {
+  final String avatarAssetPath;
+  final RadicalFrameTier tier;
+  final double size;
+  final bool isOnline;
+  final bool showBadge;
+  final VoidCallback? onTap;
 
-  RadicalFramePainter({
-    required this.gradientColors,
-    required this.glowColor,
-    this.strokeWidth = 5,
-    this.rotationRadians = 0,
+  const RadicalAvatarFrame({
+    super.key,
+    required this.avatarAssetPath,
+    this.tier = RadicalFrameTier.none,
+    this.size = 84,
+    this.isOnline = false,
+    this.showBadge = true,
+    this.onTap,
   });
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = (size.width - strokeWidth) / 2;
+  State<RadicalAvatarFrame> createState() => _RadicalAvatarFrameState();
+}
 
-    if (glowColor != Colors.transparent) {
-      final glowPaint = Paint()
-        ..color = glowColor
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12);
-      canvas.drawCircle(center, radius, glowPaint);
+class _RadicalAvatarFrameState extends State<RadicalAvatarFrame>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 6),
+    );
+    if (RadicalFrameData.of(widget.tier).isAnimated) {
+      _controller.repeat();
     }
-
-    final ringPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..shader = SweepGradient(
-        colors: [...gradientColors, gradientColors.first],
-        transform: GradientRotation(rotationRadians),
-      ).createShader(Rect.fromCircle(center: center, radius: radius));
-    canvas.drawCircle(center, radius, ringPaint);
-
-    final ornamentPaint = Paint()
-      ..color = gradientColors.last
-      ..style = PaintingStyle.fill;
-
-    for (final angleDeg in [45, 135, 225, 315]) {
-      final angle = angleDeg * math.pi / 180 + rotationRadians;
-      final point = Offset(
-        center.dx + radius * math.cos(angle),
-        center.dy + radius * math.sin(angle),
-      );
-      _drawOrnament(canvas, point, angle, ornamentPaint, strokeWidth);
-    }
-  }
-
-  void _drawOrnament(Canvas canvas, Offset at, double angle, Paint paint, double scale) {
-    canvas.save();
-    canvas.translate(at.dx, at.dy);
-    canvas.rotate(angle);
-    final path = Path()
-      ..moveTo(0, -scale * 1.6)
-      ..quadraticBezierTo(scale * 1.4, 0, 0, scale * 1.6)
-      ..quadraticBezierTo(-scale * 1.4, 0, 0, -scale * 1.6)
-      ..close();
-    canvas.drawPath(path, paint);
-    canvas.restore();
   }
 
   @override
-  bool shouldRepaint(covariant RadicalFramePainter oldDelegate) {
-    return oldDelegate.gradientColors != gradientColors ||
-        oldDelegate.glowColor != glowColor ||
-        oldDelegate.rotationRadians != rotationRadians;
+  void didUpdateWidget(covariant RadicalAvatarFrame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final shouldAnimate = RadicalFrameData.of(widget.tier).isAnimated;
+    if (shouldAnimate && !_controller.isAnimating) {
+      _controller.repeat();
+    } else if (!shouldAnimate && _controller.isAnimating) {
+      _controller.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final data = RadicalFrameData.of(widget.tier);
+    final frameSize = widget.size;
+    final avatarSize = frameSize * 0.78;
+
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: SizedBox(
+        width: frameSize,
+        height: frameSize,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            AnimatedBuilder(
+              animation: _controller,
+              builder: (context, _) {
+                return CustomPaint(
+                  size: Size(frameSize, frameSize),
+                  painter: RadicalFramePainter(
+                    gradientColors: data.gradientColors,
+                    glowColor: data.glowColor,
+                    strokeWidth: frameSize * 0.06,
+                    rotationRadians: _controller.value * 6.28319,
+                  ),
+                );
+              },
+            ),
+            ClipOval(
+              child: Container(
+                width: avatarSize,
+                height: avatarSize,
+                color: const Color(0xFF1A1A1A),
+                child: Image.asset(
+                  widget.avatarAssetPath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Icon(
+                    Icons.person,
+                    size: avatarSize * 0.6,
+                    color: Colors.white54,
+                  ),
+                ),
+              ),
+            ),
+            if (widget.showBadge && data.badgeIcon != null)
+              Positioned(
+                bottom: -2,
+                right: -2,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(colors: data.gradientColors),
+                    border: Border.all(color: Colors.black, width: 1.5),
+                  ),
+                  child: Icon(
+                    data.badgeIcon,
+                    size: frameSize * 0.16,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            if (widget.isOnline)
+              Positioned(
+                top: 0,
+                right: frameSize * 0.05,
+                child: Container(
+                  width: frameSize * 0.14,
+                  height: frameSize * 0.14,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.greenAccent,
+                    border: Border.all(color: Colors.black, width: 1.5),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }
 EOF
-echo "✅ radical_frame_painter.dart ساخته شد"
+echo "✅ radical_avatar_frame.dart ساخته شد"
