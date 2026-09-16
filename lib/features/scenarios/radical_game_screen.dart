@@ -113,17 +113,18 @@ class RadicalGameScreen extends StatelessWidget {
     return List.generate(count, (i) {
       final angle = -math.pi / 2 + (2 * math.pi * i / count);
       final name = names[i % names.length];
+      final avatarId = 'a${(i % 6) + 1}'.padLeft(3, '0');
       return Align(
         alignment: Alignment.center,
         child: Transform.translate(
           offset: Offset(radiusX * math.cos(angle), radiusY * math.sin(angle)),
-          child: _seat(name, i == 0, i + 1, females.contains(name)),
+          child: _seat(name, i == 0, i + 1, females.contains(name), avatarId),
         ),
       );
     });
   }
 
-  Widget _seat(String name, bool user, int number, bool female) {
+  Widget _seat(String name, bool user, int number, bool female, String avatarId) {
     final accent = user ? RadicalTheme.gold : RadicalTheme.violet;
     return Column(mainAxisSize: MainAxisSize.min, children: [
       Container(
@@ -135,7 +136,7 @@ class RadicalGameScreen extends StatelessWidget {
           gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [accent.withValues(alpha: .95), const Color(0xFF171B25)]),
           boxShadow: [BoxShadow(color: accent.withValues(alpha: .20), blurRadius: 16, spreadRadius: 1)],
         ),
-        child: ClipOval(child: RealisticAvatar(role: 'شهروند', female: female, size: 54)),
+        child: ClipOval(child: RealisticAvatar(role: 'شهروند', female: female, size: 54, avatarId: avatarId)),
       ),
       const SizedBox(height: 4),
       Row(mainAxisSize: MainAxisSize.min, children: [
