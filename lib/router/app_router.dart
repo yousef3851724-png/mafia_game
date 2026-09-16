@@ -1,15 +1,14 @@
+cat > lib/router/app_router.dart << 'EOF'
 import 'package:go_router/go_router.dart';
 import '../screens/splash/splash_screen.dart';
 import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/home/home_screen.dart';
 
-/// نام‌های مسیر به‌صورت متمرکز.
 class RadicalRoutes {
   RadicalRoutes._();
   static const splash = '/';
   static const onboarding = '/onboarding';
   static const home = '/home';
-  // مسیرهای لابی در مرحله اتصال flow بازی به Router اضافه می‌شوند.
 }
 
 final GoRouter radicalRouter = GoRouter(
@@ -33,3 +32,5 @@ final GoRouter radicalRouter = GoRouter(
     ),
   ],
 );
+EOF
+echo "✅ app_router.dart ساخته شد"
