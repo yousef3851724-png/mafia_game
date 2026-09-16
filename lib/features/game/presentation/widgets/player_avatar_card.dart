@@ -61,8 +61,8 @@ class PlayerAvatarCard extends StatelessWidget {
               const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.star, size: 14, color: Colors.amber),
-                  SizedBox(width: 3),
+                  _ThreeDimensionalHostStar(size: 15),
+                  SizedBox(width: 4),
                   Text('میزبان', style: TextStyle(color: Colors.amber, fontSize: 11)),
                 ],
               )
@@ -76,6 +76,67 @@ class PlayerAvatarCard extends StatelessWidget {
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// A small layered star with highlight, extrusion and glow instead of a flat
+/// Material star icon. It is intentionally kept self-contained so the host
+/// badge remains visually consistent wherever PlayerAvatarCard is reused.
+class _ThreeDimensionalHostStar extends StatelessWidget {
+  final double size;
+
+  const _ThreeDimensionalHostStar({required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(
+            left: 1,
+            top: 2,
+            child: Icon(
+              Icons.star_rounded,
+              size: size,
+              color: const Color(0xFF7A4B00),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            top: 0,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.amber.withOpacity(.45),
+                    blurRadius: 5,
+                    spreadRadius: .4,
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.star_rounded,
+                size: size,
+                color: const Color(0xFFFFD54F),
+              ),
+            ),
+          ),
+          Positioned(
+            left: size * .22,
+            top: size * .16,
+            child: Icon(
+              Icons.star_rounded,
+              size: size * .34,
+              color: const Color(0xFFFFF3B0),
+            ),
+          ),
+        ],
       ),
     );
   }
