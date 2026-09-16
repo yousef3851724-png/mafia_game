@@ -129,7 +129,7 @@ class _ScenarioLobbyScreenState extends State<ScenarioLobbyScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadicalTheme.goldButtonGradient,
-                boxShadow: [RadicalTheme.goldGlow(blurRadius: 20, opacity: .18)],
+                boxShadow: RadicalTheme.goldGlow(blur: 20, opacity: .18),
               ),
               child: const Icon(Icons.local_fire_department_rounded, color: RadicalTheme.ink, size: 29),
             ),
