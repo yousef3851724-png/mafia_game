@@ -1,4 +1,4 @@
-cat > lib/theme/radical_theme.dart << 'EOF'
+
 import 'package:flutter/material.dart';
 
 class RadicalTheme {
@@ -137,5 +137,4 @@ class RadicalTheme {
     );
   }
 }
-EOF
-echo "✅ radical_theme.dart ساخته شد"
+

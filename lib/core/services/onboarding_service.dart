@@ -1,4 +1,4 @@
-cat > lib/core/services/onboarding_service.dart << 'EOF'
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingService {
@@ -31,5 +31,4 @@ class OnboardingService {
     await prefs.remove(_kPlayerName);
   }
 }
-EOF
-echo "✅ onboarding_service.dart ساخته شد"
+

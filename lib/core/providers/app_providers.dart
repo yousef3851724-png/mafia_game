@@ -1,5 +1,5 @@
 mkdir -p lib/core/providers
-cat > lib/core/providers/app_providers.dart << 'EOF'
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/onboarding_service.dart';
 
@@ -27,5 +27,4 @@ class RadicalWallet {
 final walletProvider = StateProvider<RadicalWallet>((ref) {
   return const RadicalWallet(coins: 1250, diamonds: 40);
 });
-EOF
-echo "✅ app_providers.dart ساخته شد"
+

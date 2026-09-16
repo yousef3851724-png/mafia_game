@@ -1,5 +1,5 @@
 mkdir -p lib/router
-cat > lib/router/app_router.dart << 'EOF'
+
 import 'package:go_router/go_router.dart';
 import '../screens/splash/splash_screen.dart';
 import '../screens/onboarding/onboarding_screen.dart';
@@ -33,5 +33,4 @@ final GoRouter radicalRouter = GoRouter(
     ),
   ],
 );
-EOF
-echo "✅ app_router.dart ساخته شد"
+

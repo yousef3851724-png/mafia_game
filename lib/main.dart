@@ -1,4 +1,4 @@
-cat > lib/main.dart << 'EOF'
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'router/app_router.dart';
@@ -29,5 +29,4 @@ class MafiaRadicalApp extends StatelessWidget {
     );
   }
 }
-EOF
-echo "✅ main.dart ساخته شد"
+

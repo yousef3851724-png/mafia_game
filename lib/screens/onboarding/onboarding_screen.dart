@@ -1,5 +1,5 @@
 mkdir -p lib/screens/onboarding
-cat > lib/screens/onboarding/onboarding_screen.dart << 'EOF'
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -145,5 +145,4 @@ class _OnboardPage extends StatelessWidget {
     );
   }
 }
-EOF
-echo "✅ onboarding_screen.dart ساخته شد"
+

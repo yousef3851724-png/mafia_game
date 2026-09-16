@@ -1,5 +1,5 @@
 mkdir -p lib/core/models
-cat > lib/core/models/radical_avatar_frame_model.dart << 'EOF'
+
 import 'package:flutter/material.dart';
 
 enum RadicalFrameTier {
@@ -120,5 +120,4 @@ class RadicalAvatarCatalog {
         orElse: () => avatars.first,
       );
 }
-EOF
-echo "✅ radical_avatar_frame_model.dart ساخته شد"
+

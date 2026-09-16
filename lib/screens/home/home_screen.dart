@@ -1,5 +1,5 @@
 mkdir -p lib/screens/home
-cat > lib/screens/home/home_screen.dart << 'EOF'
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/app_providers.dart';
@@ -157,5 +157,4 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 }
-EOF
-echo "✅ home_screen.dart ساخته شد"
+

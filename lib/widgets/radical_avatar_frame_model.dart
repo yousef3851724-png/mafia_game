@@ -1,4 +1,4 @@
-cat > lib/widgets/radical_frame_painter.dart << 'EOF'
+
 import 'package:flutter/material.dart';
 import '../models/radical_avatar_frame_model.dart';
 
@@ -62,5 +62,4 @@ class RadicalFramePainter extends CustomPainter {
     return oldDelegate.tier != tier || oldDelegate.isOnline != isOnline;
   }
 }
-EOF
-echo "✅ radical_frame_painter.dart ساخته شد"
+
