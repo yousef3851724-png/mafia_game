@@ -1,3 +1,4 @@
+mkdir -p lib/core/providers
 cat > lib/core/providers/app_providers.dart << 'EOF'
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/onboarding_service.dart';
