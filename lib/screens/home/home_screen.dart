@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/app_providers.dart';
-import '../../core/models/radical_avatar_frame_model.dart';
+import '../../core/models/radical_avatar_catalog.dart';
 import '../../core/theme/radical_theme.dart';
 import '../../core/widgets/radical_avatar_frame.dart';
 import '../../core/widgets/radical_bottom_nav.dart';
