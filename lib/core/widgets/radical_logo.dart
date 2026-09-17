@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../theme/radical_theme.dart';
+import '../theme/radical_theme.dart';
 
 class RadicalLogoMark extends StatelessWidget {
   final double size;
@@ -15,13 +15,13 @@ class RadicalLogoMark extends StatelessWidget {
         shape: BoxShape.circle,
         gradient: RadicalTheme.goldButtonGradient,
         boxShadow: RadicalTheme.goldGlow(blur: size * 0.25, opacity: 0.45),
-        border: Border.all(color: RadicalTheme.black, width: size * 0.02),
+        border: Border.all(color: RadicalTheme.ink, width: size * 0.02),
       ),
       child: Center(
         child: Icon(
           Icons.auto_awesome,
           size: size * 0.5,
-          color: RadicalTheme.black,
+          color: RadicalTheme.ink,
         ),
       ),
     );

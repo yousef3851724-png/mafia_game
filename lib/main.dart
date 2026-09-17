@@ -16,7 +16,7 @@ class MafiaRadicalApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'مافیا رادیکال',
       debugShowCheckedModeBanner: false,
-      theme: RadicalTheme.themeData,
+      theme: RadicalTheme.dark(),
       routerConfig: radicalRouter,
       locale: const Locale('fa', 'IR'),
       supportedLocales: const [Locale('fa', 'IR'), Locale('en', 'US')],

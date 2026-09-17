@@ -1,4 +1,3 @@
-mkdir -p lib/core/models
 
 import 'package:flutter/material.dart';
 

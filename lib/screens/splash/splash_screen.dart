@@ -83,7 +83,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   width: 140,
                   child: LinearProgressIndicator(
                     minHeight: 3,
-                    backgroundColor: RadicalTheme.glass,
+                    backgroundColor: RadicalTheme.panel2,
                     valueColor: const AlwaysStoppedAnimation(RadicalTheme.gold),
                     borderRadius: BorderRadius.circular(4),
                   ),

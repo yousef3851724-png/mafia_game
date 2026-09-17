@@ -1,4 +1,3 @@
-mkdir -p lib/core/providers
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/onboarding_service.dart';

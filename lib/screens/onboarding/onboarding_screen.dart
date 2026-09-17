@@ -1,4 +1,3 @@
-mkdir -p lib/screens/onboarding
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -73,7 +72,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     height: 8,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(4),
-                      color: isActive ? RadicalTheme.gold : RadicalTheme.glass,
+                      color: isActive ? RadicalTheme.gold : RadicalTheme.panel2,
                     ),
                   );
                 }),
@@ -130,8 +129,8 @@ class _OnboardPage extends StatelessWidget {
             height: 140,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: RadicalTheme.glass,
-              border: Border.all(color: RadicalTheme.glassBorder, width: 1.5),
+              color: RadicalTheme.panel2,
+              border: Border.all(color: RadicalTheme.line, width: 1.5),
               boxShadow: RadicalTheme.goldGlow(blur: 24, opacity: 0.2),
             ),
             child: Icon(icon, size: 62, color: RadicalTheme.gold),
