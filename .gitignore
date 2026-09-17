@@ -22,3 +22,8 @@
 *.iml
 .DS_Store
 *.log
+
+# Signing files - NEVER commit these
+android/key.properties
+*.jks
+*.keystore
