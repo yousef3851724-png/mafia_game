@@ -50,6 +50,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.MAFIA_RELEASE_KEY_PASSWORD }}
         run: |
           printf '%s' "$KEYSTORE_B64" | base64 --decode > android/mafia-release.jks
+          echo "DEBUG_SHA256: $(sha256sum android/mafia-release.jks | cut -d" " -f1)"
           cat > android/key.properties <<EOF
           storePassword=$STORE_PASSWORD
           keyPassword=$KEY_PASSWORD
