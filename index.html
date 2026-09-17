@@ -1,4 +1,211 @@
+
 <!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فروشگاه مافیا رادیکال</title>
+    <style>
+        body { background-color: #121212; color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 10px; }
+        .header { background-color: #1e1e1e; padding: 15px; border-radius: 10px; }
+        .profile-preview { display: flex; flex-direction: column; align-items: center; margin: 20px 0; }
+        .avatar-container { position: relative; width: 100px; height: 100px; }
+        .avatar { width: 100%; height: 100%; background-color: #555; border-radius: 50%; position: absolute; top: 0; left: 0; }
+        .frame { width: 100%; height: 100%; border: 4px solid gold; border-radius: 50%; position: absolute; top: -4px; left: -4px; display: none; box-sizing: border-box; }
+        
+        .tabs { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
+        .tab { background-color: #333; padding: 10px 20px; border-radius: 20px; cursor: pointer; }
+        .tab.active { background-color: #8A2BE2; }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .card { background-color: #1e1e1e; padding: 15px; border-radius: 15px; border: 1px solid #333; }
+        .item-img { width: 80px; height: 80px; background-color: #555; border-radius: 50%; margin: 0 auto 10px; display: block; }
+        .frame-img { width: 80px; height: 80px; border: 3px solid gold; border-radius: 50%; margin: 0 auto 10px; display: block; box-sizing: border-box; }
+        
+        .btn { background-color: #8A2BE2; color: white; border: none; padding: 8px 15px; border-radius: 10px; width: 100%; cursor: pointer; font-family: inherit; }
+        .btn.owned { background-color: #444; }
+        .btn.equip { background-color: #28a745; }
+        .price { color: #FFD700; font-weight: bold; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h3>کیف پول شما</h3>
+        <p>🪙 سکه: <span id="coin-balance">12500</span> | 💎 جواهر: <span id="gem-balance">40</span></p>
+    </div>
+
+    <!-- بخش پیش‌نمایش پروفایل -->
+    <div class="profile-preview">
+        <h4>پروفایل شما</h4>
+        <div class="avatar-container">
+            <div class="avatar"></div>
+            <div class="frame" id="user-frame"></div>
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active">آواتارها</div>
+        <div class="tab">فریم‌ها</div>
+    </div>
+
+    <div class="grid" id="store-grid">
+        <!-- آیتم‌ها توسط جاوااسکریپت ساخته می‌شوند -->
+    </div>
+
+    <script>
+        // ۱. داده‌های اولیه (State)
+        let userStats = { coins: 12500, gems: 40 };
+        let storeItems = [
+            { id: 'av_001', type: 'avatar', name: 'پدرخوانده', price: 5000, currency: 'coin', owned: false, equipped: false },
+            { id: 'fr_001', type: 'frame', name: 'فریم طلایی', price: 100, currency: 'gem', owned: false, equipped: false }
+        ];
+
+        // ۲. تابع برای نمایش آیتم‌ها در صفحه
+        function renderStore() {
+            const grid = document.getElementById('store-grid');
+            grid.innerHTML = ''; // پاک کردن لیست قبلی
+
+            storeItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                // ساخت دکمه بر اساس وضعیت
+                let btnText = 'خرید';
+                let btnClass = 'btn';
+                let btnAction = `buyItem('${item.id}')`;
+
+                if (item.owned) {
+                    if (item.equipped) {
+                        btnText = 'در حال استفاده';
+                        btnClass = 'btn owned';
+                        btnAction = '';
+                    } else {
+                        btnText = 'تجهیز';
+                        btnClass = 'btn equip';
+                        btnAction = `equipItem('${item.id}')`;
+                    }
+                }
+
+                let imgHtml = item.type === 'avatar' 
+                    ? `<div class="item-img"></div>` 
+                    : `<div class="frame-img"></div>`;
+                
+                let priceHtml = item.owned ? '' : `<p class="price">${item.currency === 'coin' ? '🪙' : '💎'} ${item.price}</p>`;
+
+                card.innerHTML = `
+                    ${imgHtml}
+                    <h4>${item.name}</h4>
+                    ${priceHtml}
+                    <button class="${btnClass}" onclick="${btnAction}">${btnText}</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ۳. تابع خرید
+        function buyItem(id) {
+            const item = storeItems.find(i => i.id === id);
+            if (!item) return;
+
+            if (item.currency === 'coin' && userStats.coins >= item.price) {
+                userStats.coins -= item.price;
+                item.owned = true;
+                alert(`شما ${item.name} را خریدید!`);
+            } else if (item.currency === 'gem' && userStats.gems >= item.price) {
+                userStats.gems -= item.price;
+                item.owned = true;
+                alert(`شما ${item.name} را خریدید!`);
+            } else {
+                alert('موجودی کافی نیست!');
+                return;
+            }
+
+            updateWallet();
+            renderStore();
+        }
+
+        // ۴. تابع تجهیز کردن
+        function equipItem(id) {
+            const item = storeItems.find(i => i.id === id);
+            if (!item || !item.owned) return;
+
+            // اول همه آیتم‌های هم‌نوع رو از حالت تجهیز خارج کن
+            storeItems.forEach(i => {
+                if (i.type === item.type) i.equipped = false;
+            });
+
+            // سپس آیتم فعلی رو تجهیز کن
+            item.equipped = true;
+            
+            // اگر فریم بود، روی پروفایل نمایش بده
+            if (item.type === 'frame') {
+                document.getElementById('user-frame').style.display = 'block';
+            }
+
+            renderStore();
+            alert(`${item.name} با موفقیت تجهیز شد!`);
+        }
+
+        // ۵. آپدیت کیف پول
+        function updateWallet() {
+            document.getElementById('coin-balance').innerText = userStats.coins.toLocaleString('fa-IR');
+            document.getElementById('gem-balance').innerText = userStats.gems;
+        }
+
+        // اجرای اولیه
+        updateWallet();
+        renderStore();
+    </script>
+</body>
+</html><html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فروشگاه مافیا رادیکال</title>
+    <style>
+        body { background-color: #121212; color: white; font-family: sans-serif; text-align: center; }
+        .header { background-color: #1e1e1e; padding: 15px; border-radius: 10px; margin: 10px; }
+        .tabs { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
+        .tab { background-color: #333; padding: 10px 20px; border-radius: 20px; cursor: pointer; }
+        .tab.active { background-color: #8A2BE2; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px; }
+        .card { background-color: #1e1e1e; padding: 15px; border-radius: 15px; border: 1px solid #333; }
+        .avatar-img { width: 80px; height: 80px; background-color: #555; border-radius: 50%; margin: 0 auto 10px; }
+        .frame-img { width: 80px; height: 80px; border: 3px solid gold; border-radius: 50%; margin: 0 auto 10px; }
+        .btn { background-color: #8A2BE2; color: white; border: none; padding: 8px 15px; border-radius: 10px; width: 100%; cursor: pointer; }
+        .btn.owned { background-color: #444; }
+        .price { color: #FFD700; font-weight: bold; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h3>کیف پول شما</h3>
+        <p>🪙 سکه: ۱۲,۵۰۰ | 💎 جواهر: ۴۰</p>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active">آواتارها</div>
+        <div class="tab">فریم‌ها</div>
+    </div>
+
+    <div class="grid">
+        <!-- کارت آواتار -->
+        <div class="card">
+            <div class="avatar-img"></div>
+            <h4>پدرخوانده</h4>
+            <p class="price">🪙 ۵,۰۰۰</p>
+            <button class="btn">خرید</button>
+        </div>
+        <!-- کارت فریم -->
+        <div class="card">
+            <div class="frame-img"></div>
+            <h4>فریم طلایی</h4>
+            <p class="price">💎 ۱۰۰</p>
+            <button class="btn owned">خریداری شده</button>
+        </div>
+    </div>
+</body>
+</html><!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
