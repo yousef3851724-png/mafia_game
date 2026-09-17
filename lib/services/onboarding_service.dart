@@ -1,4 +1,3 @@
-mkdir -p lib/core/services
 
 import 'package:shared_preferences/shared_preferences.dart';
 

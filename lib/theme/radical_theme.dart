@@ -105,7 +105,6 @@ class RadicalTheme {
         onPrimary: black,
       ),
       textTheme: textTheme,
-      fontFamily: fontFamily,
       splashColor: gold.withOpacity(0.1),
       highlightColor: Colors.transparent,
       elevatedButtonTheme: ElevatedButtonThemeData(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/radical_avatar_frame_model.dart';
+import '../core/models/radical_avatar_catalog.dart';
 
 class RadicalFramePainter extends CustomPainter {
   final RadicalFrameTier tier;
@@ -12,12 +12,18 @@ class RadicalFramePainter extends CustomPainter {
 
   Color get _frameColor {
     switch (tier) {
+      case RadicalFrameTier.none:
+        return Colors.grey.shade700;
       case RadicalFrameTier.bronze:
         return const Color(0xFFCD7F32);
       case RadicalFrameTier.silver:
         return const Color(0xFFC0C0C0);
       case RadicalFrameTier.gold:
         return const Color(0xFFD4AF37);
+      case RadicalFrameTier.platinum:
+        return const Color(0xFFE5E4E2);
+      case RadicalFrameTier.diamond:
+        return const Color(0xFF00E5FF);
       case RadicalFrameTier.legendary:
         return const Color(0xFFE60023);
     }
@@ -33,7 +39,7 @@ class RadicalFramePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.0;
 
-    if (tier == RadicalFrameTier.legendary) {
+    if (tier == RadicalFrameTier.legendary || tier == RadicalFrameTier.diamond) {
       final glowPaint = Paint()
         ..color = _frameColor.withOpacity(0.5)
         ..style = PaintingStyle.stroke

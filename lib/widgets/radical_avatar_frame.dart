@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/radical_avatar_frame_model.dart';
+import '../core/models/radical_avatar_catalog.dart';
 import 'radical_frame_painter.dart';
 
 class RadicalAvatarFrame extends StatefulWidget {
