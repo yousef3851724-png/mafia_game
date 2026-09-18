@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../../core/theme/radical_theme.dart';
 
 class LobbyPlayer {
   final String id;
@@ -192,7 +193,7 @@ class _RoundLobbyState extends State<RoundLobby> {
               color: Colors.white,
             ),
           ),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -208,7 +209,7 @@ class _RoundLobbyState extends State<RoundLobby> {
                   'میز بازی',
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.white.withOpacity(0.54),
+                    color: Colors.white.withValues(alpha: 0.54),
                   ),
                 ),
               ],
@@ -311,7 +312,7 @@ class _RoundLobbyState extends State<RoundLobby> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: const Color(0xFFD4AF87).withOpacity(0.18),
+              color: Color(0xFFD4AF87).withValues(alpha: 0.18),
               width: 2,
             ),
           ),
@@ -415,11 +416,11 @@ class _RoundLobbyState extends State<RoundLobby> {
               color: Color(0xFFD4AF87),
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             '${widget.players.length}/$_seatCount',
-            style: const TextStyle(
-              color: Colors.white.withOpacity(0.7),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.7),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -452,16 +453,16 @@ class _RoundLobbyState extends State<RoundLobby> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
+              Icon(
                 Icons.people_alt_outlined,
                 size: 17,
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
               ),
-              const SizedBox(width: 5),
+              SizedBox(width: 5),
               Text(
                 '${widget.players.length} بازیکن',
-                style: const TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.7),
                 ),
               ),
               const SizedBox(width: 15),
@@ -470,11 +471,11 @@ class _RoundLobbyState extends State<RoundLobby> {
                 size: 17,
                 color: RadicalTheme.violetBright,
               ),
-              const SizedBox(width: 5),
+              SizedBox(width: 5),
               Text(
                 '$ready آماده',
-                style: const TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -833,17 +834,17 @@ class _PlayerSeat extends StatelessWidget {
                         : const Color(0xFF111722),
                     border: Border.all(
                       color: isCreator
-                          ? const Color(0xFFFFD54F)
+                          ? Color(0xFFFFD54F)
                           : isManager
-                              ? const Color(0xFF64B5F6)
+                              ? Color(0xFF64B5F6)
                               : exists
-                                  ? const Color(0xFFD4AF87)
-                                  : Colors.white.withOpacity(0.24),
+                                  ? Color(0xFFD4AF87)
+                                  : Colors.white.withValues(alpha: 0.24),
                       width: isCreator || isManager ? 2.5 : 1.8,
                     ),
-                    boxShadow: const [
+                    boxShadow: [
                       BoxShadow(
-                        color: RadicalTheme.ink.withOpacity(0.54),
+                        color: RadicalTheme.ink.withValues(alpha: 0.54),
                         blurRadius: 12,
                       ),
                     ],
@@ -864,9 +865,9 @@ class _PlayerSeat extends StatelessWidget {
                     ),
                     child: Text(
                       '${index + 1}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -923,7 +924,7 @@ class _PlayerSeat extends StatelessWidget {
                 fontWeight:
                     exists ? FontWeight.bold : FontWeight.normal,
                 color:
-                    exists ? Colors.white : Colors.white.withOpacity(0.38),
+                    exists ? Colors.white : Colors.white.withValues(alpha: 0.38),
               ),
             ),
             if (isCreator)
@@ -951,10 +952,10 @@ class _PlayerSeat extends StatelessWidget {
   Widget _avatar() {
     if (player?.avatarPath == null ||
         player!.avatarPath!.isEmpty) {
-      return const Icon(
+      return Icon(
         Icons.person,
         size: 38,
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
       );
     }
 
@@ -963,10 +964,10 @@ class _PlayerSeat extends StatelessWidget {
         player!.avatarPath!,
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) {
-          return const Icon(
+          return Icon(
             Icons.person,
             size: 38,
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
           );
         },
       ),
@@ -988,7 +989,7 @@ class _TableGlowPainter extends CustomPainter {
     final paint = Paint()
       ..shader = RadialGradient(
         colors: [
-          const Color(0xFFD4AF87).withOpacity(0.10),
+          Color(0xFFD4AF87).withValues(alpha: 0.10),
           Colors.transparent,
         ],
       ).createShader(

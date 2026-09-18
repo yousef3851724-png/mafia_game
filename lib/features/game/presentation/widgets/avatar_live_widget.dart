@@ -97,7 +97,7 @@ class _AvatarLiveWidgetState extends State<AvatarLiveWidget>
           Image(
             image: widget.imageProvider,
             fit: BoxFit.cover,
-            color: widget.isAlive ? null : Colors.black.withOpacity(0.55),
+            color: widget.isAlive ? null : Colors.black.withValues(alpha: 0.55),
             colorBlendMode: widget.isAlive ? null : BlendMode.darken,
           ),
           if (widget.eyeRegion != null)
@@ -123,9 +123,9 @@ class _AvatarLiveWidgetState extends State<AvatarLiveWidget>
                             ),
                             gradient: LinearGradient(
                               colors: [
-                                Colors.black.withOpacity(0.0),
-                                Colors.black.withOpacity(0.92),
-                                Colors.black.withOpacity(0.0),
+                                Colors.black.withValues(alpha: 0.0),
+                                Colors.black.withValues(alpha: 0.92),
+                                Colors.black.withValues(alpha: 0.0),
                               ],
                               stops: const [0.0, 0.5, 1.0],
                             ),
@@ -163,7 +163,7 @@ class _AvatarLiveWidgetState extends State<AvatarLiveWidget>
                 boxShadow: widget.isAlive
                     ? [
                         BoxShadow(
-                          color: widget.frameColor.withOpacity(0.45),
+                          color: widget.frameColor.withValues(alpha: 0.45),
                           blurRadius: 14,
                           spreadRadius: 1,
                         ),

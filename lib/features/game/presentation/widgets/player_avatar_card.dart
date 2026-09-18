@@ -29,7 +29,7 @@ class PlayerAvatarCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
         decoration: BoxDecoration(
           color: isSelected
-              ? theme.colorScheme.primary.withOpacity(0.18)
+              ? theme.colorScheme.primary.withValues(alpha: 0.18)
               : const Color(0xFF1E1E1E),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
@@ -114,7 +114,7 @@ class _ThreeDimensionalHostStar extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.amber.withOpacity(.45),
+                    color: Colors.amber.withValues(alpha: .45),
                     blurRadius: 5,
                     spreadRadius: .4,
                   ),
