@@ -1,18 +1,18 @@
 import 'package:equatable/equatable.dart';
 
-enum Team { citizens, mafia, neutral }
+enum Faction { citizens, mafia, neutral }
 
 enum GameRole { citizen, mafia, detective, doctor }
 
 extension GameRoleX on GameRole {
-  Team get team {
+  Faction get team {
     switch (this) {
       case GameRole.mafia:
-        return Team.mafia;
+        return Faction.mafia;
       case GameRole.citizen:
       case GameRole.detective:
       case GameRole.doctor:
-        return Team.citizens;
+        return Faction.citizens;
     }
   }
 

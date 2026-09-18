@@ -8,7 +8,7 @@ import '../scenarios/custom_scenario_system.dart';
 import '../scenarios/scenario_catalog.dart';
 import 'player_avatar.dart';
 
-enum GamePhase { night, dayDiscussion, dayVoting, ended }
+enum LiveGamePhase { night, dayDiscussion, dayVoting, ended }
 enum NightAction { none, kill, save, investigate }
 
 class GamePlayer {
@@ -58,8 +58,8 @@ class GamePlayer {
       );
 }
 
-class GameState {
-  final GamePhase phase;
+class LiveGameState {
+  final LiveGamePhase phase;
   final int round;
   final int secondsLeft;
   final List<GamePlayer> players;
@@ -70,7 +70,7 @@ class GameState {
   final bool nightActionDone;
   final bool initialized;
 
-  const GameState({
+  const LiveGameState({
     required this.phase,
     required this.round,
     required this.secondsLeft,
@@ -83,8 +83,8 @@ class GameState {
     required this.initialized,
   });
 
-  factory GameState.initial() => const GameState(
-        phase: GamePhase.night,
+  factory LiveGameState.initial() => const LiveGameState(
+        phase: LiveGamePhase.night,
         round: 1,
         secondsLeft: 20,
         players: [],
@@ -105,8 +105,8 @@ class GameState {
     return null;
   }
 
-  GameState copyWith({
-    GamePhase? phase,
+  LiveGameState copyWith({
+    LiveGamePhase? phase,
     int? round,
     int? secondsLeft,
     List<GamePlayer>? players,
@@ -116,7 +116,7 @@ class GameState {
     NightAction? availableAction,
     bool? nightActionDone,
     bool? initialized,
-  }) => GameState(
+  }) => LiveGameState(
         phase: phase ?? this.phase,
         round: round ?? this.round,
         secondsLeft: secondsLeft ?? this.secondsLeft,
@@ -132,16 +132,16 @@ class GameState {
   static const _keep = Object();
 }
 
-final gameControllerProvider = NotifierProvider.autoDispose<GameController, GameState>(GameController.new);
+final gameControllerProvider = NotifierProvider.autoDispose<GameController, LiveGameState>(GameController.new);
 
-class GameController extends AutoDisposeNotifier<GameState> {
+class GameController extends AutoDisposeNotifier<LiveGameState> {
   Timer? _timer;
   Random _random = Random();
 
   @override
-  GameState build() {
+  LiveGameState build() {
     ref.onDispose(() => _timer?.cancel());
-    return GameState.initial();
+    return LiveGameState.initial();
   }
 
   void start({
@@ -202,7 +202,7 @@ class GameController extends AutoDisposeNotifier<GameState> {
 
     final action = _actionForRole(built.firstWhere((p) => p.isUser).role);
     state = state.copyWith(
-      phase: GamePhase.night,
+      phase: LiveGamePhase.night,
       round: 1,
       secondsLeft: 20,
       players: built,
@@ -217,14 +217,14 @@ class GameController extends AutoDisposeNotifier<GameState> {
   }
 
   void selectPlayer(String id) {
-    if (state.phase == GamePhase.ended || state.secondsLeft <= 0 || !(state.user?.alive ?? false)) return;
+    if (state.phase == LiveGamePhase.ended || state.secondsLeft <= 0 || !(state.user?.alive ?? false)) return;
     final player = _find(id);
     if (player == null || !player.alive || player.isUser) return;
     state = state.copyWith(selectedPlayerId: id);
   }
 
   void performNightAction() {
-    if (state.phase != GamePhase.night || state.nightActionDone || !(state.user?.alive ?? false)) return;
+    if (state.phase != LiveGamePhase.night || state.nightActionDone || !(state.user?.alive ?? false)) return;
     final action = state.availableAction;
     final targetId = state.selectedPlayerId;
     if (action != NightAction.none && targetId == null) {
@@ -280,13 +280,13 @@ class GameController extends AutoDisposeNotifier<GameState> {
   }
 
   void startVoting() {
-    if (state.phase != GamePhase.dayDiscussion || !(state.user?.alive ?? false)) return;
-    state = state.copyWith(phase: GamePhase.dayVoting, secondsLeft: 15, selectedPlayerId: null, message: 'زمان رأی‌گیری شروع شد. یک بازیکن را برای اخراج انتخاب کن.');
+    if (state.phase != LiveGamePhase.dayDiscussion || !(state.user?.alive ?? false)) return;
+    state = state.copyWith(phase: LiveGamePhase.dayVoting, secondsLeft: 15, selectedPlayerId: null, message: 'زمان رأی‌گیری شروع شد. یک بازیکن را برای اخراج انتخاب کن.');
     _startTimer();
   }
 
   void castVote() {
-    if (state.phase != GamePhase.dayVoting || !(state.user?.alive ?? false)) return;
+    if (state.phase != LiveGamePhase.dayVoting || !(state.user?.alive ?? false)) return;
     final targetId = state.selectedPlayerId;
     if (targetId == null) {
       state = state.copyWith(message: 'برای اخراج یک بازیکن رأی بده.');
@@ -317,24 +317,24 @@ class GameController extends AutoDisposeNotifier<GameState> {
     }
 
     _checkWinner();
-    if (state.phase != GamePhase.ended) {
+    if (state.phase != LiveGamePhase.ended) {
       final nextRound = state.round + 1;
       final nextAction = _actionForRole(state.user?.role);
-      state = state.copyWith(round: nextRound, phase: GamePhase.night, secondsLeft: 20, availableAction: nextAction, nightActionDone: false, message: 'شب $nextRound شروع شد. ${_actionLabel(nextAction)}');
+      state = state.copyWith(round: nextRound, phase: LiveGamePhase.night, secondsLeft: 20, availableAction: nextAction, nightActionDone: false, message: 'شب $nextRound شروع شد. ${_actionLabel(nextAction)}');
       _startTimer();
     }
   }
 
   void _enterDay() {
     _checkWinner();
-    if (state.phase == GamePhase.ended) return;
-    state = state.copyWith(phase: GamePhase.dayDiscussion, secondsLeft: 15, selectedPlayerId: null, message: 'روز ${state.round} شروع شد؛ نتیجه شب اعلام شد. زمان بحث شروع شد.', nightActionDone: false);
+    if (state.phase == LiveGamePhase.ended) return;
+    state = state.copyWith(phase: LiveGamePhase.dayDiscussion, secondsLeft: 15, selectedPlayerId: null, message: 'روز ${state.round} شروع شد؛ نتیجه شب اعلام شد. زمان بحث شروع شد.', nightActionDone: false);
     _startTimer();
   }
 
   void _finishNightIfReady() {
     _checkWinner();
-    if (state.phase != GamePhase.ended && state.nightActionDone) _enterDay();
+    if (state.phase != LiveGamePhase.ended && state.nightActionDone) _enterDay();
   }
 
   void _checkWinner() {
@@ -343,17 +343,17 @@ class GameController extends AutoDisposeNotifier<GameState> {
     final citizens = alive.length - mafia;
     if (mafia == 0) {
       _timer?.cancel();
-      state = state.copyWith(phase: GamePhase.ended, secondsLeft: 0, winner: 'شهروندان', message: 'همه مافیاها حذف شدند. شهروندان برنده شدند.');
+      state = state.copyWith(phase: LiveGamePhase.ended, secondsLeft: 0, winner: 'شهروندان', message: 'همه مافیاها حذف شدند. شهروندان برنده شدند.');
     } else if (mafia >= citizens) {
       _timer?.cancel();
-      state = state.copyWith(phase: GamePhase.ended, secondsLeft: 0, winner: 'مافیا', message: 'تعداد مافیا با شهروندان برابر یا بیشتر شد. مافیا برنده شد.');
+      state = state.copyWith(phase: LiveGamePhase.ended, secondsLeft: 0, winner: 'مافیا', message: 'تعداد مافیا با شهروندان برابر یا بیشتر شد. مافیا برنده شد.');
     }
   }
 
   void _startTimer() {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (state.phase == GamePhase.ended) {
+      if (state.phase == LiveGamePhase.ended) {
         _timer?.cancel();
         return;
       }
@@ -368,20 +368,20 @@ class GameController extends AutoDisposeNotifier<GameState> {
 
   void _onTimerExpired() {
     switch (state.phase) {
-      case GamePhase.night:
+      case LiveGamePhase.night:
         if (!state.nightActionDone) _resolveNpcNight();
         break;
-      case GamePhase.dayDiscussion:
+      case LiveGamePhase.dayDiscussion:
         if (state.user?.alive ?? false) {
           startVoting();
         } else {
           _startObserverVoting();
         }
         break;
-      case GamePhase.dayVoting:
+      case LiveGamePhase.dayVoting:
         _autoVote();
         break;
-      case GamePhase.ended:
+      case LiveGamePhase.ended:
         break;
     }
   }
@@ -413,12 +413,12 @@ class GameController extends AutoDisposeNotifier<GameState> {
   }
 
   void _startObserverVoting() {
-    state = state.copyWith(phase: GamePhase.dayVoting, secondsLeft: 10, message: 'رأی‌گیری خودکار بازیکنان زنده در حال انجام است.');
+    state = state.copyWith(phase: LiveGamePhase.dayVoting, secondsLeft: 10, message: 'رأی‌گیری خودکار بازیکنان زنده در حال انجام است.');
     _startTimer();
   }
 
   void _autoVote() {
-    if (state.phase != GamePhase.dayVoting) return;
+    if (state.phase != LiveGamePhase.dayVoting) return;
     final alive = state.alivePlayers;
     if (alive.length <= 2) {
       _checkWinner();
@@ -429,10 +429,10 @@ class GameController extends AutoDisposeNotifier<GameState> {
     final updated = state.players.map((p) => p.copyWith(votesReceived: p.id == target.id ? 1 : 0, alive: p.id == target.id ? false : p.alive)).toList(growable: false);
     state = state.copyWith(players: updated, message: '${target.name} با رأی خودکار از بازی خارج شد.');
     _checkWinner();
-    if (state.phase != GamePhase.ended) {
+    if (state.phase != LiveGamePhase.ended) {
       final next = state.round + 1;
       final action = _actionForRole(state.user?.role);
-      state = state.copyWith(round: next, phase: GamePhase.night, secondsLeft: 20, availableAction: action, nightActionDone: false, message: 'شب $next شروع شد. ${_actionLabel(action)}');
+      state = state.copyWith(round: next, phase: LiveGamePhase.night, secondsLeft: 20, availableAction: action, nightActionDone: false, message: 'شب $next شروع شد. ${_actionLabel(action)}');
       _startTimer();
     }
   }

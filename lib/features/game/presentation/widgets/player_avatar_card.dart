@@ -4,7 +4,7 @@ import '../../domain/entities/player.dart';
 import '../../../../core/widgets/avatar_frame_widget.dart';
 
 class PlayerAvatarCard extends StatelessWidget {
-  final Player player;
+  final SessionPlayer player;
   final bool isSelected;
   final FrameType frameType;
   final VoidCallback onTap;

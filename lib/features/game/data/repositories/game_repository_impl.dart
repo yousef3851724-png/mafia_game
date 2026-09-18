@@ -14,7 +14,7 @@ class GameRepositoryImpl implements IGameRepository {
   });
 
   @override
-  Stream<List<Player>> watchPlayers() async* {
+  Stream<List<SessionPlayer>> watchPlayers() async* {
     await for (final state in remoteDataSource.watchGameState()) {
       await localDataSource.cacheGameState(state);
       yield state.players.map((p) => p.toEntity()).toList(growable: false);
@@ -35,7 +35,7 @@ class GameRepositoryImpl implements IGameRepository {
     final cleanName = playerName.trim();
 
     if (cleanRoomId.isEmpty) throw ArgumentError('Room ID cannot be empty.');
-    if (cleanName.isEmpty) throw ArgumentError('Player name cannot be empty.');
+    if (cleanName.isEmpty) throw ArgumentError('SessionPlayer name cannot be empty.');
 
     await localDataSource.savePlayerName(cleanName);
     await localDataSource.saveLastRoom(cleanRoomId);

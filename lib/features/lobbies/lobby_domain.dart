@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../core/models/app_models.dart' show DiamondType;
+export '../../core/models/app_models.dart' show DiamondType;
 import '../../core/theme/radical_theme.dart';
 
 enum LobbyMode { friendly, ranked }
 enum LobbyAge { teen, adult }
 enum LobbyLabel { radical, pros, newcomers, vip }
-enum DiamondType { blue, radical, teen, adult }
 enum LobbyPermission { viewChat, sendChat, react, kick, lock, startGame, viewStats, admin }
 enum LobbyChatMessageType { text, emoji, sticker, system }
 

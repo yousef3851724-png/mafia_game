@@ -67,7 +67,7 @@ class AvatarItem {
 }
 
 @immutable
-class Player {
+class AppPlayer {
   final String id;
   final String name;
   final AppRole role;
@@ -80,9 +80,9 @@ class Player {
   final int rating;
   final String league;
 
-  const Player({required this.id, required this.name, required this.role, required this.avatar, this.alive = true, this.votesReceived = 0, this.age = PlayerAge.adult, this.labels = const PlayerLabels(), this.wallet = const DiamondWallet(), this.rating = 0, this.league = 'Bronze'});
+  const AppPlayer({required this.id, required this.name, required this.role, required this.avatar, this.alive = true, this.votesReceived = 0, this.age = PlayerAge.adult, this.labels = const PlayerLabels(), this.wallet = const DiamondWallet(), this.rating = 0, this.league = 'Bronze'});
   bool get isLeader => labels.has(PlayerLabel.leader);
   bool get isRadicalStaff => labels.has(PlayerLabel.radicalStaff);
   bool get isVip => labels.has(PlayerLabel.vip);
-  Player copyWith({AppRole? role, AvatarItem? avatar, bool? alive, int? votesReceived, PlayerAge? age, PlayerLabels? labels, DiamondWallet? wallet, int? rating, String? league}) => Player(id: id, name: name, role: role ?? this.role, avatar: avatar ?? this.avatar, alive: alive ?? this.alive, votesReceived: votesReceived ?? this.votesReceived, age: age ?? this.age, labels: labels ?? this.labels, wallet: wallet ?? this.wallet, rating: rating ?? this.rating, league: league ?? this.league);
+  AppPlayer copyWith({AppRole? role, AvatarItem? avatar, bool? alive, int? votesReceived, PlayerAge? age, PlayerLabels? labels, DiamondWallet? wallet, int? rating, String? league}) => AppPlayer(id: id, name: name, role: role ?? this.role, avatar: avatar ?? this.avatar, alive: alive ?? this.alive, votesReceived: votesReceived ?? this.votesReceived, age: age ?? this.age, labels: labels ?? this.labels, wallet: wallet ?? this.wallet, rating: rating ?? this.rating, league: league ?? this.league);
 }

@@ -19,10 +19,14 @@ class CustomScenario {
     required this.createdAt,
   });
 
+  /// Alias for older callers that used `title`.
+  String get title => name;
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'ownerId': ownerId,
         'name': name,
+        'title': name,
         'playerCount': playerCount,
         'roles': roles,
         'createdAt': createdAt.toIso8601String(),
@@ -32,7 +36,7 @@ class CustomScenario {
     return CustomScenario(
       id: json['id'] as String,
       ownerId: json['ownerId'] as String,
-      name: json['name'] as String,
+      name: (json['name'] ?? json['title']) as String,
       playerCount: json['playerCount'] as int,
       roles: List<String>.from(json['roles'] as List<dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -44,15 +48,24 @@ class DiamondManager {
   DiamondManager._();
 
   static const int creationCost = 50;
+  static const int customScenarioCost = creationCost;
   static const String _balanceKey = 'radical_diamonds';
+  static const String _legacyKey = 'user_diamonds';
   static int _balance = 0;
 
   static Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
-    _balance = prefs.getInt(_balanceKey) ?? 100;
+    _balance = prefs.getInt(_balanceKey) ?? prefs.getInt(_legacyKey) ?? 100;
   }
 
   static int get balance => _balance;
+  static int get diamonds => _balance;
+
+  static Future<void> setDiamonds(int amount) async {
+    _balance = amount < 0 ? 0 : amount;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_balanceKey, _balance);
+  }
 
   static bool canCreateCustomScenario() => _balance >= creationCost;
 
@@ -63,6 +76,9 @@ class DiamondManager {
     await prefs.setInt(_balanceKey, _balance);
     return true;
   }
+
+  /// Alias for older custom-scenario manager API.
+  static Future<bool> chargeCustomScenario() => chargeForCustomScenario();
 
   static Future<void> add(int amount) async {
     if (amount <= 0) return;
@@ -145,5 +161,31 @@ class CustomScenarioStore {
       await remove(scenario.id);
       return false;
     }
+  }
+}
+
+
+/// Compatibility facade for the older manager API.
+class CustomScenarioManager {
+  CustomScenarioManager._();
+
+  static Future<List<CustomScenario>> loadOwned(String ownerId) =>
+      CustomScenarioStore.loadForOwner(ownerId);
+
+  static Future<CustomScenario?> create({
+    required String ownerId,
+    required String title,
+    required int playerCount,
+    required List<String> roles,
+  }) async {
+    final ok = await CustomScenarioStore.create(
+      ownerId: ownerId,
+      name: title,
+      playerCount: playerCount,
+      roles: roles,
+    );
+    if (!ok) return null;
+    final owned = await loadOwned(ownerId);
+    return owned.isEmpty ? null : owned.last;
   }
 }

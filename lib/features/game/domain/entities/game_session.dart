@@ -5,7 +5,7 @@ import 'player.dart';
 
 class GameSession extends Equatable {
   final String roomId;
-  final List<Player> players;
+  final List<SessionPlayer> players;
   final PhaseState phaseState;
   final List<AssignedRole> assignedRoles;
   final int round;
@@ -20,7 +20,7 @@ class GameSession extends Equatable {
 
   GameSession copyWith({
     String? roomId,
-    List<Player>? players,
+    List<SessionPlayer>? players,
     PhaseState? phaseState,
     List<AssignedRole>? assignedRoles,
     int? round,

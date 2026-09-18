@@ -187,11 +187,3 @@ class RadicalTheme {
         children: [Text(title, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w900)), if (subtitle != null) ...[const SizedBox(height: 4), Text(subtitle, style: const TextStyle(color: smoke, fontSize: 12))]],
       );
 }
-
-class RadicalColors {
-  RadicalColors._();
-  static const backgroundDark = RadicalTheme.ink;
-  static const surfaceDark = RadicalTheme.panel;
-  static const goldAccent = RadicalTheme.goldBright;
-  static const crimsonPrimary = RadicalTheme.violet;
-}

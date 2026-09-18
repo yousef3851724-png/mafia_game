@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'custom_scenario_manager.dart';
+import 'custom_scenario_system.dart';
 
 class CustomScenarioScreen extends StatefulWidget {
   final String ownerId;

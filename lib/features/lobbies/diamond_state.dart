@@ -2,11 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'lobby_system.dart';
 
-class DiamondWallet {
+class LobbyDiamondWallet {
   final Map<DiamondType, int> balances;
-  const DiamondWallet(this.balances);
+  const LobbyDiamondWallet(this.balances);
 
-  factory DiamondWallet.initial() => const DiamondWallet({
+  factory LobbyDiamondWallet.initial() => const LobbyDiamondWallet({
         DiamondType.blue: 500,
         DiamondType.radical: 0,
         DiamondType.teen: 0,
@@ -15,14 +15,14 @@ class DiamondWallet {
 
   int balance(DiamondType type) => balances[type] ?? 0;
 
-  DiamondWallet copyWith(DiamondType type, int amount) => DiamondWallet({...balances, type: amount});
+  LobbyDiamondWallet copyWith(DiamondType type, int amount) => LobbyDiamondWallet({...balances, type: amount});
 }
 
-final diamondControllerProvider = NotifierProvider<DiamondController, DiamondWallet>(DiamondController.new);
+final diamondControllerProvider = NotifierProvider<DiamondController, LobbyDiamondWallet>(DiamondController.new);
 
-class DiamondController extends Notifier<DiamondWallet> {
+class DiamondController extends Notifier<LobbyDiamondWallet> {
   @override
-  DiamondWallet build() => DiamondWallet.initial();
+  LobbyDiamondWallet build() => LobbyDiamondWallet.initial();
 
   bool canSpend({required DiamondType type, required int amount}) => amount >= 0 && state.balance(type) >= amount;
 

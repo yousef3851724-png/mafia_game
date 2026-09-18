@@ -17,7 +17,7 @@ void main() {
       final state = container.read(gameControllerProvider);
 
       expect(state.initialized, isTrue);
-      expect(state.phase, GamePhase.night);
+      expect(state.phase, LiveGamePhase.night);
       expect(state.round, 1);
       expect(state.secondsLeft, 20);
       expect(state.players, hasLength(8));

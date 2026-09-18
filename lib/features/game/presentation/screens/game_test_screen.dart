@@ -27,7 +27,7 @@ class _GameTestScreenState extends State<GameTestScreen> {
   void _addPlayer() {
     if (_session.phaseState.phase != GamePhase.lobby) return;
     _playerCounter++;
-    final player = Player(
+    final player = SessionPlayer(
       id: 'test_player_$_playerCounter',
       name: 'بازیکن $_playerCounter',
     );
@@ -56,7 +56,7 @@ class _GameTestScreenState extends State<GameTestScreen> {
     });
   }
 
-  void _removePlayer(Player player) {
+  void _removePlayer(SessionPlayer player) {
     if (_session.phaseState.phase != GamePhase.lobby) return;
     setState(() {
       _session = _engine.removePlayer(_session, player.id);
@@ -175,13 +175,13 @@ class _GameTestScreenState extends State<GameTestScreen> {
                         (assignment) => ListTile(
                           dense: true,
                           leading: Icon(
-                            assignment.role.team == Team.mafia ? Icons.visibility_off : Icons.shield,
+                            assignment.role.team == Faction.mafia ? Icons.visibility_off : Icons.shield,
                           ),
                           title: Text(
                             _session.players
                                 .firstWhere(
                                   (p) => p.id == assignment.playerId,
-                                  orElse: () => const Player(id: '', name: 'بازیکن حذف‌شده'),
+                                  orElse: () => const SessionPlayer(id: '', name: 'بازیکن حذف‌شده'),
                                 )
                                 .name,
                           ),

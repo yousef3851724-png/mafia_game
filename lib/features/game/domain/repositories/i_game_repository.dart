@@ -1,7 +1,7 @@
 import '../entities/player.dart';
 
 abstract class IGameRepository {
-  Stream<List<Player>> watchPlayers();
+  Stream<List<SessionPlayer>> watchPlayers();
 
   Stream<Map<String, int>> watchVotes();
 

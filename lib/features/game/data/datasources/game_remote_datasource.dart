@@ -42,7 +42,7 @@ class GameRemoteDataSourceImpl implements GameRemoteDataSource {
 
     final cleanName = playerName.trim();
     if (cleanName.isEmpty) {
-      throw ArgumentError('Player name cannot be empty.');
+      throw ArgumentError('SessionPlayer name cannot be empty.');
     }
 
     final playerId = 'p_${DateTime.now().microsecondsSinceEpoch}';

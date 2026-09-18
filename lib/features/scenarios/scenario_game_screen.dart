@@ -74,7 +74,7 @@ class _ScenarioGameScreenState extends ConsumerState<ScenarioGameScreen> {
     final game = ref.watch(gameControllerProvider);
     final controller = ref.read(gameControllerProvider.notifier);
     final title = widget.customScenario?.name ?? widget.scenario?.title ?? 'میز رادیکال';
-    final night = game.phase == GamePhase.night;
+    final night = game.phase == LiveGamePhase.night;
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -122,16 +122,16 @@ class _ScenarioGameScreenState extends ConsumerState<ScenarioGameScreen> {
 
 class _Header extends StatelessWidget {
   final String title;
-  final GameState game;
+  final LiveGameState game;
   const _Header({required this.title, required this.game});
 
   @override
   Widget build(BuildContext context) {
     final phase = switch (game.phase) {
-      GamePhase.night => 'شب ${game.round}',
-      GamePhase.dayDiscussion => 'روز ${game.round} • بحث',
-      GamePhase.dayVoting => 'روز ${game.round} • رأی‌گیری',
-      GamePhase.ended => 'پایان بازی',
+      LiveGamePhase.night => 'شب ${game.round}',
+      LiveGamePhase.dayDiscussion => 'روز ${game.round} • بحث',
+      LiveGamePhase.dayVoting => 'روز ${game.round} • رأی‌گیری',
+      LiveGamePhase.ended => 'پایان بازی',
     };
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 8, 14, 6),
@@ -167,13 +167,13 @@ class _Header extends StatelessWidget {
 }
 
 class _PhaseBanner extends StatelessWidget {
-  final GameState game;
+  final LiveGameState game;
   const _PhaseBanner({required this.game});
 
   @override
   Widget build(BuildContext context) {
-    final night = game.phase == GamePhase.night;
-    final ended = game.phase == GamePhase.ended;
+    final night = game.phase == LiveGamePhase.night;
+    final ended = game.phase == LiveGamePhase.ended;
     final accent = ended ? RadicalTheme.gold : night ? RadicalTheme.violet : RadicalTheme.crimsonBright;
     return Container(
       margin: const EdgeInsets.fromLTRB(14, 2, 14, 8),
@@ -323,7 +323,7 @@ class _SeatBadge extends StatelessWidget {
 }
 
 class _ActionBar extends StatelessWidget {
-  final GameState game;
+  final LiveGameState game;
   final VoidCallback onNight;
   final VoidCallback onDiscussEnd;
   final VoidCallback onVote;
@@ -331,13 +331,13 @@ class _ActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (game.phase == GamePhase.ended) {
+    if (game.phase == LiveGamePhase.ended) {
       return _Panel(child: Column(children: [const Icon(Icons.emoji_events_rounded, color: RadicalTheme.goldBright, size: 34), const SizedBox(height: 6), Text('برنده: ${game.winner ?? 'نامشخص'}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w900))]));
     }
     if (!(game.user?.alive ?? false)) {
       return _Panel(child: Row(children: [const Icon(Icons.visibility_rounded, color: RadicalTheme.smoke), const SizedBox(width: 9), const Expanded(child: Text('شما حذف شده‌اید؛ بازی را به‌عنوان ناظر دنبال کنید.', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: RadicalTheme.smoke, fontSize: 11))), Text('${game.secondsLeft}s', style: const TextStyle(color: RadicalTheme.gold, fontWeight: FontWeight.w900))]));
     }
-    if (game.phase == GamePhase.night) {
+    if (game.phase == LiveGamePhase.night) {
       final action = switch (game.availableAction) {
         NightAction.kill => ('شلیک', Icons.gps_fixed_rounded),
         NightAction.save => ('نجات', Icons.health_and_safety_rounded),
@@ -346,7 +346,7 @@ class _ActionBar extends StatelessWidget {
       };
       return _BottomAction(timer: game.secondsLeft, hint: 'نقش شما: ${game.user?.role ?? 'شهروند'}', label: action.$1, icon: action.$2, enabled: game.availableAction != NightAction.none && game.selectedPlayerId != null && !game.nightActionDone, onPressed: onNight);
     }
-    if (game.phase == GamePhase.dayDiscussion) {
+    if (game.phase == LiveGamePhase.dayDiscussion) {
       return _BottomAction(timer: game.secondsLeft, hint: 'زمان بحث و تحلیل بازیکنان', label: 'پایان بحث', icon: Icons.how_to_vote_rounded, enabled: true, onPressed: onDiscussEnd);
     }
     return _BottomAction(timer: game.secondsLeft, hint: game.selectedPlayerId == null ? 'یک بازیکن را انتخاب کنید' : 'رأی شما ثبت می‌شود', label: 'ثبت رأی', icon: Icons.gavel_rounded, enabled: game.selectedPlayerId != null, onPressed: onVote);

@@ -44,7 +44,7 @@ class _GameRoomScreenState extends State<GameRoomScreen> {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: widget.bloc,
-      child: BlocConsumer<GameBloc, GameState>(
+      child: BlocConsumer<GameBloc, GameRoomState>(
         listener: (context, state) {
           if (state.status == GameStatus.error && state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -75,7 +75,7 @@ class _GameRoomScreenState extends State<GameRoomScreen> {
     );
   }
 
-  Widget _buildBody(BuildContext context, GameState state) {
+  Widget _buildBody(BuildContext context, GameRoomState state) {
     if (state.status == GameStatus.loading) {
       return const Center(child: CircularProgressIndicator());
     }

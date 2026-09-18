@@ -12,7 +12,7 @@ class GameEngine {
     return GameSession(roomId: roomId);
   }
 
-  GameSession addPlayer(GameSession session, Player player) {
+  GameSession addPlayer(GameSession session, SessionPlayer player) {
     if (session.phaseState.phase != GamePhase.lobby) {
       throw StateError('امکان افزودن بازیکن پس از شروع بازی وجود ندارد.');
     }
@@ -101,7 +101,7 @@ class GameEngine {
     return null;
   }
 
-  int countTeam(GameSession session, Team team) {
+  int countTeam(GameSession session, Faction team) {
     return session.assignedRoles
         .where((assignment) => assignment.role.team == team)
         .length;

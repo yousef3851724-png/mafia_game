@@ -31,7 +31,7 @@ class LeaveRoomRequested extends GameEvent {
 }
 
 class _PlayersUpdated extends GameEvent {
-  final List<Player> players;
+  final List<SessionPlayer> players;
   const _PlayersUpdated(this.players);
 }
 
@@ -40,18 +40,18 @@ class _VotesUpdated extends GameEvent {
   const _VotesUpdated(this.votes);
 }
 
-class GameBloc extends Bloc<GameEvent, GameState> {
+class GameBloc extends Bloc<GameEvent, GameRoomState> {
   final JoinRoomUseCase joinRoomUseCase;
   final SubmitVoteUseCase submitVoteUseCase;
   final LeaveRoomUseCase leaveRoomUseCase;
   final IGameRepository repository;
 
-  StreamSubscription<List<Player>>? _playersSubscription;
+  StreamSubscription<List<SessionPlayer>>? _playersSubscription;
   StreamSubscription<Map<String, int>>? _votesSubscription;
 
   String _roomId = '';
   String _currentPlayerId = '';
-  List<Player> _players = const [];
+  List<SessionPlayer> _players = const [];
   Map<String, int> _votes = const {};
 
   GameBloc({
@@ -59,7 +59,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     required this.submitVoteUseCase,
     required this.leaveRoomUseCase,
     required this.repository,
-  }) : super(const GameState()) {
+  }) : super(const GameRoomState()) {
     on<JoinRoomRequested>(_onJoinRoom);
     on<VoteRequested>(_onVote);
     on<LeaveRoomRequested>(_onLeaveRoom);
@@ -84,7 +84,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
   Future<void> _onJoinRoom(
     JoinRoomRequested event,
-    Emitter<GameState> emit,
+    Emitter<GameRoomState> emit,
   ) async {
     final roomId = event.roomId.trim();
     final playerName = event.playerName.trim();
@@ -129,7 +129,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
   Future<void> _onVote(
     VoteRequested event,
-    Emitter<GameState> emit,
+    Emitter<GameRoomState> emit,
   ) async {
     if (_roomId.isEmpty || _currentPlayerId.isEmpty) return;
 
@@ -152,7 +152,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
   Future<void> _onLeaveRoom(
     LeaveRoomRequested event,
-    Emitter<GameState> emit,
+    Emitter<GameRoomState> emit,
   ) async {
     try {
       if (_roomId.isNotEmpty && _currentPlayerId.isNotEmpty) {
@@ -161,7 +161,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
           playerId: _currentPlayerId,
         );
       }
-      emit(const GameState());
+      emit(const GameRoomState());
     } catch (e) {
       emit(state.copyWith(
         status: GameStatus.error,
@@ -170,7 +170,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     }
   }
 
-  void _onPlayersUpdated(_PlayersUpdated event, Emitter<GameState> emit) {
+  void _onPlayersUpdated(_PlayersUpdated event, Emitter<GameRoomState> emit) {
     emit(state.copyWith(
       status: state.status == GameStatus.loading
           ? GameStatus.loading
@@ -182,7 +182,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     ));
   }
 
-  void _onVotesUpdated(_VotesUpdated event, Emitter<GameState> emit) {
+  void _onVotesUpdated(_VotesUpdated event, Emitter<GameRoomState> emit) {
     emit(state.copyWith(
       status: state.status == GameStatus.loading
           ? GameStatus.loading
@@ -203,8 +203,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   }
 }
 
-extension on Iterable<Player> {
-  Player? firstWhereOrNull(bool Function(Player player) test) {
+extension on Iterable<SessionPlayer> {
+  SessionPlayer? firstWhereOrNull(bool Function(SessionPlayer player) test) {
     for (final player in this) {
       if (test(player)) return player;
     }

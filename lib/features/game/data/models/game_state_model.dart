@@ -13,7 +13,7 @@ class PlayerModel {
     this.vote,
   });
 
-  factory PlayerModel.fromEntity(Player player) {
+  factory PlayerModel.fromEntity(SessionPlayer player) {
     return PlayerModel(
       id: player.id,
       name: player.name,
@@ -22,8 +22,8 @@ class PlayerModel {
     );
   }
 
-  Player toEntity() {
-    return Player(
+  SessionPlayer toEntity() {
+    return SessionPlayer(
       id: id,
       name: name,
       isHost: isHost,

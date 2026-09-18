@@ -124,7 +124,7 @@ class LobbyAiModerator {
     required String creatorId,
     required String managerId,
   }) {
-    final role = LobbyPermission.roleOf(
+    final role = LobbyAccessControl.roleOf(
       playerId: actorId,
       creatorId: creatorId,
       managerId: managerId,
@@ -295,8 +295,8 @@ class LobbyAiModerator {
 }
 
 /// کنترل دسترسی اعضای لابی.
-class LobbyPermission {
-  LobbyPermission._();
+class LobbyAccessControl {
+  LobbyAccessControl._();
 
   static LobbyMemberRole roleOf({
     required String playerId,
