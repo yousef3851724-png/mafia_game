@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/models/radical_avatar_catalog.dart';
 import '../../core/theme/radical_theme.dart';
@@ -87,7 +87,7 @@ class HomeScreen extends ConsumerWidget {
                         SizedBox(
                           width: 220,
                           child: ElevatedButton.icon(
-                            onPressed: () {},
+                            onPressed: () => context.go('/lobby/demo-room'),
                             icon: const Icon(Icons.play_arrow_rounded),
                             label: const Text('ورود به بازی'),
                           ),
@@ -101,44 +101,20 @@ class HomeScreen extends ConsumerWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 54,
-                            height: 54,
-                            decoration: RadicalTheme.glassCard(radius: 16),
-                            child: const Icon(Icons.flash_on, color: RadicalTheme.gold, size: 24),
-                          ),
-                          const SizedBox(height: 6),
-                          Text('شروع سریع', style: RadicalTheme.textTheme.bodyMedium),
-                        ],
+                      _NavButton(
+                        icon: Icons.flash_on,
+                        label: 'شروع سریع',
+                        onTap: () => context.go('/pass-and-play'),
                       ),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 54,
-                            height: 54,
-                            decoration: RadicalTheme.glassCard(radius: 16),
-                            child: const Icon(Icons.people_alt_outlined, color: RadicalTheme.gold, size: 24),
-                          ),
-                          const SizedBox(height: 6),
-                          Text('دوستان', style: RadicalTheme.textTheme.bodyMedium),
-                        ],
+                      _NavButton(
+                        icon: Icons.people_alt_outlined,
+                        label: 'دوستان',
+                        onTap: () => context.go('/home?tab=friends'),
                       ),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 54,
-                            height: 54,
-                            decoration: RadicalTheme.glassCard(radius: 16),
-                            child: const Icon(Icons.event_outlined, color: RadicalTheme.gold, size: 24),
-                          ),
-                          const SizedBox(height: 6),
-                          Text('رویدادها', style: RadicalTheme.textTheme.bodyMedium),
-                        ],
+                      _NavButton(
+                        icon: Icons.event_outlined,
+                        label: 'رویدادها',
+                        onTap: () => context.go('/home?tab=events'),
                       ),
                     ],
                   ),
@@ -157,3 +133,34 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
+class _NavButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _NavButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 54,
+            height: 54,
+            decoration: RadicalTheme.glassCard(radius: 16),
+            child: Icon(icon, color: RadicalTheme.gold, size: 24),
+          ),
+          const SizedBox(height: 6),
+          Text(label, style: RadicalTheme.textTheme.bodyMedium),
+        ],
+      ),
+    );
+  }
+}
