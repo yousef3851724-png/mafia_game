@@ -198,7 +198,7 @@ class _StoreScreenState extends State<StoreScreen> {
       ),
       child: Column(
         children: [
-          const Text('پیش‌نمایش', style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w700)),
+          const Text('پیش‌نمایش', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13, fontWeight: FontWeight.w700)),
           const SizedBox(height: 10),
           Container(
             width: 90,

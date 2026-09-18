@@ -77,10 +77,10 @@ class _AnimatedAvatarFrameState extends State<AnimatedAvatarFrame>
                   height: widget.size + 24,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.greenAccent, width: 2),
+                    border: Border.all(color: RadicalTheme.violetAccent, width: 2),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.greenAccent.withOpacity(0.5),
+                        color: RadicalTheme.violetAccent.withOpacity(0.5),
                         blurRadius: 16,
                         spreadRadius: 4,
                       )
@@ -138,7 +138,7 @@ class _AnimatedAvatarFrameState extends State<AnimatedAvatarFrame>
                   height: widget.size,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.black54,
+                    color: RadicalTheme.ink.withOpacity(0.54),
                   ),
                   child: const Icon(
                     Icons.clear_rounded,
