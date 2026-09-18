@@ -7,6 +7,8 @@ import '../../core/theme/radical_theme.dart';
 import '../game/game_state.dart';
 import 'custom_scenario_system.dart';
 import 'scenario_catalog.dart';
+import '../lobbies/diamond_state.dart';
+import '../lobbies/lobby_domain.dart';
 
 /// Geometry shared by the table widget and its layout tests.
 class GameTableLayout {
@@ -56,6 +58,7 @@ class ScenarioGameScreen extends ConsumerStatefulWidget {
 }
 
 class _ScenarioGameScreenState extends ConsumerState<ScenarioGameScreen> {
+  bool _rewardGranted = false;
   @override
   void initState() {
     super.initState();
@@ -75,6 +78,22 @@ class _ScenarioGameScreenState extends ConsumerState<ScenarioGameScreen> {
     final controller = ref.read(gameControllerProvider.notifier);
     final title = widget.customScenario?.name ?? widget.scenario?.title ?? 'میز رادیکال';
     final night = game.phase == GamePhase.night;
+    if (game.phase == GamePhase.ended && !_rewardGranted) {
+      _rewardGranted = true;
+      final isRanked = widget.mode == ScenarioMode.ranked;
+      final userRole = game.user?.role ?? '';
+      final userIsMafia = userRole == 'مافیا';
+      final userWon = (game.winner == 'مافیا' && userIsMafia) || (game.winner == 'شهروندان' && !userIsMafia);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final diamonds = ref.read(diamondControllerProvider.notifier);
+        if (isRanked) {
+          diamonds.grant(DiamondType.radical, userWon ? 30 : 10);
+        } else {
+          diamonds.grant(DiamondType.blue, userWon ? 15 : 5);
+        }
+      });
+    }
 
     return Directionality(
       textDirection: TextDirection.rtl,
