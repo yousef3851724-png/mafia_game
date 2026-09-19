@@ -28,9 +28,11 @@ jobs:
 
       - name: Build Debug APK
         run: flutter build apk --debug
+        
+- name: Upload APK
+  uses: actions/upload-artifact@v5
+  with:
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
         with:
           name: mafia-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
