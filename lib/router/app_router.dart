@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
 
 import '../screens/splash/splash_screen.dart';
+import '../features/profile/avatar_selection_screen.dart';
+import '../features/cosmetics/presentation/screens/frame_showcase_screen.dart';
 import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../features/lobby/presentation/lobby_realtime_screen.dart';
@@ -41,17 +43,16 @@ final GoRouter radicalRouter = GoRouter(
       name: 'home',
       builder: (context, state) => const HomeScreen(),
     ),
-    // TODO: فعالسازی بعد از ساخت صفحات cosmetics
-    // GoRoute(
-    //   path: RadicalRoutes.avatarSelection,
-    //   name: 'avatar-selection',
-    //   builder: (context, state) => const AvatarSelectionScreen(),
-    // ),
-    // GoRoute(
-    //   path: RadicalRoutes.frameShop,
-    //   name: 'frame-shop',
-    //   builder: (context, state) => const FrameShopScreen(),
-    // ),
+       GoRoute(
+      path: RadicalRoutes.avatarSelection,
+      name: 'avatar-selection',
+      builder: (context, state) => const AvatarSelectionScreen(),
+    ),
+    GoRoute(
+      path: RadicalRoutes.frameShop,
+      name: 'frame-shop',
+      builder: (context, state) => const FrameShowcaseScreen(),
+    ),
     GoRoute(
       path: RadicalRoutes.passAndPlay,
       name: 'pass-and-play',
