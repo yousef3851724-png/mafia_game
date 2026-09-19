@@ -28,7 +28,6 @@ jobs:
 
       - name: Build Debug APK
         run: flutter build apk --debug
-         run: flutter build apk --debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v5
