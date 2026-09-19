@@ -1,5 +1,10 @@
 allprojects {
     repositories {
+        maven { url = uri("https://maven.myket.ir") }
+        maven { url = uri("https://maven.devneeds.ir") }
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        maven { url = uri("https://maven.aliyun.com/repository/public") }
+        maven { url = uri("https://maven.aliyun.com/repository/central") }
         google()
         mavenCentral()
     }

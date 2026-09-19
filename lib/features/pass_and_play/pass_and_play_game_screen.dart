@@ -1,94 +1,74 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/theme/radical_theme.dart';
+
 import '../../core/models/scenario_catalog.dart';
 import 'game_logic.dart';
 
-class PassAndPlayGameScreen extends ConsumerStatefulWidget {
+class PassAndPlayGameScreen extends StatefulWidget {
   final String scenarioId;
   final int playerCount;
-  const PassAndPlayGameScreen({required this.scenarioId, required this.playerCount, super.key});
+
+  const PassAndPlayGameScreen({
+    super.key,
+    required this.scenarioId,
+    required this.playerCount,
+  });
+
   @override
-  ConsumerState<PassAndPlayGameScreen> createState() => _PassAndPlayGameScreenState();
+  State<PassAndPlayGameScreen> createState() => _PassAndPlayGameScreenState();
 }
 
-class _PassAndPlayGameScreenState extends ConsumerState<PassAndPlayGameScreen> {
-  late GameState gameState;
-  late GameLogic gameLogic;
+class _PassAndPlayGameScreenState extends State<PassAndPlayGameScreen> {
+  late GameState _state;
 
   @override
   void initState() {
     super.initState();
     final scenario = ScenarioCatalog.byId(widget.scenarioId);
-    gameLogic = GameLogic(scenario: scenario!, playerCount: widget.playerCount);
-    gameState = gameLogic.initializeGame();
+    final players = GameLogic.buildPlayers(
+      scenario: scenario,
+      playerCount: widget.playerCount,
+      names: const [],
+    );
+    _state = GameState(scenario: scenario, players: players);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('روز ${gameState.dayNumber}'), backgroundColor: RadicalTheme.panel),
-      body: Container(
-        decoration: const BoxDecoration(gradient: RadicalTheme.backgroundGradient),
-        child: gameState.isGameOver ? _buildGameOver() : gameState.isNight ? _buildNightPhase() : _buildDayPhase(),
+      appBar: AppBar(
+        title: Text('بازی - ${_state.scenario.displayNameFa}'),
       ),
-    );
-  }
-
-  Widget _buildDayPhase() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Text('☀️ روز ${gameState.dayNumber}', style: RadicalTheme.textTheme.displaySmall, textAlign: TextAlign.center),
-        const SizedBox(height: 16),
-        Text('رای‌گیری: کی رو حذف کنیم؟', style: RadicalTheme.textTheme.titleMedium, textAlign: TextAlign.center),
-        const SizedBox(height: 16),
-        ..._buildPlayerVoteButtons(),
-      ],
-    );
-  }
-
-  List<Widget> _buildPlayerVoteButtons() {
-    return gameState.alivePlayers.map((p) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: ElevatedButton(
-          onPressed: () => _castVote(p.id),
-          style: ElevatedButton.styleFrom(backgroundColor: RadicalTheme.panel, padding: const EdgeInsets.all(12)),
-          child: Text('${p.name} (${p.role})', style: const TextStyle(color: Colors.white)),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('فاز: ${_state.phase.name}',
+                style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 16),
+            Text('بازیکن‌های زنده: ${_state.alivePlayers.length}'),
+            Text('مافیاهای زنده: ${_state.aliveMafia.length}'),
+            const SizedBox(height: 16),
+            const Divider(),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _state.players.length,
+                itemBuilder: (context, i) {
+                  final p = _state.players[i];
+                  return ListTile(
+                    title: Text(p.name),
+                    subtitle: Text('نقش: ${p.role.name}'),
+                    trailing: Icon(
+                      p.isAlive ? Icons.favorite : Icons.close,
+                      color: p.isAlive ? Colors.red : Colors.grey,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
-      );
-    }).toList();
-  }
-
-  Widget _buildNightPhase() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('🌙 شب ${gameState.dayNumber}', style: RadicalTheme.textTheme.displaySmall),
-          const SizedBox(height: 32),
-          const Text('مافیا درحال تصمیم گیری است...', textAlign: TextAlign.center),
-          const SizedBox(height: 32),
-          ElevatedButton(onPressed: () => _nextPhase(), child: const Text('ادامه')),
-        ],
       ),
     );
   }
-
-  Widget _buildGameOver() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(gameState.winner == 'mafia' ? '🏴 مافیا برد!' : '👮 شهروند برد!', style: RadicalTheme.textTheme.displayLarge),
-          const SizedBox(height: 32),
-          ElevatedButton.icon(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.home), label: const Text('خانه')),
-        ],
-      ),
-    );
-  }
-
-  void _castVote(String playerId) => setState(() => gameState = gameLogic.castVote(gameState, playerId));
-  void _nextPhase() => setState(() => gameState = gameLogic.nextPhase(gameState));
 }
