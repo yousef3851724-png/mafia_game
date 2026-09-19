@@ -32,8 +32,6 @@ jobs:
 - name: Upload APK
   uses: actions/upload-artifact@v5
   with:
-
-        with:
           name: mafia-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
           retention-days: 30
