@@ -1,9 +1,12 @@
+import '../../features/lobbies/diamond_state.dart';
+
 enum RadicalFrameTier {
   none(
     index: 0,
     name: 'بدون فریم',
     displayName: 'None',
     diamondPrice: 0,
+    diamondType: null,
     description: 'فریم پیش‌فرض',
     color: 0xFFFFFFFF,
   ),
@@ -12,6 +15,7 @@ enum RadicalFrameTier {
     name: 'برنز',
     displayName: 'Bronze',
     diamondPrice: 50,
+    diamondType: DiamondType.blue,
     description: 'فریم برنزی ساده',
     color: 0xFFCD7F32,
   ),
@@ -20,6 +24,7 @@ enum RadicalFrameTier {
     name: 'نقره',
     displayName: 'Silver',
     diamondPrice: 100,
+    diamondType: DiamondType.blue,
     description: 'فریم نقره‌ای درخشان',
     color: 0xFFC0C0C0,
   ),
@@ -28,6 +33,7 @@ enum RadicalFrameTier {
     name: 'طلا',
     displayName: 'Gold',
     diamondPrice: 250,
+    diamondType: DiamondType.radical,
     description: 'فریم طلایی فاخر',
     color: 0xFFFFD700,
   ),
@@ -36,6 +42,7 @@ enum RadicalFrameTier {
     name: 'پلاتین',
     displayName: 'Platinum',
     diamondPrice: 500,
+    diamondType: DiamondType.teen,
     description: 'فریم پلاتینی نایاب',
     color: 0xFFE5E4E2,
   ),
@@ -44,6 +51,7 @@ enum RadicalFrameTier {
     name: 'الماس',
     displayName: 'Diamond',
     diamondPrice: 1000,
+    diamondType: DiamondType.adult,
     description: 'فریم الماسی افسانه‌ای',
     color: 0xFF00D9FF,
   ),
@@ -52,6 +60,7 @@ enum RadicalFrameTier {
     name: 'افسانه‌ای',
     displayName: 'Legendary',
     diamondPrice: 2500,
+    diamondType: DiamondType.adult,
     description: 'فریم افسانه‌ای ابدی',
     color: 0xFFFF00FF,
   );
@@ -60,6 +69,7 @@ enum RadicalFrameTier {
   final String name;
   final String displayName;
   final int diamondPrice;
+  final DiamondType? diamondType;
   final String description;
   final int color;
 
@@ -68,6 +78,7 @@ enum RadicalFrameTier {
     required this.name,
     required this.displayName,
     required this.diamondPrice,
+    required this.diamondType,
     required this.description,
     required this.color,
   });

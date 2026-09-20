@@ -191,3 +191,19 @@ class _FrameShopScreenState extends ConsumerState<FrameShopScreen> {
     );
   }
 }
+// فیلتر کنید - cost display نشان دهد diamondType
+// در _buildFrameCard - اضافه کنید:
+if (!isOwned)
+  Padding(
+    padding: const EdgeInsets.only(top: 8),
+    child: Row(
+      children: [
+        Text('${tier.diamondPrice}'),
+        const SizedBox(width: 4),
+        Text(
+          tier.diamondType?.name.toUpperCase() ?? '',
+          style: const TextStyle(fontSize: 10),
+        ),
+      ],
+    ),
+  ),
