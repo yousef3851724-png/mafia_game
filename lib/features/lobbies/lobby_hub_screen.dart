@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/radical_theme.dart';
 import '../scenarios/radical_game_screen.dart';
 import '../scenarios/scenario_catalog.dart';
+import 'lobby_state.dart';
 import 'lobby_system.dart';
 
-class LobbyHubScreen extends StatefulWidget {
+class LobbyHubScreen extends ConsumerStatefulWidget {
   final String ownerId;
   const LobbyHubScreen({super.key, required this.ownerId});
 
   @override
-  State<LobbyHubScreen> createState() => _LobbyHubScreenState();
+  ConsumerState<LobbyHubScreen> createState() => _LobbyHubScreenState();
 }
 
-class _LobbyHubScreenState extends State<LobbyHubScreen> {
+class _LobbyHubScreenState extends ConsumerState<LobbyHubScreen> {
   LobbyCategory _category = LobbyCatalog.friendlyAdult;
-  LobbyLabel _label = LobbyLabel.radical;
+  final LobbyLabel _label = LobbyLabel.radical;
   String _scenarioId = 'classic';
   int _players = 10;
-  bool _locked = false;
   final TextEditingController _chat = TextEditingController();
 
   String get _lobbyId => 'local_${widget.ownerId}';
@@ -32,13 +33,35 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
   @override
   void initState() {
     super.initState();
-    LobbyChatStore.seed(_lobbyId, widget.ownerId == 'local_creator' ? 'شما' : widget.ownerId);
+    // اگر این لابی هنوز در LobbyController واقعی ساخته نشده، همین الان بسازش.
+    final alreadyExists = ref
+        .read(lobbyControllerProvider)
+        .lobbies
+        .any((lobby) => lobby.id == _lobbyId);
+    if (!alreadyExists) {
+      ref.read(lobbyControllerProvider.notifier).createLobby(
+            id: _lobbyId,
+            name: 'لابی محلی',
+            category: _category,
+            label: _label,
+            ownerId: widget.ownerId,
+            ownerName: 'شما',
+          );
+    }
   }
 
   @override
   void dispose() {
     _chat.dispose();
     super.dispose();
+  }
+
+  LobbyDefinition? get _lobby {
+    final lobbies = ref.watch(lobbyControllerProvider).lobbies;
+    for (final lobby in lobbies) {
+      if (lobby.id == _lobbyId) return lobby;
+    }
+    return null;
   }
 
   void _pickCategory(LobbyCategory value) {
@@ -72,6 +95,15 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
       _toast('بازی امتیازی دقیقاً ۱۰ نفره است.');
       return;
     }
+    try {
+      ref.read(lobbyControllerProvider.notifier).startGame(
+            lobbyId: _lobbyId,
+            actorId: widget.ownerId,
+          );
+    } on StateError catch (e) {
+      _toast(e.message);
+      return;
+    }
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -91,62 +123,51 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
   void _sendText(String text) {
     final clean = text.trim();
     if (clean.isEmpty) return;
-    LobbyChatStore.send(
-      lobby: _localLobby(),
-      senderId: widget.ownerId,
-      senderName: 'شما',
-      text: clean,
-    );
+    try {
+      ref.read(lobbyControllerProvider.notifier).sendMessage(
+            lobbyId: _lobbyId,
+            senderId: widget.ownerId,
+            senderName: 'شما',
+            text: clean,
+          );
+    } on StateError catch (e) {
+      _toast(e.message);
+    }
     _chat.clear();
-    setState(() {});
   }
 
   void _sendEmoji(String emoji) {
-    LobbyChatStore.send(
-      lobby: _localLobby(),
-      senderId: widget.ownerId,
-      senderName: 'شما',
-      text: '',
-      emoji: emoji,
-    );
-    setState(() {});
+    try {
+      ref.read(lobbyControllerProvider.notifier).sendQuickEmoji(
+            lobbyId: _lobbyId,
+            senderId: widget.ownerId,
+            senderName: 'شما',
+            emoji: emoji,
+          );
+    } on StateError catch (e) {
+      _toast(e.message);
+    }
   }
 
-  LobbyDefinition _localLobby() {
-    return LobbyDefinition(
-      id: _lobbyId,
-      name: 'لابی محلی',
-      category: _category,
-      label: _label,
-      ownerId: widget.ownerId,
-      locked: _locked,
-      players: [
-        LobbyPlayerLabel(
-          playerId: widget.ownerId,
-          playerName: 'شما',
-          isLeader: true,
-          isStaff: RadicalStaffDirectory.isStaff(widget.ownerId),
-        ),
-      ],
-    );
-  }
-
-  LobbyPlayerLabel _demoPlayer({required String id, required String name, bool leader = false, bool staff = false}) {
-    return LobbyPlayerLabel(
-      playerId: id,
-      playerName: name,
-      isLeader: leader,
-      isStaff: staff,
-      groupLabels: staff ? const {LobbyLabel.radical} : const {},
-    );
+  void _toggleLock() {
+    final lobby = _lobby;
+    if (lobby == null) return;
+    try {
+      ref.read(lobbyControllerProvider.notifier).toggleLock(
+            lobbyId: _lobbyId,
+            actorId: widget.ownerId,
+          );
+    } on StateError catch (e) {
+      _toast(e.message);
+    }
   }
 
   LobbyPlayerLabel? _chatPlayer(String senderId) {
-    if (senderId == widget.ownerId) {
-      return _demoPlayer(id: senderId, name: 'شما', leader: true, staff: RadicalStaffDirectory.isStaff(senderId));
+    final lobby = _lobby;
+    if (lobby == null) return null;
+    for (final player in lobby.players) {
+      if (player.playerId == senderId) return player;
     }
-    final staff = RadicalStaffDirectory.member(senderId);
-    if (staff != null) return staff;
     return null;
   }
 
@@ -157,6 +178,7 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
     final count = scenario == null
         ? _players
         : _players.clamp(scenario.minPlayers, scenario.maxPlayers).toInt();
+    final lobby = _lobby;
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -181,11 +203,11 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
               style: TextStyle(color: RadicalTheme.smoke, fontSize: 11),
             ),
             const SizedBox(height: 14),
-            _lobbyCard(label),
+            _lobbyCard(label, lobby),
             const SizedBox(height: 14),
             _section('سناریو و ظرفیت', _scenarioPanel(scenario, count)),
             const SizedBox(height: 14),
-            _section('بازیکنان', _playersPanel()),
+            _section('بازیکنان', _playersPanel(lobby)),
             const SizedBox(height: 14),
             _section('چت گروهی همین لابی', _chatPanel()),
             const SizedBox(height: 14),
@@ -263,7 +285,9 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
     );
   }
 
-  Widget _lobbyCard(LobbyLabelDefinition label) {
+  Widget _lobbyCard(LobbyLabelDefinition label, LobbyDefinition? lobby) {
+    final locked = lobby?.locked ?? false;
+    final canToggleLock = lobby != null && lobby.ownerId == widget.ownerId;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: RadicalTheme.glass(accent: _category.isRanked),
@@ -295,11 +319,9 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
             ),
           ),
           Switch(
-            value: _locked,
-            onChanged: widget.ownerId == 'local_creator'
-                ? (value) => setState(() => _locked = value)
-                : null,
-            activeColor: RadicalTheme.gold,
+            value: locked,
+            onChanged: canToggleLock ? (_) => _toggleLock() : null,
+            activeThumbColor: RadicalTheme.gold,
           ),
         ],
       ),
@@ -364,29 +386,34 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
     );
   }
 
-  Widget _playersPanel() {
-    final players = [
-      _demoPlayer(id: widget.ownerId, name: 'شما', leader: true, staff: RadicalStaffDirectory.isStaff(widget.ownerId)),
-      _demoPlayer(id: 'staff_01', name: 'رادیکال • مدیر', staff: true),
-      _demoPlayer(id: 'newcomer', name: 'بازیکن تازه‌وارد'),
-      _demoPlayer(id: 'pro', name: 'بازیکن حرفه‌ای'),
-    ];
+  Widget _playersPanel(LobbyDefinition? lobby) {
+    final players = lobby?.players ?? const <LobbyPlayerLabel>[];
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: RadicalTheme.glass(),
-      child: Column(
-        children: [
-          for (var i = 0; i < players.length; i++) ...[
-            _PlayerRow(player: players[i]),
-            if (i != players.length - 1) const Divider(height: 18),
-          ],
-        ],
-      ),
+      child: players.isEmpty
+          ? const Padding(
+              padding: EdgeInsets.symmetric(vertical: 6),
+              child: Text(
+                'در حال آماده‌سازی لابی...',
+                style: TextStyle(color: RadicalTheme.smoke, fontSize: 12),
+              ),
+            )
+          : Column(
+              children: [
+                for (var i = 0; i < players.length; i++) ...[
+                  _PlayerRow(player: players[i]),
+                  if (i != players.length - 1) const Divider(height: 18),
+                ],
+              ],
+            ),
     );
   }
 
   Widget _chatPanel() {
-    final messages = LobbyChatStore.messagesFor(_lobbyId);
+    final messages = ref.watch(
+      lobbyControllerProvider.select((s) => s.chats[_lobbyId] ?? const <LobbyChatMessage>[]),
+    );
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: RadicalTheme.glass(),
@@ -400,7 +427,7 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
           ),
           Row(
             children: [
-              for (final emoji in ['😂', '🔥', '🎭', '💀', '🎉'])
+              for (final emoji in [' 😂', '🔥', '🎭', '💀', '🎉'])
                 IconButton(onPressed: () => _sendEmoji(emoji), icon: Text(emoji)),
             ],
           ),
@@ -545,7 +572,7 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
             const SizedBox(height: 12),
             for (final item in RadicalDiamonds.all)
               ListTile(
-                leading: _DiamondIcon(item),
+                leading: _diamondIcon(item),
                 title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.w900)),
                 subtitle: Text(item.usage),
                 trailing: Text(item.emoji, style: TextStyle(color: item.primary, fontSize: 24)),
@@ -571,7 +598,7 @@ class _LobbyHubScreenState extends State<LobbyHubScreen> {
     );
   }
 
-  Widget _DiamondIcon(RadicalDiamondDefinition item) {
+  Widget _diamondIcon(RadicalDiamondDefinition item) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: .9, end: 1.08),
       duration: const Duration(milliseconds: 900),

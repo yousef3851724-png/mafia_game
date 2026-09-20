@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../../theme/radical_theme.dart';
 import '../avatar_frame_widget.dart';
 import '../../constants/frame_catalog.dart';
 
@@ -77,10 +78,10 @@ class _AnimatedAvatarFrameState extends State<AnimatedAvatarFrame>
                   height: widget.size + 24,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.greenAccent, width: 2),
+                    border: Border.all(color: RadicalTheme.violetBright, width: 2),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.greenAccent.withOpacity(0.5),
+                        color: RadicalTheme.violetBright.withValues(alpha: 0.5),
                         blurRadius: 16,
                         spreadRadius: 4,
                       )
@@ -101,7 +102,7 @@ class _AnimatedAvatarFrameState extends State<AnimatedAvatarFrame>
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: colors.first.withOpacity(0.4),
+                          color: colors.first.withValues(alpha: 0.4),
                           blurRadius: 10,
                           spreadRadius: 2,
                         ),
@@ -136,9 +137,9 @@ class _AnimatedAvatarFrameState extends State<AnimatedAvatarFrame>
                 Container(
                   width: widget.size,
                   height: widget.size,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.black54,
+                    color: RadicalTheme.ink.withValues(alpha: 0.54),
                   ),
                   child: const Icon(
                     Icons.clear_rounded,

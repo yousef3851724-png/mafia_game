@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../../core/theme/radical_theme.dart';
 
 class LobbyPlayer {
   final String id;
@@ -192,7 +193,7 @@ class _RoundLobbyState extends State<RoundLobby> {
               color: Colors.white,
             ),
           ),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -208,7 +209,7 @@ class _RoundLobbyState extends State<RoundLobby> {
                   'میز بازی',
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.white54,
+                    color: Colors.white.withValues(alpha: 0.54),
                   ),
                 ),
               ],
@@ -243,8 +244,8 @@ class _RoundLobbyState extends State<RoundLobby> {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: ranked
-              ? Colors.amber
-              : Colors.greenAccent,
+              ? RadicalTheme.gold
+              : RadicalTheme.violetBright,
         ),
       ),
       child: Row(
@@ -256,8 +257,8 @@ class _RoundLobbyState extends State<RoundLobby> {
                 : Icons.sports_esports,
             size: 15,
             color: ranked
-                ? Colors.amber
-                : Colors.greenAccent,
+                ? RadicalTheme.gold
+                : RadicalTheme.violetBright,
           ),
           const SizedBox(width: 5),
           Text(
@@ -266,8 +267,8 @@ class _RoundLobbyState extends State<RoundLobby> {
               fontSize: 12,
               fontWeight: FontWeight.bold,
               color: ranked
-                  ? Colors.amber
-                  : Colors.greenAccent,
+                  ? RadicalTheme.gold
+                  : RadicalTheme.violetBright,
             ),
           ),
         ],
@@ -311,7 +312,7 @@ class _RoundLobbyState extends State<RoundLobby> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: const Color(0xFFD4AF87).withOpacity(0.18),
+              color: Color(0xFFD4AF87).withValues(alpha: 0.18),
               width: 2,
             ),
           ),
@@ -335,7 +336,7 @@ class _RoundLobbyState extends State<RoundLobby> {
             ),
             boxShadow: const [
               BoxShadow(
-                color: Colors.black87,
+                color: RadicalTheme.ink,
                 blurRadius: 30,
                 spreadRadius: 4,
               ),
@@ -415,11 +416,11 @@ class _RoundLobbyState extends State<RoundLobby> {
               color: Color(0xFFD4AF87),
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             '${widget.players.length}/$_seatCount',
-            style: const TextStyle(
-              color: Colors.white70,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.7),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -431,8 +432,8 @@ class _RoundLobbyState extends State<RoundLobby> {
             style: TextStyle(
               fontSize: 11,
               color: ranked
-                  ? Colors.amber
-                  : Colors.greenAccent,
+                  ? RadicalTheme.gold
+                  : RadicalTheme.violetBright,
             ),
           ),
         ],
@@ -452,29 +453,29 @@ class _RoundLobbyState extends State<RoundLobby> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
+              Icon(
                 Icons.people_alt_outlined,
                 size: 17,
-                color: Colors.white60,
+                color: Colors.white.withValues(alpha: 0.6),
               ),
-              const SizedBox(width: 5),
+              SizedBox(width: 5),
               Text(
                 '${widget.players.length} بازیکن',
-                style: const TextStyle(
-                  color: Colors.white70,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.7),
                 ),
               ),
               const SizedBox(width: 15),
               const Icon(
                 Icons.check_circle_outline,
                 size: 17,
-                color: Colors.greenAccent,
+                color: RadicalTheme.violetBright,
               ),
-              const SizedBox(width: 5),
+              SizedBox(width: 5),
               Text(
                 '$ready آماده',
-                style: const TextStyle(
-                  color: Colors.white70,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -542,7 +543,7 @@ class _RoundLobbyState extends State<RoundLobby> {
                 ListTile(
                   leading: const Icon(
                     Icons.sports_esports,
-                    color: Colors.greenAccent,
+                    color: RadicalTheme.violetBright,
                   ),
                   title: const Text('حالت بازی'),
                   subtitle: Text(
@@ -559,7 +560,7 @@ class _RoundLobbyState extends State<RoundLobby> {
                   ListTile(
                     leading: const Icon(
                       Icons.admin_panel_settings,
-                      color: Colors.amber,
+                      color: RadicalTheme.gold,
                     ),
                     title: const Text('تغییر مدیر لابی'),
                     subtitle: const Text(
@@ -615,7 +616,7 @@ class _RoundLobbyState extends State<RoundLobby> {
                     trailing: index == _backgroundIndex
                         ? const Icon(
                             Icons.check_circle,
-                            color: Colors.greenAccent,
+                            color: RadicalTheme.violetBright,
                           )
                         : null,
                     onTap: () {
@@ -656,7 +657,7 @@ class _RoundLobbyState extends State<RoundLobby> {
               ListTile(
                 leading: const Icon(
                   Icons.sports_esports,
-                  color: Colors.greenAccent,
+                  color: RadicalTheme.violetBright,
                 ),
                 title: const Text('دوستانه'),
                 subtitle: const Text(
@@ -672,7 +673,7 @@ class _RoundLobbyState extends State<RoundLobby> {
               ListTile(
                 leading: const Icon(
                   Icons.emoji_events,
-                  color: Colors.amber,
+                  color: RadicalTheme.gold,
                 ),
                 title: const Text('امتیازی'),
                 subtitle: const Text(
@@ -733,7 +734,7 @@ class _RoundLobbyState extends State<RoundLobby> {
                     trailing: player.id == _managerId
                         ? const Icon(
                             Icons.check_circle,
-                            color: Colors.greenAccent,
+                            color: RadicalTheme.violetBright,
                           )
                         : null,
                     onTap: () {
@@ -773,7 +774,7 @@ class _RoundLobbyState extends State<RoundLobby> {
                 ListTile(
                   leading: const Icon(
                     Icons.admin_panel_settings,
-                    color: Colors.amber,
+                    color: RadicalTheme.gold,
                   ),
                   title: const Text('قرار دادن به عنوان مدیر'),
                   onTap: () {
@@ -833,17 +834,17 @@ class _PlayerSeat extends StatelessWidget {
                         : const Color(0xFF111722),
                     border: Border.all(
                       color: isCreator
-                          ? const Color(0xFFFFD54F)
+                          ? Color(0xFFFFD54F)
                           : isManager
-                              ? const Color(0xFF64B5F6)
+                              ? Color(0xFF64B5F6)
                               : exists
-                                  ? const Color(0xFFD4AF87)
-                                  : Colors.white24,
+                                  ? Color(0xFFD4AF87)
+                                  : Colors.white.withValues(alpha: 0.24),
                       width: isCreator || isManager ? 2.5 : 1.8,
                     ),
-                    boxShadow: const [
+                    boxShadow: [
                       BoxShadow(
-                        color: Colors.black54,
+                        color: RadicalTheme.ink.withValues(alpha: 0.54),
                         blurRadius: 12,
                       ),
                     ],
@@ -864,9 +865,9 @@ class _PlayerSeat extends StatelessWidget {
                     ),
                     child: Text(
                       '${index + 1}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
-                        color: Colors.white70,
+                        color: Colors.white.withValues(alpha: 0.7),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -900,7 +901,7 @@ class _PlayerSeat extends StatelessWidget {
                       width: 21,
                       height: 21,
                       decoration: const BoxDecoration(
-                        color: Colors.green,
+                        color: RadicalTheme.violet,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -923,7 +924,7 @@ class _PlayerSeat extends StatelessWidget {
                 fontWeight:
                     exists ? FontWeight.bold : FontWeight.normal,
                 color:
-                    exists ? Colors.white : Colors.white38,
+                    exists ? Colors.white : Colors.white.withValues(alpha: 0.38),
               ),
             ),
             if (isCreator)
@@ -931,7 +932,7 @@ class _PlayerSeat extends StatelessWidget {
                 'سازنده',
                 style: TextStyle(
                   fontSize: 9,
-                  color: Colors.amber,
+                  color: RadicalTheme.gold,
                 ),
               )
             else if (isManager)
@@ -939,7 +940,7 @@ class _PlayerSeat extends StatelessWidget {
                 'مدیر',
                 style: TextStyle(
                   fontSize: 9,
-                  color: Colors.lightBlueAccent,
+                  color: RadicalTheme.smoke,
                 ),
               ),
           ],
@@ -951,10 +952,10 @@ class _PlayerSeat extends StatelessWidget {
   Widget _avatar() {
     if (player?.avatarPath == null ||
         player!.avatarPath!.isEmpty) {
-      return const Icon(
+      return Icon(
         Icons.person,
         size: 38,
-        color: Colors.white70,
+        color: Colors.white.withValues(alpha: 0.7),
       );
     }
 
@@ -963,10 +964,10 @@ class _PlayerSeat extends StatelessWidget {
         player!.avatarPath!,
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) {
-          return const Icon(
+          return Icon(
             Icons.person,
             size: 38,
-            color: Colors.white70,
+            color: Colors.white.withValues(alpha: 0.7),
           );
         },
       ),
@@ -988,7 +989,7 @@ class _TableGlowPainter extends CustomPainter {
     final paint = Paint()
       ..shader = RadialGradient(
         colors: [
-          const Color(0xFFD4AF87).withOpacity(0.10),
+          Color(0xFFD4AF87).withValues(alpha: 0.10),
           Colors.transparent,
         ],
       ).createShader(

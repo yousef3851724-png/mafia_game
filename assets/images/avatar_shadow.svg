@@ -1,1 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="28" fill="#10131a"/><circle cx="64" cy="48" r="24" fill="#697386"/><path d="M24 116c4-28 20-42 40-42s36 14 40 42" fill="#303746"/><circle cx="56" cy="48" r="4" fill="#e3b873"/><circle cx="72" cy="48" r="4" fill="#e3b873"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+<defs>
+<linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#1a1a2e"/>
+<stop offset="1" stop-color="#0a0a15"/>
+</linearGradient>
+</defs>
+<rect width="128" height="128" rx="28" fill="url(#bg1)"/>
+<path d="M64 12 C 40 12 28 32 28 56 C 28 78 42 92 64 92 C 86 92 100 78 100 56 C 100 32 88 12 64 12 Z" fill="#1a1a2e"/>
+<circle cx="50" cy="62" r="4" fill="#FF4444"/>
+<circle cx="78" cy="62" r="4" fill="#FF4444"/>
+<circle cx="50" cy="62" r="1.5" fill="#FFD700"/>
+<circle cx="78" cy="62" r="1.5" fill="#FFD700"/>
+<path d="M56 80 Q 64 84 72 80" stroke="#FF4444" stroke-width="1.5" fill="none"/>
+<path d="M22 128 C 26 100 40 92 64 92 C 88 92 102 100 106 128 Z" fill="#0f0f1a"/>
+</svg>
