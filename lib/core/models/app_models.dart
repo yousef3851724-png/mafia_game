@@ -12,6 +12,7 @@ class DiamondWallet {
   final int teen;
   final int adult;
   const DiamondWallet({this.blue = 0, this.radical = 0, this.teen = 0, this.adult = 0});
+  factory DiamondWallet.initial() => const DiamondWallet(blue: 500);
   int balance(DiamondType type) => switch (type) { DiamondType.blue => blue, DiamondType.radical => radical, DiamondType.teen => teen, DiamondType.adult => adult };
   DiamondWallet add(DiamondType type, int amount) => copyWith(type, balance(type) + amount);
   DiamondWallet spend(DiamondType type, int amount) => balance(type) < amount ? this : copyWith(type, balance(type) - amount);
