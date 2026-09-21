@@ -1,15 +1,6 @@
 
 import 'package:flutter/material.dart';
-
-enum RadicalFrameTier {
-  none,
-  bronze,
-  silver,
-  gold,
-  platinum,
-  diamond,
-  legendary,
-}
+import '../theme/radical_frame_tier.dart';
 
 class RadicalFrameData {
   final RadicalFrameTier tier;

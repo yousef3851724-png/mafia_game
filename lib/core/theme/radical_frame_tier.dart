@@ -1,4 +1,4 @@
-import '../../features/lobbies/diamond_state.dart';
+import '../models/app_models.dart';
 
 enum RadicalFrameTier {
   none(
