@@ -1,26 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/radical_theme.dart';
+import '../../widgets/player_with_frame.dart';
 
-import '../../domain/entities/player.dart';
-import '../../../../core/widgets/avatar_frame_widget.dart';
-
-class PlayerAvatarCard extends StatelessWidget {
-  final Player player;
+class PlayerAvatarCard extends ConsumerWidget {
+  final dynamic player;
   final bool isSelected;
-  final FrameType frameType;
   final VoidCallback onTap;
 
   const PlayerAvatarCard({
     super.key,
     required this.player,
     required this.isSelected,
-    this.frameType = FrameType.fire,
     required this.onTap,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
+  Widget build(BuildContext context, WidgetRef ref) {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
@@ -29,114 +25,32 @@ class PlayerAvatarCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
         decoration: BoxDecoration(
           color: isSelected
-              ? theme.colorScheme.primary.withValues(alpha: 0.18)
-              : const Color(0xFF1E1E1E),
+              ? RadicalTheme.gold.withOpacity(0.15)
+              : RadicalTheme.panel,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? theme.colorScheme.primary : Colors.white12,
+            color: isSelected ? RadicalTheme.gold : RadicalTheme.line,
             width: isSelected ? 2 : 1,
           ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AvatarFrameWidget(
-              fallbackInitial: player.name,
-              frameType: frameType,
-              size: 56,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              player.name.isEmpty ? 'بازیکن' : player.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 4),
-            if (player.isHost)
-              const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _ThreeDimensionalHostStar(size: 15),
-                  SizedBox(width: 4),
-                  Text('میزبان', style: TextStyle(color: Colors.amber, fontSize: 11)),
-                ],
-              )
-            else if (player.vote != null)
-              Text(
-                'رأی ثبت شده',
-                style: TextStyle(
-                  color: theme.colorScheme.secondary,
-                  fontSize: 11,
+            PlayerWithFrame(
+              playerName: player.name ?? 'بازیکن',
+              avatar: Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: RadicalTheme.ink.withOpacity(0.2),
                 ),
+                child: const Icon(Icons.person, size: 30),
               ),
+              size: 80,
+            ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// A small layered star with highlight, extrusion and glow instead of a flat
-/// Material star icon. It is intentionally kept self-contained so the host
-/// badge remains visually consistent wherever PlayerAvatarCard is reused.
-class _ThreeDimensionalHostStar extends StatelessWidget {
-  final double size;
-
-  const _ThreeDimensionalHostStar({required this.size});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned(
-            left: 1,
-            top: 2,
-            child: Icon(
-              Icons.star_rounded,
-              size: size,
-              color: const Color(0xFF7A4B00),
-            ),
-          ),
-          Positioned(
-            left: 0,
-            top: 0,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.amber.withValues(alpha: .45),
-                    blurRadius: 5,
-                    spreadRadius: .4,
-                  ),
-                ],
-              ),
-              child: Icon(
-                Icons.star_rounded,
-                size: size,
-                color: const Color(0xFFFFD54F),
-              ),
-            ),
-          ),
-          Positioned(
-            left: size * .22,
-            top: size * .16,
-            child: Icon(
-              Icons.star_rounded,
-              size: size * .34,
-              color: const Color(0xFFFFF3B0),
-            ),
-          ),
-        ],
       ),
     );
   }
