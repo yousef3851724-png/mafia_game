@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/models/app_models.dart';
 import '../../core/theme/radical_theme.dart';
 import '../game/game_state.dart';
 import 'custom_scenario_system.dart';
