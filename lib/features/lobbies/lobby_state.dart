@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/models/app_models.dart';
 
 import 'lobby_system.dart';
 
