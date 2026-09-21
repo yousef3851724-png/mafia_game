@@ -1,61 +1,82 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/theme/radical_theme.dart';
-import '../../core/widgets/radical_scaffold.dart';
-import '../store/widgets/equipped_frame_display.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/radical_frame_tier.dart';
+import '../../../core/theme/radical_theme.dart';
+import '../controllers/frame_ownership_controller.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+class EquippedFrameDisplay extends ConsumerWidget {
+  final double size;
+  final bool showLabel;
+
+  const EquippedFrameDisplay({
+    super.key,
+    this.size = 80,
+    this.showLabel = true,
+  });
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ownership = ref.watch(frameOwnershipProvider);
+    final tier = ownership.equippedFrame;
 
-class _ProfileScreenState extends State<ProfileScreen> {
-  String _name = 'بازیکن رادیکال';
-  int _level = 1;
-
-  @override
-  Widget build(BuildContext context) {
-    return RadicalScaffold(
-      title: 'پروفایل',
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: RadicalTheme.ink.withOpacity(0.1),
-                      border: Border.all(color: RadicalTheme.gold, width: 2),
-                    ),
-                    child: const Center(child: Icon(Icons.person, size: 50)),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(_name, style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: RadicalTheme.gold)),
-                ],
-              ),
+    if (tier == RadicalFrameTier.none || tier.index == 0) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: RadicalTheme.ink.withOpacity(0.2),
+              border: Border.all(color: RadicalTheme.line, width: 1),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('فریم فعال', style: Theme.of(context).textTheme.labelLarge?.copyWith(color: RadicalTheme.gold)),
-                  const SizedBox(height: 16),
-                  const Center(child: EquippedFrameDisplay(size: 120, showLabel: true)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
+            child: const Icon(Icons.frame_outlined),
+          ),
+          if (showLabel) ...[
+            const SizedBox(height: 8),
+            const Text('فریم نہیں', style: TextStyle(color: RadicalTheme.smoke)),
           ],
+        ],
+      );
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Color(tier.color), width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: Color(tier.color).withOpacity(0.5),
+                blurRadius: 15,
+                spreadRadius: 3,
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              tier.displayName.isNotEmpty ? tier.displayName[0] : '?',
+              style: TextStyle(
+                fontSize: size * 0.4,
+                color: Color(tier.color),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ),
-      ),
+        if (showLabel) ...[
+          const SizedBox(height: 8),
+          Text(
+            tier.name,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ],
+      ],
     );
   }
 }

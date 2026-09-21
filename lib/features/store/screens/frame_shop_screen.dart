@@ -28,24 +28,82 @@ class _FrameShopScreenState extends ConsumerState<FrameShopScreen> {
       itemBuilder: (context, index) {
         final tier = RadicalFrameTier.values[index];
         final isOwned = ownership.ownedFrames.contains(tier);
-        final isEquipped = ownership.equippedFrame == tier;
 
-        return Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Color(tier.color), width: 2),
-            color: RadicalTheme.panel,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(tier.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: isOwned ? () => _equipFrame(tier) : () => _purchaseFrame(tier),
-                child: Text(isOwned ? 'تجهیز' : 'خرید'),
+        return GestureDetector(
+          onTap: isOwned ? () => _equipFrame(tier) : () => _purchaseFrame(tier),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isOwned ? Color(tier.color) : RadicalTheme.line,
+                width: isOwned ? 3 : 1,
               ),
-            ],
+              color: RadicalTheme.panel,
+              boxShadow: isOwned
+                  ? [
+                      BoxShadow(
+                        color: Color(tier.color).withOpacity(0.5),
+                        blurRadius: 20,
+                      )
+                    ]
+                  : null,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Color(tier.color), width: 2),
+                    color: Color(tier.color).withOpacity(0.1),
+                  ),
+                  child: Center(
+                    child: Text(
+                      tier.displayName.isNotEmpty ? tier.displayName[0] : '?',
+                      style: TextStyle(
+                        fontSize: 28,
+                        color: Color(tier.color),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  tier.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                if (!isOwned)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      '${tier.diamondPrice}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: RadicalTheme.gold,
+                      ),
+                    ),
+                  )
+                else
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      'مجہز',
+                      style: TextStyle(
+                        color: RadicalTheme.gold,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         );
       },
@@ -60,4 +118,3 @@ class _FrameShopScreenState extends ConsumerState<FrameShopScreen> {
     ref.read(frameOwnershipProvider.notifier).equipFrame(tier);
   }
 }
-EO

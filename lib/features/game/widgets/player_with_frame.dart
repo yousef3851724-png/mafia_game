@@ -20,6 +20,8 @@ class PlayerWithFrame extends ConsumerWidget {
     final ownership = ref.watch(frameOwnershipProvider);
     final tier = ownership.equippedFrame;
 
+    final hasFrame = tier.index > 0;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -29,10 +31,10 @@ class PlayerWithFrame extends ConsumerWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: tier.index > 0 ? Color(tier.color) : RadicalTheme.line,
-              width: tier.index > 0 ? 3 : 1,
+              color: hasFrame ? Color(tier.color) : RadicalTheme.line,
+              width: hasFrame ? 3 : 1,
             ),
-            boxShadow: tier.index > 0
+            boxShadow: hasFrame
                 ? [
                     BoxShadow(
                       color: Color(tier.color).withOpacity(0.5),
@@ -45,7 +47,12 @@ class PlayerWithFrame extends ConsumerWidget {
           child: avatar,
         ),
         const SizedBox(height: 8),
-        Text(playerName, style: const TextStyle(fontWeight: FontWeight.w600)),
+        Text(
+          playerName,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ],
     );
   }
