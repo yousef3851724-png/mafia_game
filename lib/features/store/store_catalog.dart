@@ -12,17 +12,17 @@ const avatarStoreItems = <app.AvatarItem>[
 ];
 
 const radicalDiamondStoreItems = <LobbyStoreItem>[
-  LobbyStoreItem(id: 'radical_avatar_gold', name: 'آواتار طلایی رادیکال', price: 200, currency: DiamondType.radical, vip: true),
-  LobbyStoreItem(id: 'radical_vip_lobby', name: 'دسترسی لابی VIP', price: 250, currency: DiamondType.radical, vip: true),
-  LobbyStoreItem(id: 'radical_special_scenario', name: 'سناریوی ویژه رادیکال', price: 500, currency: DiamondType.radical, vip: true),
+  LobbyStoreItem(id: 'radical_avatar_gold', name: 'آواتار طلایی رادیکال', price: 200, currency: app.DiamondType.radical, vip: true),
+  LobbyStoreItem(id: 'radical_vip_lobby', name: 'دسترسی لابی VIP', price: 250, currency: app.DiamondType.radical, vip: true),
+  LobbyStoreItem(id: 'radical_special_scenario', name: 'سناریوی ویژه رادیکال', price: 500, currency: app.DiamondType.radical, vip: true),
 ];
 
 const teenDiamondStoreItems = <LobbyStoreItem>[
-  LobbyStoreItem(id: 'teen_sticker_pack', name: 'پک استیکر نوجوان', price: 75, currency: DiamondType.teen),
-  LobbyStoreItem(id: 'teen_avatar_pack', name: 'پک آواتار نوجوان', price: 150, currency: DiamondType.teen),
+  LobbyStoreItem(id: 'teen_sticker_pack', name: 'پک استیکر نوجوان', price: 75, currency: app.DiamondType.teen),
+  LobbyStoreItem(id: 'teen_avatar_pack', name: 'پک آواتار نوجوان', price: 150, currency: app.DiamondType.teen),
 ];
 
 const adultDiamondStoreItems = <LobbyStoreItem>[
-  LobbyStoreItem(id: 'adult_scenario_pack', name: 'پک سناریوی بزرگسال', price: 450, currency: DiamondType.adult),
-  LobbyStoreItem(id: 'adult_avatar_pack', name: 'پک آواتار بزرگسال', price: 300, currency: DiamondType.adult),
+  LobbyStoreItem(id: 'adult_scenario_pack', name: 'پک سناریوی بزرگسال', price: 450, currency: app.DiamondType.adult),
+  LobbyStoreItem(id: 'adult_avatar_pack', name: 'پک آواتار بزرگسال', price: 300, currency: app.DiamondType.adult),
 ];
