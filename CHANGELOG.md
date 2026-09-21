@@ -1,23 +1,29 @@
 # Changelog
 
-## 1.0.0+3 — Release
+## [1.1.0] - 2026-09-21
 
-### Gameplay
-- Finalized the Home → Scenario → Game flow.
-- Role assignment remains genuinely randomized; adjacent Mafia seats are valid random outcomes and are not a deterministic pattern.
-- Validated role distribution, game phases, voting, victory conditions, and 20-player table layout.
-- Preserved Leader and Radical Staff table labels.
+### Added
+- Complete Frame Shop System
+- 7 Frame Tiers (Bronze to Legendary)
+- Frame Upgrades (Glow, Animation, Rarity, Special)
+- Frame Ownership Controller with Riverpod
+- Diamond Integration (4 types)
+- PlayerWithFrame widget
+- Frame animations and effects
+- Frame SVG assets
+- Unit tests
 
-### Quality
-- CI analysis and tests are green on the release baseline.
-- Release APK generation and provenance attestation remain part of CI.
-- Production release workflow now verifies the APK cryptographic signature before publishing.
+### Fixed
+- Null checks in frame widgets
+- Type safety improvements
+- Legacy code cleanup
 
-### Android / Branding
-- Version bumped to `1.0.0+3`.
-- Android launcher branding uses the Mafia Radical release icon.
-- Production signing is supported through a private GitHub Actions keystore; no signing material is stored in the repository.
+### Optimized
+- Lazy loading for frames
+- Image caching
+- Performance improvements
 
-### Release note
-- The ordinary CI build remains suitable for automated validation/testing and may use the existing debug-signing fallback.
-- Google Play / production distribution must use `.github/workflows/release.yml` with the four documented GitHub repository secrets and the project's production keystore.
+### Integration
+- Game Room display
+- Lobby Screen display
+- Profile Screen display
