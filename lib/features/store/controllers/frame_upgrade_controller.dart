@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/models/app_models.dart';
 import '../../lobbies/diamond_state.dart';
 import '../models/frame_upgrade.dart';
-import '../controllers/frame_ownership_controller.dart';
+import 'frame_ownership_controller.dart';
 
 class FrameUpgradeState {
   final Map<String, bool> purchasedUpgrades;
