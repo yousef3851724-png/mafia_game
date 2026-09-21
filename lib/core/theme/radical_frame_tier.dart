@@ -2,7 +2,6 @@ import '../models/app_models.dart';
 
 enum RadicalFrameTier {
   none(
-    index: 0,
     name: 'بدون فریم',
     displayName: 'None',
     diamondPrice: 0,
@@ -11,7 +10,6 @@ enum RadicalFrameTier {
     color: 0xFFFFFFFF,
   ),
   bronze(
-    index: 1,
     name: 'برنز',
     displayName: 'Bronze',
     diamondPrice: 50,
@@ -20,7 +18,6 @@ enum RadicalFrameTier {
     color: 0xFFCD7F32,
   ),
   silver(
-    index: 2,
     name: 'نقره',
     displayName: 'Silver',
     diamondPrice: 100,
@@ -29,7 +26,6 @@ enum RadicalFrameTier {
     color: 0xFFC0C0C0,
   ),
   gold(
-    index: 3,
     name: 'طلا',
     displayName: 'Gold',
     diamondPrice: 250,
@@ -38,7 +34,6 @@ enum RadicalFrameTier {
     color: 0xFFFFD700,
   ),
   platinum(
-    index: 4,
     name: 'پلاتین',
     displayName: 'Platinum',
     diamondPrice: 500,
@@ -47,7 +42,6 @@ enum RadicalFrameTier {
     color: 0xFFE5E4E2,
   ),
   diamond(
-    index: 5,
     name: 'الماس',
     displayName: 'Diamond',
     diamondPrice: 1000,
@@ -56,7 +50,6 @@ enum RadicalFrameTier {
     color: 0xFF00D9FF,
   ),
   legendary(
-    index: 6,
     name: 'افسانه‌ای',
     displayName: 'Legendary',
     diamondPrice: 2500,
@@ -65,7 +58,6 @@ enum RadicalFrameTier {
     color: 0xFFFF00FF,
   );
 
-  final int index;
   final String name;
   final String displayName;
   final int diamondPrice;
@@ -74,7 +66,6 @@ enum RadicalFrameTier {
   final int color;
 
   const RadicalFrameTier({
-    required this.index,
     required this.name,
     required this.displayName,
     required this.diamondPrice,
@@ -83,10 +74,10 @@ enum RadicalFrameTier {
     required this.color,
   });
 
-  static RadicalFrameTier? getByName(String name) {
+  static RadicalFrameTier? getByName(String value) {
     try {
       return RadicalFrameTier.values.firstWhere(
-        (tier) => tier.name == name || tier.displayName == name,
+        (tier) => tier.name == value || tier.displayName == value,
       );
     } catch (_) {
       return null;
@@ -94,11 +85,8 @@ enum RadicalFrameTier {
   }
 
   static RadicalFrameTier? getByIndex(int idx) {
-    try {
-      return RadicalFrameTier.values.firstWhere((tier) => tier.index == idx);
-    } catch (_) {
-      return null;
-    }
+    if (idx < 0 || idx >= RadicalFrameTier.values.length) return null;
+    return RadicalFrameTier.values[idx];
   }
 
   RadicalFrameTier? get nextTier {
@@ -112,8 +100,6 @@ enum RadicalFrameTier {
   }
 
   bool get isPremium => diamondPrice > 0;
-
   String get label => name;
-
   String get desc => description;
 }
