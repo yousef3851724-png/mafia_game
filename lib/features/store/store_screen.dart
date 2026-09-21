@@ -41,23 +41,21 @@ class _RadicalStoreScreenState extends ConsumerState<RadicalStoreScreen>
               Tab(text: 'فریم‌ها'),
             ],
             labelColor: RadicalTheme.gold,
-            unselectedLabelColor: RadicalTheme.ink.withOpacity(0.5),
+            unselectedLabelColor: RadicalTheme.ink.withValues(alpha: 0.5),
             indicatorColor: RadicalTheme.gold,
           ),
           Expanded(
             child: TabBarView(
               controller: _tabController,
               children: [
-                // Avatars tab (placeholder)
                 Center(
                   child: Text(
                     'آواتارها به‌زودی...',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: RadicalTheme.ink.withOpacity(0.5),
+                          color: RadicalTheme.ink.withValues(alpha: 0.5),
                         ),
                   ),
                 ),
-                // Frames tab
                 const FrameShopScreen(),
               ],
             ),
@@ -66,4 +64,9 @@ class _RadicalStoreScreenState extends ConsumerState<RadicalStoreScreen>
       ),
     );
   }
+}
+
+/// Backwards-compatible name used by the existing home screens and routes.
+class StoreScreen extends RadicalStoreScreen {
+  const StoreScreen({super.key});
 }
