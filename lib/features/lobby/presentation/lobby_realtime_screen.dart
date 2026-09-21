@@ -1,74 +1,184 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../game/widgets/player_with_frame.dart';
+
 import '../../../core/theme/radical_theme.dart';
+import '../providers/lobby_realtime_provider.dart';
 
-// ... (existing imports)
+class LobbyRealtimeScreen extends ConsumerStatefulWidget {
+  final String roomId;
+  final String playerId;
 
-class _PlayerTile extends ConsumerWidget {
-  final dynamic player;
-  final bool isMe;
-  final bool canKick;
-  final VoidCallback onKick;
-
-  const _PlayerTile({
-    required this.player,
-    required this.isMe,
-    required this.canKick,
-    required this.onKick,
+  const LobbyRealtimeScreen({
+    super.key,
+    required this.roomId,
+    required this.playerId,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: isMe ? RadicalTheme.gold.withOpacity(0.1) : RadicalTheme.panel,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isMe ? RadicalTheme.gold : RadicalTheme.line,
-          width: isMe ? 2 : 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          PlayerWithFrame(
-            playerName: player.name,
-            avatar: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: RadicalTheme.ink.withOpacity(0.2),
-              ),
-              child: const Icon(Icons.person, size: 24),
-            ),
-            size: 60,
+  ConsumerState<LobbyRealtimeScreen> createState() => _LobbyRealtimeScreenState();
+}
+
+class _LobbyRealtimeScreenState extends ConsumerState<LobbyRealtimeScreen> {
+  final _chatController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => ref.read(lobbyRealtimeProvider.notifier).join(
+          roomId: widget.roomId,
+          playerId: widget.playerId,
+        ));
+  }
+
+  @override
+  void dispose() {
+    _chatController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(lobbyRealtimeProvider);
+    final controller = ref.read(lobbyRealtimeProvider.notifier);
+
+    return Scaffold(
+      backgroundColor: RadicalTheme.ink,
+      appBar: AppBar(
+        title: Text('لابی ' + widget.roomId),
+        actions: [
+          IconButton(
+            tooltip: 'خروج',
+            onPressed: controller.leave,
+            icon: const Icon(Icons.logout_rounded),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      body: Column(
+        children: [
+          if (state.error != null)
+            MaterialBanner(
+              content: Text(state.error!),
+              actions: [
+                TextButton(
+                  onPressed: controller.clearError,
+                  child: const Text('بستن'),
+                ),
+              ],
+            ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+            child: Row(
               children: [
-                Text(player.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 3),
-                Text('صندلی ${player.seat + 1}', style: const TextStyle(color: RadicalTheme.smoke, fontSize: 12)),
+                Icon(
+                  state.status == LobbyConnectionStatus.connected
+                      ? Icons.wifi_rounded
+                      : Icons.wifi_off_rounded,
+                  color: state.status == LobbyConnectionStatus.connected
+                      ? Colors.greenAccent
+                      : RadicalTheme.smoke,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  _statusLabel(state.status),
+                  style: const TextStyle(color: RadicalTheme.smoke),
+                ),
+                const Spacer(),
+                Text(
+                  state.players.length.toString() + ' بازیکن',
+                  style: const TextStyle(
+                    color: RadicalTheme.goldBright,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
               ],
             ),
           ),
-          if (player.ready)
-            const Icon(Icons.check_circle, color: Colors.green)
-          else
-            const Icon(Icons.hourglass_empty, color: RadicalTheme.smoke),
-          if (canKick) ...[
-            const SizedBox(width: 8),
-            IconButton(
-              icon: const Icon(Icons.remove_circle, color: Colors.red),
-              onPressed: onKick,
+          Expanded(
+            child: state.players.isEmpty
+                ? const Center(
+                    child: Text(
+                      'در انتظار بازیکنان...',
+                      style: TextStyle(color: RadicalTheme.smoke),
+                    ),
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: state.players.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      final player = state.players[index];
+                      final canKick = state.isHost && player.id != widget.playerId;
+                      return _PlayerTile(
+                        player: player,
+                        isMe: player.id == widget.playerId,
+                        canKick: canKick,
+                        onKick: () => controller.kick(player.id),
+                      );
+                    },
+                  ),
+          ),
+          if (state.isHost)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: FilledButton.icon(
+                onPressed: state.allReady ? controller.startGame : null,
+                icon: const Icon(Icons.play_arrow_rounded),
+                label: const Text('شروع بازی'),
+              ),
             ),
-          ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _chatController,
+                    textInputAction: TextInputAction.send,
+                    onSubmitted: (value) {
+                      controller.sendChat(value);
+                      _chatController.clear();
+                    },
+                    decoration: const InputDecoration(hintText: 'پیام در لابی...'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton.filled(
+                  onPressed: () {
+                    controller.sendChat(_chatController.text);
+                    _chatController.clear();
+                  },
+                  icon: const Icon(Icons.send_rounded),
+                ),
+                const SizedBox(width: 6),
+                IconButton(
+                  tooltip: state.amReady ? 'لغو آمادگی' : 'آماده‌ام',
+                  onPressed: controller.toggleReady,
+                  icon: Icon(
+                    state.amReady
+                        ? Icons.check_circle_rounded
+                        : Icons.check_circle_outline_rounded,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  String _statusLabel(LobbyConnectionStatus status) {
+    switch (status) {
+      case LobbyConnectionStatus.connected:
+        return 'متصل';
+      case LobbyConnectionStatus.connecting:
+        return 'در حال اتصال';
+      case LobbyConnectionStatus.reconnecting:
+        return 'در حال اتصال مجدد';
+      case LobbyConnectionStatus.error:
+        return 'خطا در اتصال';
+      case LobbyConnectionStatus.disconnected:
+        return 'قطع شده';
+    }
   }
 }
