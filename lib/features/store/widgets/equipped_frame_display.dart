@@ -8,11 +8,7 @@ class EquippedFrameDisplay extends ConsumerWidget {
   final double size;
   final bool showLabel;
 
-  const EquippedFrameDisplay({
-    super.key,
-    this.size = 80,
-    this.showLabel = true,
-  });
+  const EquippedFrameDisplay({super.key, this.size = 80, this.showLabel = true});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,14 +24,14 @@ class EquippedFrameDisplay extends ConsumerWidget {
             height: size,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: RadicalTheme.ink.withOpacity(0.2),
+              color: RadicalTheme.ink.withValues(alpha: 0.2),
               border: Border.all(color: RadicalTheme.line, width: 1),
             ),
-            child: const Icon(Icons.frame_outlined),
+            child: const Icon(Icons.filter_frames_outlined),
           ),
           if (showLabel) ...[
             const SizedBox(height: 8),
-            const Text('فریم نہیں', style: TextStyle(color: RadicalTheme.smoke)),
+            const Text('فریم نیست', style: TextStyle(color: RadicalTheme.smoke)),
           ],
         ],
       );
@@ -52,7 +48,7 @@ class EquippedFrameDisplay extends ConsumerWidget {
             border: Border.all(color: Color(tier.color), width: 2),
             boxShadow: [
               BoxShadow(
-                color: Color(tier.color).withOpacity(0.5),
+                color: Color(tier.color).withValues(alpha: 0.5),
                 blurRadius: 15,
                 spreadRadius: 3,
               ),
@@ -71,10 +67,7 @@ class EquippedFrameDisplay extends ConsumerWidget {
         ),
         if (showLabel) ...[
           const SizedBox(height: 8),
-          Text(
-            tier.name,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
+          Text(tier.name, style: const TextStyle(fontWeight: FontWeight.w600)),
         ],
       ],
     );
