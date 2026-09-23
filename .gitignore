@@ -27,3 +27,9 @@
 android/key.properties
 *.jks
 *.keystore
+android/keystore-base64.txt
+android/keystore-base64-v2.txt
+android/keystore-v2-b64.txt
+android/*.jks
+android/*.keystore
+android/key.properties

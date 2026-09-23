@@ -1,4 +1,4 @@
-﻿name: Build APK
+﻿name: Build Signed APK
 
 on:
   push:
@@ -23,15 +23,31 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/mafia-release-v2.jks
+
+      - name: Create key.properties
+        run: |
+          cat > android/key.properties << EOF
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=mafia-release-v2.jks
+          EOF
+
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Build Debug APK
-        run: flutter build apk --debug
+      - name: Build Signed Release APK
+        run: flutter build apk --release
 
-      - name: Upload APK
+      - name: Verify APK
+        run: ls -la build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload Signed APK
         uses: actions/upload-artifact@v4
         with:
-          name: mafia-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          name: mafia-radical-signed-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
