@@ -28,21 +28,24 @@ class _FrameShopScreenState extends ConsumerState<FrameShopScreen> {
       itemBuilder: (context, index) {
         final tier = RadicalFrameTier.values[index];
         final isOwned = ownership.ownedFrames.contains(tier);
+        final isEquipped = ownership.equippedFrame == tier;
 
         return GestureDetector(
-          onTap: isOwned ? () => _equipFrame(tier) : () => _purchaseFrame(tier),
+          onTap: isOwned 
+            ? () => _equipFrame(tier)
+            : () => _purchaseFrame(tier),
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isOwned ? Color(tier.color) : RadicalTheme.line,
-                width: isOwned ? 3 : 1,
+                color: isEquipped ? Color(tier.color) : RadicalTheme.line,
+                width: isEquipped ? 3 : 1,
               ),
               color: RadicalTheme.panel,
-              boxShadow: isOwned
+              boxShadow: isEquipped
                   ? [
                       BoxShadow(
-                        color: Color(tier.color).withOpacity(0.5),
+                        color: Color(tier.color).withValues(alpha: 0.5),
                         blurRadius: 20,
                       )
                     ]
@@ -57,7 +60,7 @@ class _FrameShopScreenState extends ConsumerState<FrameShopScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Color(tier.color), width: 2),
-                    color: Color(tier.color).withOpacity(0.1),
+                    color: Color(tier.color).withValues(alpha: 0.1),
                   ),
                   child: Center(
                     child: Text(
@@ -84,10 +87,21 @@ class _FrameShopScreenState extends ConsumerState<FrameShopScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
-                      '${tier.diamondPrice}',
+                      '${tier.diamondPrice}💎',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: RadicalTheme.gold,
+                      ),
+                    ),
+                  )
+                else if (isEquipped)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      'تجهیز شده',
+                      style: TextStyle(
+                        color: RadicalTheme.gold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   )
@@ -95,9 +109,9 @@ class _FrameShopScreenState extends ConsumerState<FrameShopScreen> {
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
-                      'مجہز',
+                      'خریداری شده',
                       style: TextStyle(
-                        color: RadicalTheme.gold,
+                        color: RadicalTheme.smoke,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

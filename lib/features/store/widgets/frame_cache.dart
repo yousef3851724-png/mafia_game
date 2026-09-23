@@ -13,9 +13,9 @@ class FrameImageCache {
     return provider;
   }
 
-  static void preloadFrames(List<String> frameIds) {
+  static void preloadFrames(BuildContext context, List<String> frameIds) {
     for (final id in frameIds) {
-      precacheImage(getFrameImage(id), null);
+      precacheImage(getFrameImage(id), context);
     }
   }
 

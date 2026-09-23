@@ -1,56 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/radical_theme.dart';
-import '../../widgets/player_with_frame.dart';
+import '../../../../core/theme/radical_theme.dart';
+import '../../../store/widgets/equipped_frame_display.dart';
 
 class PlayerAvatarCard extends ConsumerWidget {
-  final dynamic player;
-  final bool isSelected;
-  final VoidCallback onTap;
+  final String playerName;
+  final String? avatarId;
+  final bool isCurrentPlayer;
 
   const PlayerAvatarCard({
     super.key,
-    required this.player,
-    required this.isSelected,
-    required this.onTap,
+    required this.playerName,
+    this.avatarId,
+    this.isCurrentPlayer = false,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? RadicalTheme.gold.withOpacity(0.15)
-              : RadicalTheme.panel,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected ? RadicalTheme.gold : RadicalTheme.line,
-            width: isSelected ? 2 : 1,
-          ),
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: isCurrentPlayer 
+          ? RadicalTheme.gold.withValues(alpha: 0.1)
+          : RadicalTheme.panel,
+        border: Border.all(
+          color: isCurrentPlayer ? RadicalTheme.gold : RadicalTheme.line,
+          width: isCurrentPlayer ? 2 : 1,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            PlayerWithFrame(
-              playerName: player.name ?? 'بازیکن',
-              avatar: Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: RadicalTheme.ink.withOpacity(0.2),
-                ),
-                child: const Icon(Icons.person, size: 30),
-              ),
-              size: 80,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          EquippedFrameDisplay(size: 60, showLabel: false),
+          const SizedBox(height: 8),
+          Text(
+            playerName,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
             ),
-          ],
-        ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }

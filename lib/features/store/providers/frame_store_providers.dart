@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/radical_frame_tier.dart';
 import '../controllers/frame_ownership_controller.dart';
 
-// Frame availability providers
 final frameIsOwnedProvider = FutureProvider.family<bool, RadicalFrameTier>(
   (ref, tier) async {
     final ownership = ref.watch(frameOwnershipProvider);
@@ -33,6 +32,6 @@ final ownedFramesListProvider = FutureProvider<List<RadicalFrameTier>>(
 
 final availableFramesProvider = FutureProvider<List<RadicalFrameTier>>(
   (ref) async {
-    return RadicalFrameTier.values.where((tier) => tier.index > 0).toList();
+    return RadicalFrameTier.values.where((tier) => tier.tierIndex > 0).toList();
   },
 );

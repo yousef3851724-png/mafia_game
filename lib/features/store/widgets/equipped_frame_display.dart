@@ -19,7 +19,7 @@ class EquippedFrameDisplay extends ConsumerWidget {
     final ownership = ref.watch(frameOwnershipProvider);
     final tier = ownership.equippedFrame;
 
-    if (tier == RadicalFrameTier.none || tier.index == 0) {
+    if (tier.tierIndex == 0) {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -28,10 +28,10 @@ class EquippedFrameDisplay extends ConsumerWidget {
             height: size,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: RadicalTheme.ink.withOpacity(0.2),
+              color: RadicalTheme.ink.withValues(alpha: 0.2),
               border: Border.all(color: RadicalTheme.line, width: 1),
             ),
-            child: const Icon(Icons.frame_outlined),
+            child: const Icon(Icons.image_not_supported),
           ),
           if (showLabel) ...[
             const SizedBox(height: 8),
@@ -52,7 +52,7 @@ class EquippedFrameDisplay extends ConsumerWidget {
             border: Border.all(color: Color(tier.color), width: 2),
             boxShadow: [
               BoxShadow(
-                color: Color(tier.color).withOpacity(0.5),
+                color: Color(tier.color).withValues(alpha: 0.5),
                 blurRadius: 15,
                 spreadRadius: 3,
               ),

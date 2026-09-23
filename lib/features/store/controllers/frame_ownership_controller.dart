@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/radical_frame_tier.dart';
+import '../../lobbies/diamond_state.dart';
 
 class FrameOwnershipState {
-  final Set<RadicalFrameTier> ownedFrames;
+  final List<RadicalFrameTier> ownedFrames;
   final RadicalFrameTier equippedFrame;
   final bool isLoading;
   final String? error;
@@ -16,142 +17,105 @@ class FrameOwnershipState {
   });
 
   FrameOwnershipState copyWith({
-    Set<RadicalFrameTier>? ownedFrames,
+    List<RadicalFrameTier>? ownedFrames,
     RadicalFrameTier? equippedFrame,
     bool? isLoading,
     String? error,
-  }) =>
-      FrameOwnershipState(
-        ownedFrames: ownedFrames ?? this.ownedFrames,
-        equippedFrame: equippedFrame ?? this.equippedFrame,
-        isLoading: isLoading ?? this.isLoading,
-        error: error ?? this.error,
-      );
-
-  Map<String, dynamic> toJson() => {
-    'owned': ownedFrames.map((f) => f.name).toList(),
-    'equipped': equippedFrame.name,
-  };
-
-  static FrameOwnershipState fromJson(Map<String, dynamic>? json) {
-    if (json == null) {
-      return FrameOwnershipState(
-        ownedFrames: {RadicalFrameTier.none},
-        equippedFrame: RadicalFrameTier.none,
-      );
-    }
-
-    final ownedNames = (json['owned'] as List<dynamic>?)?.cast<String>() ?? [];
-    final owned = ownedNames
-        .map((name) => RadicalFrameTier.getByName(name) ?? RadicalFrameTier.none)
-        .toSet();
-
-    final equippedName = json['equipped'] as String? ?? 'none';
-    final equipped =
-        RadicalFrameTier.getByName(equippedName) ?? RadicalFrameTier.none;
-
+  }) {
     return FrameOwnershipState(
-      ownedFrames: owned.isEmpty ? {RadicalFrameTier.none} : owned,
-      equippedFrame: equipped,
+      ownedFrames: ownedFrames ?? this.ownedFrames,
+      equippedFrame: equippedFrame ?? this.equippedFrame,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
     );
   }
 }
 
-class FrameOwnershipController
-    extends StateNotifier<FrameOwnershipState> {
-  final SharedPreferences prefs;
+class FrameOwnershipController extends StateNotifier<FrameOwnershipState> {
+  final Ref ref;
 
-  static const String _storageKey = 'frame_ownership_v2';
+  FrameOwnershipController(this.ref)
+      : super(FrameOwnershipState(
+          ownedFrames: [RadicalFrameTier.none],
+          equippedFrame: RadicalFrameTier.none,
+        )) {
+    _loadFromStorage();
+  }
 
-  FrameOwnershipController({
-    required this.prefs,
-  }) : super(FrameOwnershipState.fromJson(_loadFromPrefs(prefs)));
-
-  static Map<String, dynamic>? _loadFromPrefs(SharedPreferences prefs) {
-    final json = prefs.getString(_storageKey);
-    if (json == null) return null;
+  Future<void> _loadFromStorage() async {
     try {
-      final ownedMatch = RegExp(r'"owned":\[(.*?)\]').firstMatch(json);
-      final equippedMatch = RegExp(r'"equipped":"([^"]*)"').firstMatch(json);
+      final prefs = await SharedPreferences.getInstance();
+      final ownedJson = prefs.getStringList('owned_frames') ?? [];
+      final equippedIndex =
+          prefs.getInt('equipped_frame') ?? RadicalFrameTier.none.index;
 
-      final ownedStr = ownedMatch?.group(1) ?? '';
-      final ownedList = ownedStr.isEmpty
-          ? <String>[]
-          : ownedStr.split(',').map((s) => s.trim().replaceAll('"', ''));
+      final owned = ownedJson
+          .map((e) => RadicalFrameTier.values
+              .firstWhere((t) => t.name == e, orElse: () => RadicalFrameTier.none))
+          .toList();
 
-      final equipped = equippedMatch?.group(1) ?? 'none';
+      final equipped = RadicalFrameTier.values.firstWhere(
+        (t) => t.tierIndex == equippedIndex,
+        orElse: () => RadicalFrameTier.none,
+      );
 
-      return {
-        'owned': ownedList.toList(),
-        'equipped': equipped,
-      };
-    } catch (_) {
-      return null;
+      state = state.copyWith(ownedFrames: owned, equippedFrame: equipped);
+    } catch (e) {
+      state = state.copyWith(error: e.toString());
     }
   }
 
-  Future<bool> purchaseFrame(RadicalFrameTier tier) async {
-    if (state.ownedFrames.contains(tier)) {
-      return false;
+  Future<void> purchaseFrameWithDiamonds(RadicalFrameTier tier) async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      final diamondWallet = ref.read(diamondControllerProvider);
+      if (diamondWallet.canSpend(tier.diamondPrice)) {
+        ref.read(diamondControllerProvider.notifier).spend(tier.diamondPrice);
+        await equipFrame(tier);
+      } else {
+        state = state.copyWith(
+          error: 'الماس کافی نیست',
+          isLoading: false,
+        );
+      }
+    } catch (e) {
+      state = state.copyWith(error: e.toString(), isLoading: false);
     }
-
-    final updated = state.copyWith(
-      ownedFrames: {...state.ownedFrames, tier},
-    );
-    state = updated;
-    await _save();
-    return true;
   }
 
-  Future<bool> equipFrame(RadicalFrameTier tier) async {
-    if (!state.ownedFrames.contains(tier)) {
-      return false;
+  Future<void> equipFrame(RadicalFrameTier tier) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final owned = state.ownedFrames;
+
+      if (!owned.contains(tier)) {
+        owned.add(tier);
+      }
+
+      await prefs.setStringList(
+        'owned_frames',
+        owned.map((e) => e.name).toList(),
+      );
+      await prefs.setInt('equipped_frame', tier.tierIndex);
+
+      state = state.copyWith(
+        ownedFrames: owned,
+        equippedFrame: tier,
+        isLoading: false,
+        error: null,
+      );
+    } catch (e) {
+      state = state.copyWith(error: e.toString(), isLoading: false);
     }
-
-    state = state.copyWith(equippedFrame: tier);
-    await _save();
-    return true;
   }
 
-  Future<bool> unequipFrame() async {
-    state = state.copyWith(equippedFrame: RadicalFrameTier.none);
-    await _save();
-    return true;
-  }
-
-  bool isOwned(RadicalFrameTier tier) => state.ownedFrames.contains(tier);
-
-  bool isEquipped(RadicalFrameTier tier) => state.equippedFrame == tier;
-
-  List<RadicalFrameTier> getOwnedSorted() {
-    return state.ownedFrames
-        .where((f) => f != RadicalFrameTier.none)
-        .toList()
-      ..sort((a, b) => a.index.compareTo(b.index));
-  }
-
-  Future<void> _save() async {
-    final json = state.toJson();
-    final ownedStr = (json['owned'] as List)
-        .map((f) => '"$f"')
-        .join(',');
-    final jsonStr =
-        '{"owned":[$ownedStr],"equipped":"${json['equipped']}"}';
-    await prefs.setString(_storageKey, jsonStr);
-  }
-
-  Future<void> reset() async {
-    state = FrameOwnershipState(
-      ownedFrames: {RadicalFrameTier.none},
-      equippedFrame: RadicalFrameTier.none,
-    );
-    await prefs.remove(_storageKey);
+  Future<void> unequipFrame() async {
+    await equipFrame(RadicalFrameTier.none);
   }
 }
 
 final frameOwnershipProvider =
     StateNotifierProvider<FrameOwnershipController, FrameOwnershipState>(
-  (ref) => FrameOwnershipController(
-    prefs: SharedPreferences.getInstance() as SharedPreferences,
-  ),
+  (ref) => FrameOwnershipController(ref),
 );

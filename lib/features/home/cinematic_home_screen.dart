@@ -43,7 +43,7 @@ class _CinematicHomeScreenState extends State<CinematicHomeScreen>
 
   void _openScenarios() => _open(const ClassesScreen());
   void _openRanked() => _open(const LobbyHubScreen(ownerId: 'local_creator'));
-  void _openStore() => _open(const StoreScreen());
+  void _openStore() => _open(const const StoreScreen());
   void _openProfile() => _open(const ProfileScreen());
 
   @override
@@ -66,7 +66,7 @@ class _CinematicHomeScreenState extends State<CinematicHomeScreen>
         actionLabel: 'ورود به بازی رقابتی',
         onAction: _openRanked,
       ),
-      const StoreScreen(),
+      const const StoreScreen(),
       const ProfileScreen(),
     ];
 

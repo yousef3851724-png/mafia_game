@@ -1,119 +1,30 @@
-import '../../features/lobbies/diamond_state.dart';
+import '../models/diamond_type.dart';
+import 'radical_theme.dart';
 
 enum RadicalFrameTier {
-  none(
-    index: 0,
-    name: 'بدون فریم',
-    displayName: 'None',
-    diamondPrice: 0,
-    diamondType: null,
-    description: 'فریم پیش‌فرض',
-    color: 0xFFFFFFFF,
-  ),
-  bronze(
-    index: 1,
-    name: 'برنز',
-    displayName: 'Bronze',
-    diamondPrice: 50,
-    diamondType: DiamondType.blue,
-    description: 'فریم برنزی ساده',
-    color: 0xFFCD7F32,
-  ),
-  silver(
-    index: 2,
-    name: 'نقره',
-    displayName: 'Silver',
-    diamondPrice: 100,
-    diamondType: DiamondType.blue,
-    description: 'فریم نقره‌ای درخشان',
-    color: 0xFFC0C0C0,
-  ),
-  gold(
-    index: 3,
-    name: 'طلا',
-    displayName: 'Gold',
-    diamondPrice: 250,
-    diamondType: DiamondType.radical,
-    description: 'فریم طلایی فاخر',
-    color: 0xFFFFD700,
-  ),
-  platinum(
-    index: 4,
-    name: 'پلاتین',
-    displayName: 'Platinum',
-    diamondPrice: 500,
-    diamondType: DiamondType.teen,
-    description: 'فریم پلاتینی نایاب',
-    color: 0xFFE5E4E2,
-  ),
-  diamond(
-    index: 5,
-    name: 'الماس',
-    displayName: 'Diamond',
-    diamondPrice: 1000,
-    diamondType: DiamondType.adult,
-    description: 'فریم الماسی افسانه‌ای',
-    color: 0xFF00D9FF,
-  ),
-  legendary(
-    index: 6,
-    name: 'افسانه‌ای',
-    displayName: 'Legendary',
-    diamondPrice: 2500,
-    diamondType: DiamondType.adult,
-    description: 'فریم افسانه‌ای ابدی',
-    color: 0xFFFF00FF,
-  );
+  none(0, 'نیست', '', 0, DiamondType.blue, 'فریم ندارید', 0xFF808080),
+  bronze(1, 'برنز', 'ب', 50, DiamondType.blue, 'فریم برنز', 0xFF8B7355),
+  silver(2, 'نقره', 'ن', 100, DiamondType.blue, 'فریم نقره', 0xFFC0C0C0),
+  gold(3, 'طلا', 'ط', 250, DiamondType.radical, 'فریم طلا', 0xFFFFD700),
+  platinum(4, 'پلاتین', 'پ', 500, DiamondType.teen, 'فریم پلاتین', 0xFFE5E4E2),
+  diamond(5, 'الماس', 'ا', 1000, DiamondType.adult, 'فریم الماس', 0xFFB9F2FF),
+  legendary(6, 'افسانوی', 'ا', 2500, DiamondType.adult, 'فریم افسانوی', 0xFFFF6B9D);
 
-  final int index;
+  final int tierIndex;
   final String name;
   final String displayName;
   final int diamondPrice;
-  final DiamondType? diamondType;
+  final DiamondType diamondType;
   final String description;
   final int color;
 
-  const RadicalFrameTier({
-    required this.index,
-    required this.name,
-    required this.displayName,
-    required this.diamondPrice,
-    required this.diamondType,
-    required this.description,
-    required this.color,
-  });
-
-  static RadicalFrameTier? getByName(String name) {
-    try {
-      return RadicalFrameTier.values.firstWhere(
-        (tier) => tier.name == name || tier.displayName == name,
-      );
-    } catch (_) {
-      return null;
-    }
-  }
-
-  static RadicalFrameTier? getByIndex(int idx) {
-    try {
-      return RadicalFrameTier.values.firstWhere((tier) => tier.index == idx);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  RadicalFrameTier? get nextTier {
-    if (index >= RadicalFrameTier.legendary.index) return null;
-    return RadicalFrameTier.getByIndex(index + 1);
-  }
-
-  RadicalFrameTier? get previousTier {
-    if (index <= RadicalFrameTier.none.index) return null;
-    return RadicalFrameTier.getByIndex(index - 1);
-  }
-
-  bool get isPremium => diamondPrice > 0;
-
-  String get label => name;
-
-  String get desc => description;
+  const RadicalFrameTier(
+    this.tierIndex,
+    this.name,
+    this.displayName,
+    this.diamondPrice,
+    this.diamondType,
+    this.description,
+    this.color,
+  );
 }

@@ -20,7 +20,7 @@ class PlayerWithFrame extends ConsumerWidget {
     final ownership = ref.watch(frameOwnershipProvider);
     final tier = ownership.equippedFrame;
 
-    final hasFrame = tier.index > 0;
+    final hasFrame = tier.tierIndex > 0;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -37,7 +37,7 @@ class PlayerWithFrame extends ConsumerWidget {
             boxShadow: hasFrame
                 ? [
                     BoxShadow(
-                      color: Color(tier.color).withOpacity(0.5),
+                      color: Color(tier.color).withValues(alpha: 0.5),
                       blurRadius: 20,
                       spreadRadius: 5,
                     )

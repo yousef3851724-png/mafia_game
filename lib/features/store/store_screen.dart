@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/radical_theme.dart';
-import '../../core/widgets/radical_scaffold.dart';
+import 'screens/avatar_shop_screen.dart';
 import 'screens/frame_shop_screen.dart';
 
-class RadicalStoreScreen extends ConsumerStatefulWidget {
-  const RadicalStoreScreen({super.key});
+class StoreScreen extends StatefulWidget {
+  const StoreScreen({super.key});
 
   @override
-  ConsumerState<RadicalStoreScreen> createState() =>
-      _RadicalStoreScreenState();
+  State<StoreScreen> createState() => _StoreScreenState();
 }
 
-class _RadicalStoreScreenState extends ConsumerState<RadicalStoreScreen>
+class _StoreScreenState extends State<StoreScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -30,38 +28,24 @@ class _RadicalStoreScreenState extends ConsumerState<RadicalStoreScreen>
 
   @override
   Widget build(BuildContext context) {
-    return RadicalScaffold(
-      title: 'فروشگاه',
-      body: Column(
-        children: [
-          TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(text: 'آواتارها'),
-              Tab(text: 'فریم‌ها'),
-            ],
-            labelColor: RadicalTheme.gold,
-            unselectedLabelColor: RadicalTheme.ink.withOpacity(0.5),
-            indicatorColor: RadicalTheme.gold,
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                // Avatars tab (placeholder)
-                Center(
-                  child: Text(
-                    'آواتارها به‌زودی...',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: RadicalTheme.ink.withOpacity(0.5),
-                        ),
-                  ),
-                ),
-                // Frames tab
-                const FrameShopScreen(),
-              ],
-            ),
-          ),
+    return Scaffold(
+      backgroundColor: RadicalTheme.background,
+      appBar: AppBar(
+        title: const Text('فروشگاه'),
+        backgroundColor: RadicalTheme.panel,
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'آواتارها'),
+            Tab(text: 'فریم‌ها'),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: const [
+          AvatarShopScreen(),
+          FrameShopScreen(),
         ],
       ),
     );
