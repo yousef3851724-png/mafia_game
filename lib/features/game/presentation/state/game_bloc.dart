@@ -1,3 +1,4 @@
+import '../../../../core/models/game_models.dart' show SessionPlayer;
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,7 +32,7 @@ class LeaveRoomRequested extends GameEvent {
 }
 
 class _PlayersUpdated extends GameEvent {
-  final List<Player> players;
+  final List<SessionPlayer> players;
   const _PlayersUpdated(this.players);
 }
 
@@ -46,12 +47,12 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   final LeaveRoomUseCase leaveRoomUseCase;
   final IGameRepository repository;
 
-  StreamSubscription<List<Player>>? _playersSubscription;
+  StreamSubscription<List<SessionPlayer>>? _playersSubscription;
   StreamSubscription<Map<String, int>>? _votesSubscription;
 
   String _roomId = '';
   String _currentPlayerId = '';
-  List<Player> _players = const [];
+  List<SessionPlayer> _players = const [];
   Map<String, int> _votes = const {};
 
   GameBloc({
@@ -203,8 +204,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   }
 }
 
-extension on Iterable<Player> {
-  Player? firstWhereOrNull(bool Function(Player player) test) {
+extension on Iterable<SessionPlayer> {
+  SessionPlayer? firstWhereOrNull(bool Function(SessionPlayer player) test) {
     for (final player in this) {
       if (test(player)) return player;
     }

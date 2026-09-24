@@ -1,3 +1,4 @@
+import '../../../../core/models/game_models.dart' show SessionPlayer;
 import 'package:equatable/equatable.dart';
 
 import '../../domain/entities/player.dart';
@@ -6,7 +7,7 @@ enum GameStatus { initial, loading, loaded, error }
 
 class GameState extends Equatable {
   final GameStatus status;
-  final List<Player> players;
+  final List<SessionPlayer> players;
   final Map<String, int> votes;
   final List<String> options;
   final String currentPlayerId;
@@ -25,7 +26,7 @@ class GameState extends Equatable {
 
   GameState copyWith({
     GameStatus? status,
-    List<Player>? players,
+    List<SessionPlayer>? players,
     Map<String, int>? votes,
     List<String>? options,
     String? currentPlayerId,
