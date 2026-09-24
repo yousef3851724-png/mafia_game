@@ -1,5 +1,3 @@
-import 'package:mafia_game/features/lobby/presentation/lobby_realtime_screen.dart';
-import 'package:mafia_game/features/lobby/presentation/lobby_realtime_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 
