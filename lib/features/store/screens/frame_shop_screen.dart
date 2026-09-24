@@ -15,6 +15,7 @@ class _FrameShopScreenState extends ConsumerState<FrameShopScreen> {
   @override
   Widget build(BuildContext context) {
     final ownership = ref.watch(frameOwnershipProvider);
+    final tiers = RadicalFrameTier.values.where((t) => t.tierIndex > 0).toList();
 
     return GridView.builder(
       padding: const EdgeInsets.all(16),
@@ -24,9 +25,9 @@ class _FrameShopScreenState extends ConsumerState<FrameShopScreen> {
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
       ),
-      itemCount: 7,
+      itemCount: tiers.length,
       itemBuilder: (context, index) {
-        final tier = RadicalFrameTier.values[index];
+        final tier = tiers[index];
         final isOwned = ownership.ownedFrames.contains(tier);
         final isEquipped = ownership.equippedFrame == tier;
 
@@ -75,7 +76,7 @@ class _FrameShopScreenState extends ConsumerState<FrameShopScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  tier.name,
+                  tier.displayName,
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -124,8 +125,16 @@ class _FrameShopScreenState extends ConsumerState<FrameShopScreen> {
     );
   }
 
-  void _purchaseFrame(RadicalFrameTier tier) {
-    ref.read(frameOwnershipProvider.notifier).purchaseFrameWithDiamonds(tier);
+  Future<void> _purchaseFrame(RadicalFrameTier tier) async {
+    await ref
+        .read(frameOwnershipProvider.notifier)
+        .purchaseFrameWithDiamonds(tier);
+    if (!mounted) return;
+    final owned =
+        ref.read(frameOwnershipProvider).ownedFrames.contains(tier);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(owned ? 'خرید انجام شد' : 'الماس کافی نیست')),
+    );
   }
 
   void _equipFrame(RadicalFrameTier tier) {
