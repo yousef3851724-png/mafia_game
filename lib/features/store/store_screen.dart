@@ -29,7 +29,7 @@ class _StoreScreenState extends State<StoreScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: RadicalTheme.background,
+      backgroundColor: RadicalTheme.ink,
       appBar: AppBar(
         title: const Text('فروشگاه'),
         backgroundColor: RadicalTheme.panel,

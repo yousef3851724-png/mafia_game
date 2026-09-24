@@ -14,7 +14,7 @@ class LobbyRealtimeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: RadicalTheme.background,
+      backgroundColor: RadicalTheme.ink,
       appBar: AppBar(
         title: const Text('لابی'),
         backgroundColor: RadicalTheme.panel,
