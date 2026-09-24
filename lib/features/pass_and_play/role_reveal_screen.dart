@@ -3,7 +3,7 @@ import '../../core/models/game_models.dart';
 import '../../core/constants/app_theme.dart';
 
 class RoleRevealScreen extends StatefulWidget {
-  final List<Player> players;
+  final List<SessionPlayer> players;
   final VoidCallback onFinished;
 
   const RoleRevealScreen({super.key, required this.players, required this.onFinished});

@@ -4,7 +4,7 @@ import '../../core/models/game_models.dart';
 
 class VictoryScreen extends StatelessWidget {
   final Team winner;
-  final List<Player> players;
+  final List<SessionPlayer> players;
   final VoidCallback onRestart;
 
   const VictoryScreen({super.key, required this.winner, required this.players, required this.onRestart});

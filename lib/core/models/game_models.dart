@@ -81,14 +81,14 @@ const Map<RoleType, Role> kGameRoles = {
   ),
 };
 
-class Player {
+class SessionPlayer {
   final String id;
   final String name;
   final Role role;
   bool isAlive;
   int votesReceived;
 
-  Player({
+  SessionPlayer({
     required this.id,
     required this.name,
     required this.role,

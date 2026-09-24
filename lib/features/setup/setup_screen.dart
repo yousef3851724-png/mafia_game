@@ -4,7 +4,7 @@ import '../../core/constants/app_theme.dart';
 import '../../core/models/game_models.dart';
 
 class SetupScreen extends StatefulWidget {
-  final Function(List<Player>) onStart;
+  final Function(List<SessionPlayer>) onStart;
   const SetupScreen({super.key, required this.onStart});
 
   @override
@@ -51,9 +51,9 @@ class _SetupScreenState extends State<SetupScreen> {
 
     availableRoles.shuffle(Random());
     
-    List<Player> players = [];
+    List<SessionPlayer> players = [];
     for (int i = 0; i < _playerNames.length; i++) {
-      players.add(Player(
+      players.add(SessionPlayer(
         id: i.toString(),
         name: _playerNames[i],
         role: kGameRoles[availableRoles[i]]!,
