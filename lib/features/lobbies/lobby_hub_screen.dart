@@ -64,6 +64,14 @@ class _LobbyHubScreenState extends ConsumerState<LobbyHubScreen> {
     return null;
   }
 
+  LobbyDefinition? get _lobbyNow {
+    final lobbies = ref.read(lobbyControllerProvider).lobbies;
+    for (final lobby in lobbies) {
+      if (lobby.id == _lobbyId) return lobby;
+    }
+    return null;
+  }
+
   void _pickCategory(LobbyCategory value) {
     final scenarios = ScenarioCatalog.forMode(
       value.mode == LobbyMode.ranked ? ScenarioMode.ranked : ScenarioMode.friendly,
@@ -150,7 +158,7 @@ class _LobbyHubScreenState extends ConsumerState<LobbyHubScreen> {
   }
 
   void _toggleLock() {
-    final lobby = _lobby;
+    final lobby = _lobbyNow;
     if (lobby == null) return;
     try {
       ref.read(lobbyControllerProvider.notifier).toggleLock(
