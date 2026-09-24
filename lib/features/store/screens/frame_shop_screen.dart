@@ -130,10 +130,11 @@ class _FrameShopScreenState extends ConsumerState<FrameShopScreen> {
         .read(frameOwnershipProvider.notifier)
         .purchaseFrameWithDiamonds(tier);
     if (!mounted) return;
-    final owned =
-        ref.read(frameOwnershipProvider).ownedFrames.contains(tier);
+    final st = ref.read(frameOwnershipProvider);
+    final msg = st.error ??
+        (st.ownedFrames.contains(tier) ? 'خرید انجام شد' : 'خرید ناموفق بود');
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(owned ? 'خرید انجام شد' : 'الماس کافی نیست')),
+      SnackBar(content: Text(msg)),
     );
   }
 
