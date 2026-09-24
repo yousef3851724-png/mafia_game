@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
+import 'diamond_type.dart';
+export 'diamond_type.dart';
 
 enum AppTeam { city, mafia }
 enum PlayerAge { teen, adult }
 enum PlayerLabel { leader, radicalStaff, radicalLobby, professionals, newcomers, vip }
-enum DiamondType { blue, radical, teen, adult }
 
 @immutable
 class DiamondWallet {
