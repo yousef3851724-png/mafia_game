@@ -71,7 +71,7 @@ class FrameOwnershipController extends StateNotifier<FrameOwnershipState> {
 
       final diamondWallet = ref.read(diamondControllerProvider);
       if (diamondWallet.canSpend(tier.diamondPrice)) {
-        ref.read(diamondControllerProvider.notifier).spend(tier.diamondPrice);
+        ref.read(diamondControllerProvider.notifier).spend(tier.diamondType, tier.diamondPrice);
         await equipFrame(tier);
       } else {
         state = state.copyWith(
