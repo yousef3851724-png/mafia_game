@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show Scaffold, Center, Text;
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 
@@ -93,7 +94,7 @@ final GoRouter radicalRouter = GoRouter(
       name: 'lobby',
       builder: (context, state) {
         final roomId = state.pathParameters['roomId']!;
-        return LobbyRealtimeScreen(roomId: roomId);
+        return LobbyRealtimeScreen(lobbyId: roomId);
       },
     ),
     GoRoute(
