@@ -209,7 +209,7 @@ build/app/outputs/flutter-apk/app-release.apk
 
 ```text
 versionName: 1.0.0
-versionCode: 3
+versionCode: 4
 ```
 
 آیکون از `assets/images/app_icon.png` تولید می‌شود و تنظیمات launcher/splash در `pubspec.yaml` قرار دارد. Android همچنین resourceهای launcher تولیدشده را در `android/app/src/main/res/` نگه می‌دارد.
@@ -242,9 +242,13 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-یا workflow `Production Android Release` را به‌صورت دستی اجرا کنید.
+یا در GitHub از مسیر `Actions → Production Android Release → Run workflow`
+آن را روی tag انتشار اجرا کنید. اجرای دستی روی branch عادی برای انتشار توصیه
+نمی‌شود؛ ref انتخاب‌شده باید همان tag نسخه باشد.
 
 **نکته امنیتی:** keystore، password و `key.properties` نباید commit شوند.
+کلیدها و passwordهایی که قبلاً در این workspace وجود داشته‌اند افشاشده فرض
+می‌شوند؛ پیش از انتشار باید در Google Play و GitHub Actions چرخش (rotate) شوند.
 
 ---
 
@@ -259,10 +263,10 @@ git push origin v1.0.0
 5. `flutter pub get`
 6. `flutter analyze`
 7. `flutter test`
-8. `flutter build apk --release`
-9. وجود APK را verify می‌کند
-10. provenance attestation تولید می‌کند
-11. APK را به عنوان artifact ذخیره می‌کند
+8. یک APK release با امضای debug فقط برای اعتبارسنجی build می‌سازد
+9. وجود APK اعتبارسنجی را بررسی می‌کند
+
+این APK برای توزیع نیست. فقط `release.yml` با secrets تولیدی مجاز به انتشار است.
 
 برای production signing از `release.yml` استفاده می‌شود؛ این دو مسیر عمداً جدا هستند تا CI معمولی به secret release key وابسته نباشد.
 
@@ -276,4 +280,6 @@ git push origin v1.0.0
 
 ## 📄 License
 
-در صورت انتشار عمومی، مجوز پروژه را به‌صورت صریح در `LICENSE` اضافه کنید.
+مجوز پروژه و مجوز استفاده از assetها باید پیش از انتشار عمومی در فایل `LICENSE`
+و مستندات مربوط به assetها به‌صورت صریح ثبت شود. در وضعیت فعلی، انتشار عمومی
+بدون تعیین مجوز یک گیت انتشارِ باز است.

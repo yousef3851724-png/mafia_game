@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0+4 — Release readiness hardening
+
+### Security and CI
+- Production release builds now fail unless a release keystore is configured.
+- Validation builds explicitly opt in to debug signing and are not published.
+- CI uses official Google and Maven Central repositories only.
+- Release documentation and version metadata are aligned with build number `4`.
+
 ## 1.0.0+3 — Release
 
 ### Gameplay
@@ -19,5 +27,5 @@
 - Production signing is supported through a private GitHub Actions keystore; no signing material is stored in the repository.
 
 ### Release note
-- The ordinary CI build remains suitable for automated validation/testing and may use the existing debug-signing fallback.
+- The ordinary CI build is suitable for validation/testing only and explicitly uses debug signing.
 - Google Play / production distribution must use `.github/workflows/release.yml` with the four documented GitHub repository secrets and the project's production keystore.

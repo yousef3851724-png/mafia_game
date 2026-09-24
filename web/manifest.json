@@ -1,35 +1,22 @@
-{
-    "name": "mafia_radical",
-    "short_name": "mafia_radical",
-    "start_url": ".",
-    "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
-    "prefer_related_applications": false,
-    "icons": [
-        {
-            "src": "icons/Icon-192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "icons/Icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        },
-        {
-            "src": "icons/Icon-maskable-192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "icons/Icon-maskable-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
-        }
-    ]
-}
+from PIL import Image
+
+src = Image.open("logo.png").convert("RGBA")
+
+def save(size, path, padding=0.0, bg=None):
+    canvas = Image.new("RGBA", (size, size), bg or (0, 0, 0, 0))
+    inner = int(size * (1 - 2 * padding))
+    img = src.resize((inner, inner), Image.LANCZOS)
+    off = (size - inner) // 2
+    canvas.paste(img, (off, off), img)
+    canvas.save(path)
+
+# آیکون‌های عادی
+save(192, "web/icons/Icon-192.png")
+save(512, "web/icons/Icon-512.png")
+
+# آیکون‌های maskable (حاشیه ۱۰٪ و پس‌زمینه یکدست)
+save(192, "web/icons/Icon-maskable-192.png", padding=0.1, bg=(0, 0, 0, 255))
+save(512, "web/icons/Icon-maskable-512.png", padding=0.1, bg=(0, 0, 0, 255))
+
+# favicon
+save(32, "web/favicon.png")

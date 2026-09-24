@@ -8,8 +8,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
-  attestations: write
 
 jobs:
   build:
@@ -44,21 +42,8 @@ jobs:
       - name: Test
         run: flutter test
 
-      - name: Build release APK
-        run: flutter build apk --release
+      - name: Build unsigned validation APK
+        run: flutter build apk --release --android-gradle-extra-args="-PallowDebugSigning=true"
 
-      - name: Verify release APK
+      - name: Verify validation APK
         run: test -s build/app/outputs/flutter-apk/app-release.apk
-
-      - name: Attest release APK provenance
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-path: build/app/outputs/flutter-apk/app-release.apk
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: mafia-radical-release
-          path: build/app/outputs/flutter-apk/app-release.apk
-          if-no-files-found: error
-          retention-days: 30

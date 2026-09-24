@@ -42,12 +42,15 @@ android {
 
     buildTypes {
         release {
-            // Local/CI test builds retain the existing debug-signing fallback.
-            // Production release workflow always supplies key.properties.
             signingConfig = if (keystorePropertiesFile.exists()) {
                 signingConfigs.getByName("release")
-            } else {
+            } else if (providers.gradleProperty("allowDebugSigning").orNull == "true") {
                 signingConfigs.getByName("debug")
+            } else {
+                error(
+                    "Release signing is not configured. Provide android/key.properties " +
+                        "or explicitly pass -PallowDebugSigning=true for local validation only.",
+                )
             }
         }
     }
