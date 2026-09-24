@@ -109,7 +109,3 @@ final GoRouter radicalRouter = GoRouter(
     ),
   ],
 );
-DARTEOFwc -l ~/mafia_game/lib/router/app_router.dartconst LobbyRealtimeScreen({
-  super.key,
-  required this.lobbyId,   // ← lobbyId نه roomId
-});rm ~/mafia_game/lib/router/app_router.dart
