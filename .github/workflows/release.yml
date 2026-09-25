@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version to publish (for example 1.0.1)'
+        required: true
+        default: '1.0.1'
 
 permissions:
   contents: write
@@ -17,6 +22,41 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Resolve release metadata
+        id: release_metadata
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+            TAG_NAME="${GITHUB_REF_NAME}"
+          else
+            VERSION="${INPUT_VERSION}"
+            TAG_NAME="v${VERSION#v}"
+          fi
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid release version: $VERSION" >&2
+            exit 1
+          fi
+
+          BUILD_NUMBER="$GITHUB_RUN_NUMBER"
+          if (( BUILD_NUMBER < 5 )); then
+            BUILD_NUMBER=5
+          fi
+
+          echo "version=${VERSION}" >> "$GITHUB_ENV"
+          echo "build_number=${BUILD_NUMBER}" >> "$GITHUB_ENV"
+          echo "tag_name=${TAG_NAME}" >> "$GITHUB_ENV"
+          echo "release_name=Mafia Radical ${VERSION}" >> "$GITHUB_ENV"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "build_number=${BUILD_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "release_name=Mafia Radical ${VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Java 17
         uses: actions/setup-java@v5
@@ -69,14 +109,20 @@ jobs:
         run: flutter test
 
       - name: Build signed release APK
-        run: flutter build apk --release
+        env:
+          VERSION: ${{ steps.release_metadata.outputs.version }}
+          BUILD_NUMBER: ${{ steps.release_metadata.outputs.build_number }}
+        run: flutter build apk --release --build-name="$VERSION" --build-number="$BUILD_NUMBER"
 
       - name: Build signed release AAB
-        run: flutter build appbundle --release
+        env:
+          VERSION: ${{ steps.release_metadata.outputs.version }}
+          BUILD_NUMBER: ${{ steps.release_metadata.outputs.build_number }}
+        run: flutter build appbundle --release --build-name="$VERSION" --build-number="$BUILD_NUMBER"
 
       - name: Verify APK signature
         run: |
-          $ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)/apksigner verify --verbose build/app/outputs/flutter-apk/app-release.apk
+          "$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)/apksigner" verify --verbose build/app/outputs/flutter-apk/app-release.apk
 
       - name: Attest signed APK provenance
         uses: actions/attest-build-provenance@v2
@@ -86,13 +132,26 @@ jobs:
             build/app/outputs/bundle/release/app-release.aab
 
       - name: Prepare release assets
+        env:
+          VERSION: ${{ steps.release_metadata.outputs.version }}
         run: |
-          cp build/app/outputs/flutter-apk/app-release.apk "mafia-radical-${GITHUB_REF_NAME#v}.apk"
-          cp build/app/outputs/bundle/release/app-release.aab "mafia-radical-${GITHUB_REF_NAME#v}.aab"
+          cp build/app/outputs/flutter-apk/app-release.apk "mafia-radical-${VERSION}.apk"
+          cp build/app/outputs/bundle/release/app-release.aab "mafia-radical-${VERSION}.aab"
+
+      - name: Upload release APK and AAB as workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mafia-radical-${{ steps.release_metadata.outputs.version }}
+          path: |
+            mafia-radical-*.apk
+            mafia-radical-*.aab
+          if-no-files-found: error
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.release_metadata.outputs.tag_name }}
+          name: ${{ steps.release_metadata.outputs.release_name }}
           generate_release_notes: true
           files: |
             mafia-radical-*.apk
@@ -102,5 +161,3 @@ jobs:
         if: always()
         run: |
           rm -f android/mafia-release.jks android/key.properties
-
-

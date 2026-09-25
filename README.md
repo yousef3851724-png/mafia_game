@@ -2,7 +2,7 @@
 
 اپلیکیشن Flutter برای اجرای حرفه‌ای بازی مافیا، مدیریت لابی، تخصیص نقش، جریان شب/روز، رأی‌گیری و نمایش نتیجه بازی.
 
-**Current release:** `1.0.0+3`
+**Current package metadata:** `1.0.0+4` (production releases use the tag/workflow version)
 
 ## وضعیت نسخه نهایی
 
@@ -208,8 +208,8 @@ build/app/outputs/flutter-apk/app-release.apk
 نسخه فعلی:
 
 ```text
-versionName: 1.0.0
-versionCode: 4
+versionName: release tag or manual version input
+versionCode: increasing GitHub Actions run number (minimum 5)
 ```
 
 آیکون از `assets/images/app_icon.png` تولید می‌شود و تنظیمات launcher/splash در `pubspec.yaml` قرار دارد. Android همچنین resourceهای launcher تولیدشده را در `android/app/src/main/res/` نگه می‌دارد.
@@ -243,8 +243,9 @@ git push origin v1.0.0
 ```
 
 یا در GitHub از مسیر `Actions → Production Android Release → Run workflow`
-آن را روی tag انتشار اجرا کنید. اجرای دستی روی branch عادی برای انتشار توصیه
-نمی‌شود؛ ref انتخاب‌شده باید همان tag نسخه باشد.
+اجرا کنید و نسخه‌ای مانند `1.0.1` وارد کنید. workflow نام نسخه و شماره‌ی build
+را مستقیماً هنگام ساخت APK/AAB تنظیم می‌کند؛ نسخه‌ی داخل برنامه با نام فایل
+انتشار همسان می‌ماند و شماره‌ی build برای نصب به‌روزرسانی‌شده افزایش می‌یابد.
 
 **نکته امنیتی:** keystore، password و `key.properties` نباید commit شوند.
 کلیدها و passwordهایی که قبلاً در این workspace وجود داشته‌اند افشاشده فرض
