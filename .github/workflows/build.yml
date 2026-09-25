@@ -43,7 +43,9 @@ jobs:
         run: flutter test
 
       - name: Build unsigned validation APK
-        run: flutter build apk --release --android-gradle-extra-args="-PallowDebugSigning=true"
+        env:
+          ORG_GRADLE_PROJECT_allowDebugSigning: "true"
+        run: flutter build apk --release
 
       - name: Verify validation APK
         run: test -s build/app/outputs/flutter-apk/app-release.apk
