@@ -51,7 +51,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.MAFIA_RELEASE_KEY_PASSWORD }}
         run: |
           printf '%s' "$KEYSTORE_B64" | base64 --decode > android/mafia-release.jks
-          echo "DEBUG_SHA256: $(sha256sum android/mafia-release.jks | cut -d" " -f1)"
+          echo "KEYSTORE_SHA256: $(sha256sum android/mafia-release.jks | cut -d" " -f1)"
           cat > android/key.properties <<EOF
           storePassword=$STORE_PASSWORD
           keyPassword=$KEY_PASSWORD
@@ -71,6 +71,9 @@ jobs:
       - name: Build signed release APK
         run: flutter build apk --release
 
+      - name: Build signed release AAB
+        run: flutter build appbundle --release
+
       - name: Verify APK signature
         run: |
           $ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)/apksigner verify --verbose build/app/outputs/flutter-apk/app-release.apk
@@ -78,17 +81,24 @@ jobs:
       - name: Attest signed APK provenance
         uses: actions/attest-build-provenance@v2
         with:
-          subject-path: build/app/outputs/flutter-apk/app-release.apk
+          subject-path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
 
-      - name: Prepare release asset
-        run: cp build/app/outputs/flutter-apk/app-release.apk "mafia-radical-${GITHUB_REF_NAME#v}.apk"
+      - name: Prepare release assets
+        run: |
+          cp build/app/outputs/flutter-apk/app-release.apk "mafia-radical-${GITHUB_REF_NAME#v}.apk"
+          cp build/app/outputs/bundle/release/app-release.aab "mafia-radical-${GITHUB_REF_NAME#v}.aab"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          files: mafia-radical-*.apk
+          files: |
+            mafia-radical-*.apk
+            mafia-radical-*.aab
 
-      - name: Cleanup signing material
+      - name: Clean up signing material
         if: always()
-        run: rm -f android/mafia-release.jks android/key.properties
+        run: |
+          rm -f android/mafia-release.jks android/key.properties
