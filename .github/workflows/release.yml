@@ -9,7 +9,7 @@ on:
       version:
         description: 'Release version to publish (for example 1.0.1)'
         required: true
-        default: '1.0.1'
+        default: '1.2.2'
 
 permissions:
   contents: write
@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v5
