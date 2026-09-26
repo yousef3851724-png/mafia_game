@@ -1,11 +1,45 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'router/app_router.dart';
 import 'core/theme/radical_theme.dart';
 
 void main() {
-  runApp(const ProviderScope(child: MafiaRadicalApp()));
+  runZonedGuarded(() {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    // Show any Flutter framework error directly on screen instead of a silent freeze.
+    ErrorWidget.builder = (FlutterErrorDetails details) {
+      return Material(
+        color: Colors.black,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: SelectableText(
+              'خطا رخ داد:\n\n${details.exceptionAsString()}\n\n${details.stack}',
+              style: const TextStyle(color: Colors.red, fontSize: 12),
+              textDirection: TextDirection.ltr,
+            ),
+          ),
+        ),
+      );
+    };
+
+    // Catch framework-level errors (widget build errors, etc.)
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+      debugPrint('FLUTTER ERROR: ${details.exceptionAsString()}');
+      debugPrint('${details.stack}');
+    };
+
+    runApp(const ProviderScope(child: MafiaRadicalApp()));
+  }, (error, stack) {
+    // Catch any uncaught async errors (the most common cause of silent freezes).
+    debugPrint('UNCAUGHT ASYNC ERROR: $error');
+    debugPrint('$stack');
+  });
 }
 
 class MafiaRadicalApp extends StatelessWidget {
