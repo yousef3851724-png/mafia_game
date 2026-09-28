@@ -157,7 +157,7 @@ class _GameRoomScreenState extends State<GameRoomScreen> {
                         children: [
                           Positioned.fill(
                             child: PlayerAvatarCard(
-                              player: player,
+                              playerName: player.name,
                               isSelected: selectedPlayerId == player.id,
                               onTap: () {
                                 if (hasVoted || player.id == state.currentPlayerId) return;

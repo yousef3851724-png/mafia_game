@@ -7,17 +7,23 @@ class PlayerAvatarCard extends ConsumerWidget {
   final String playerName;
   final String? avatarId;
   final bool isCurrentPlayer;
+  final bool isSelected;
+  final VoidCallback? onTap;
 
   const PlayerAvatarCard({
     super.key,
     required this.playerName,
     this.avatarId,
     this.isCurrentPlayer = false,
+    this.isSelected = false,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
@@ -25,8 +31,8 @@ class PlayerAvatarCard extends ConsumerWidget {
           ? RadicalTheme.gold.withValues(alpha: 0.1)
           : RadicalTheme.panel,
         border: Border.all(
-          color: isCurrentPlayer ? RadicalTheme.gold : RadicalTheme.line,
-          width: isCurrentPlayer ? 2 : 1,
+          color: (isCurrentPlayer || isSelected) ? RadicalTheme.gold : RadicalTheme.line,
+          width: (isCurrentPlayer || isSelected) ? 2 : 1,
         ),
       ),
       child: Column(
