@@ -94,7 +94,7 @@ final GoRouter radicalRouter = GoRouter(
       name: 'lobby',
       builder: (context, state) {
         final roomId = state.pathParameters['roomId']!;
-        return LobbyRealtimeScreen(lobbyId: roomId);
+        return LobbyRealtimeScreen(roomId: roomId, playerId: 'me');
       },
     ),
     GoRoute(
