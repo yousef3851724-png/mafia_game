@@ -1,15 +1,42 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'features/scenarios/scenario_lobby_screen.dart';
 import 'router/app_router.dart';
 import 'core/theme/radical_theme.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await SharedPreferences.getInstance();
-  runApp(const ProviderScope(child: MafiaRadicalApp()));
+void main() {
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await SharedPreferences.getInstance();
+
+    ErrorWidget.builder = (FlutterErrorDetails details) {
+      return Material(
+        color: Colors.black,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: SelectableText(
+              'خطا رخ داد:\n\n${details.exceptionAsString()}\n\n${details.stack}',
+              style: const TextStyle(color: Colors.red, fontSize: 12),
+              textDirection: TextDirection.ltr,
+            ),
+          ),
+        ),
+      );
+    };
+
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+      debugPrint('FLUTTER ERROR: ${details.exceptionAsString()}');
+    };
+
+    runApp(const ProviderScope(child: MafiaRadicalApp()));
+  }, (error, stack) {
+    debugPrint('UNCAUGHT ASYNC ERROR: $error\n$stack');
+  });
 }
 
 class MafiaRadicalApp extends StatelessWidget {
