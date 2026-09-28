@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../models/radical_avatar_catalog.dart';
 import '../theme/radical_theme.dart';
 
@@ -42,6 +43,38 @@ class _RadicalAvatarFrameState extends State<RadicalAvatarFrame>
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+
+  Widget _buildAvatarImage() {
+    final path = widget.avatarAssetPath;
+    Widget fallback() => Container(
+          width: widget.size,
+          height: widget.size,
+          color: RadicalTheme.panel2,
+          alignment: Alignment.center,
+          child: Icon(
+            Icons.person_rounded,
+            size: widget.size * .46,
+            color: RadicalTheme.goldBright,
+          ),
+        );
+    if (path.toLowerCase().endsWith('.svg')) {
+      return SvgPicture.asset(
+        path,
+        width: widget.size,
+        height: widget.size,
+        fit: BoxFit.cover,
+        placeholderBuilder: (_) => fallback(),
+      );
+    }
+    return Image.asset(
+      path,
+      width: widget.size,
+      height: widget.size,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) => fallback(),
+    );
   }
 
   @override
@@ -91,21 +124,7 @@ class _RadicalAvatarFrameState extends State<RadicalAvatarFrame>
                       : null,
                 ),
                 child: ClipOval(
-                  child: Image.asset(
-                    widget.avatarAssetPath,
-                    width: widget.size,
-                    height: widget.size,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: RadicalTheme.panel2,
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.person_rounded,
-                        size: widget.size * .46,
-                        color: RadicalTheme.goldBright,
-                      ),
-                    ),
-                  ),
+                  child: _buildAvatarImage(),
                 ),
               ),
               if (widget.isOnline)
