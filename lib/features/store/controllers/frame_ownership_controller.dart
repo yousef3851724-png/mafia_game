@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/radical_frame_tier.dart';
 import '../../lobbies/diamond_state.dart';
+import '../../../core/providers/app_providers.dart';
 
 class FrameOwnershipState {
   final List<RadicalFrameTier> ownedFrames;
@@ -81,6 +82,19 @@ class FrameOwnershipController extends StateNotifier<FrameOwnershipState> {
     } catch (e) {
       state = state.copyWith(error: e.toString(), isLoading: false);
     }
+  }
+
+  /// خرید با الماس واحد (walletProvider). true یعنی موفق.
+  Future<bool> buyWithWallet(RadicalFrameTier tier, int price) async {
+    final w = ref.read(walletProvider);
+    if (w.diamonds < price) {
+      state = state.copyWith(error: 'الماس کافی نیست');
+      return false;
+    }
+    ref.read(walletProvider.notifier).state =
+        RadicalWallet(coins: w.coins, diamonds: w.diamonds - price);
+    await equipFrame(tier);
+    return true;
   }
 
   Future<void> equipFrame(RadicalFrameTier tier) async {
