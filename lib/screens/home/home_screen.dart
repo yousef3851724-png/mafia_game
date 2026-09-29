@@ -183,6 +183,24 @@ class _HomeTabBody extends StatelessWidget {
                       style: RadicalTheme.textTheme.bodyMedium),
                 ],
               ),
+              GestureDetector(
+                onTap: () => context.push('/lucky-wheel'),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 54,
+                      height: 54,
+                      decoration: RadicalTheme.glassCard(radius: 16),
+                      child: const Icon(Icons.casino_rounded,
+                          color: RadicalTheme.gold, size: 24),
+                    ),
+                    const SizedBox(height: 6),
+                    Text('گردونه شانس',
+                        style: RadicalTheme.textTheme.bodyMedium),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
