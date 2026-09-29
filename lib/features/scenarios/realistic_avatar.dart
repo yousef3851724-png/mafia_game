@@ -1,118 +1,74 @@
 import 'package:flutter/material.dart';
-import '../../core/models/radical_avatar_catalog.dart';
-import '../../core/widgets/avatar_frame_widget.dart';
+import '../../../core/models/radical_avatar_catalog.dart';
+import '../../../core/theme/radical_theme.dart';
 
-/// آواتار اصلی رادیکال.
-/// وقتی avatarId مشخص باشد، فقط دارایی محلی همان آواتار استفاده می‌شود
-/// تا نمایش آواتارهای رادیکال به شبکه یا سرویس شخص ثالث وابسته نباشد.
-class RealisticAvatar extends StatelessWidget {
-  final String role;
-  final bool female;
-  final double size;
-  final FrameType? frameType;
-  final bool isAlive;
-  final String? avatarId;
-
-  const RealisticAvatar({
-    super.key,
-    required this.role,
-    this.female = false,
-    this.size = 54,
-    this.frameType,
-    this.isAlive = true,
-    this.avatarId,
-  });
-
-  RadicalAvatarAsset? get _catalogAvatar {
-    if (avatarId == null || avatarId!.isEmpty) return null;
-    return RadicalAvatarCatalog.byId(avatarId!);
-  }
-
-  String get _portraitUrl {
-    final femaleIds = <String, int>{
-      'شهروند': 47,
-      'دکتر': 49,
-      'بازپرس': 45,
-      'کارآگاه': 44,
-      'مافیا': 43,
-      'پدرخوانده': 42,
-      'دلقک': 41,
-      'جوکر': 40,
-      'زامبی': 39,
-      'قاتل مستقل': 38,
-      'محافظ': 37,
-      'تکاور': 36,
-    };
-    final maleIds = <String, int>{
-      'شهروند': 12,
-      'دکتر': 13,
-      'بازپرس': 14,
-      'کارآگاه': 15,
-      'مافیا': 16,
-      'پدرخوانده': 17,
-      'دلقک': 18,
-      'جوکر': 19,
-      'زامبی': 20,
-      'قاتل مستقل': 21,
-      'محافظ': 22,
-      'تکاور': 23,
-    };
-    final id = (female ? femaleIds : maleIds)[role] ?? (female ? 47 : 12);
-    return 'https://i.pravatar.cc/256?img=$id';
-  }
-
-  String? get _fallbackAsset {
-    switch (role) {
-      case 'کارآگاه':
-      case 'بازپرس':
-        return 'assets/images/avatar_detective.svg';
-      case 'مافیا':
-      case 'پدرخوانده':
-      case 'قاتل مستقل':
-        return 'assets/images/avatar_noir.svg';
-      case 'دلقک':
-      case 'جوکر':
-        return 'assets/images/avatar_crimson.svg';
-      case 'زامبی':
-        return 'assets/images/avatar_shadow.svg';
-      default:
-        return 'assets/images/avatar_gold.svg';
-    }
-  }
-
-  FrameType get _roleFrame {
-    if (frameType != null) return frameType!;
-    switch (role) {
-      case 'مافیا':
-      case 'پدرخوانده':
-      case 'قاتل مستقل':
-      case 'زامبی':
-        return FrameType.fire;
-      case 'کارآگاه':
-      case 'بازپرس':
-        return FrameType.lightning;
-      case 'دلقک':
-      case 'جوکر':
-        return FrameType.neon;
-      default:
-        return FrameType.gold;
-    }
-  }
+class AvatarShopScreen extends StatelessWidget {
+  const AvatarShopScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final catalogAvatar = _catalogAvatar;
-    return AvatarFrameWidget(
-      size: size,
-      frameType: _roleFrame,
-      isAlive: isAlive,
-      fallbackInitial: (catalogAvatar?.displayNameFa ?? role).isNotEmpty
-          ? (catalogAvatar?.displayNameFa ?? role)
-          : '?',
-      // Catalog avatars are local-only. Legacy role-based avatars may still
-      // use the existing network source when no catalog id is supplied.
-      imageUrl: catalogAvatar == null ? _portraitUrl : null,
-      fallbackAsset: catalogAvatar?.assetPath ?? _fallbackAsset,
+    const avatars = RadicalAvatarCatalog.avatars;
+    return GridView.builder(
+      padding: const EdgeInsets.all(16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 0.72,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 14,
+      ),
+      itemCount: avatars.length,
+      itemBuilder: (context, i) {
+        final a = avatars[i];
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            color: RadicalTheme.panel,
+            border: Border.all(color: RadicalTheme.gold, width: 1.2),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: SizedBox(
+                  width: 72,
+                  height: 72,
+                  child: Image.asset(
+                    a.assetPath,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _fallback(a),
+                    frameBuilder: (context, child, frame, sync) {
+                      return child;
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                a.displayNameFa,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: RadicalTheme.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 2),
+              const Text('لجندری',
+                  style: TextStyle(color: RadicalTheme.gold, fontSize: 10)),
+            ],
+          ),
+        );
+      },
     );
   }
+
+  Widget _fallback(RadicalAvatarAsset a) => Container(
+        color: RadicalTheme.panel2,
+        alignment: Alignment.center,
+        child: Text(
+          a.displayNameFa.isNotEmpty ? a.displayNameFa[0] : '?',
+          style: const TextStyle(
+              color: RadicalTheme.goldBright,
+              fontSize: 30,
+              fontWeight: FontWeight.w800),
+        ),
+      );
 }
