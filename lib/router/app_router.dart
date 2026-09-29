@@ -8,6 +8,7 @@ import '../screens/home/home_screen.dart';
 import '../features/profile/avatar_selection_screen.dart';
 import '../features/cosmetics/presentation/screens/frame_showcase_screen.dart';
 import '../features/lobby/presentation/lobby_realtime_screen.dart';
+import '../features/store/screens/lucky_wheel_screen.dart';
 import '../features/game/presentation/game_realtime_screen.dart';
 import '../features/pass_and_play/pass_and_play_screen.dart';
 import '../features/pass_and_play/pass_and_play_game_screen.dart';
@@ -20,6 +21,7 @@ class RadicalRoutes {
   static const home = '/home';
   static const avatarSelection = '/avatar-selection';
   static const frameShop = '/frame-shop';
+  static const luckyWheel = '/lucky-wheel';
   static const passAndPlay = '/pass-and-play';
 
   static const passAndPlayGamePattern =
@@ -65,6 +67,11 @@ final GoRouter radicalRouter = GoRouter(
       path: RadicalRoutes.avatarSelection,
       name: 'avatar-selection',
       builder: (context, state) => const AvatarSelectionScreen(),
+    ),
+    GoRoute(
+      path: RadicalRoutes.luckyWheel,
+      name: 'lucky-wheel',
+      builder: (context, state) => const LuckyWheelScreen(),
     ),
     GoRoute(
       path: RadicalRoutes.frameShop,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/models/radical_avatar_catalog.dart';
 import '../../core/theme/radical_theme.dart';
@@ -83,7 +84,7 @@ class _HomeTabBody extends StatelessWidget {
                     const Icon(Icons.monetization_on,
                         size: 16, color: RadicalTheme.gold),
                     const SizedBox(width: 5),
-                    Text('\${wallet.coins}',
+                    Text('${wallet.coins}',
                         style: RadicalTheme.textTheme.bodyMedium),
                   ],
                 ),
@@ -99,7 +100,7 @@ class _HomeTabBody extends StatelessWidget {
                     const Icon(Icons.diamond,
                         size: 16, color: Colors.cyanAccent),
                     const SizedBox(width: 5),
-                    Text('\${wallet.diamonds}',
+                    Text('${wallet.diamonds}',
                         style: RadicalTheme.textTheme.bodyMedium),
                   ],
                 ),
