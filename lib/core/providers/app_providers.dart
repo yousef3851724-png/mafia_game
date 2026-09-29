@@ -24,6 +24,6 @@ class RadicalWallet {
 }
 
 final walletProvider = StateProvider<RadicalWallet>((ref) {
-  return const RadicalWallet(coins: 1250, diamonds: 40);
+  return const RadicalWallet(coins: 1250, diamonds: 3000);
 });
 
