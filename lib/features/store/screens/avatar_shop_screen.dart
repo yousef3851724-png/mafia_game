@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../core/models/radical_avatar_catalog.dart';
 import '../../../core/theme/radical_theme.dart';
 
@@ -33,11 +34,13 @@ class AvatarShopScreen extends StatelessWidget {
                 child: SizedBox(
                   width: 72,
                   height: 72,
-                  child: Image.asset(
-                    a.assetPath,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _fallback(a),
-                  ),
+                  child: a.assetPath.endsWith('.svg')
+                      ? SvgPicture.asset(a.assetPath, fit: BoxFit.cover)
+                      : Image.asset(
+                          a.assetPath,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => _fallback(a),
+                        ),
                 ),
               ),
               const SizedBox(height: 8),

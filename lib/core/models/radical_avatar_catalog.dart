@@ -112,6 +112,11 @@ class RadicalAvatarCatalog {
     RadicalAvatarAsset(id: 'a01', assetPath: 'assets/logo/radical_face_only.png', displayNameFa: 'گادفادر'),
     RadicalAvatarAsset(id: 'a02', assetPath: 'assets/avatars/avatar_02.jpg', displayNameFa: 'اژدها'),
     RadicalAvatarAsset(id: 'a03', assetPath: 'assets/avatars/avatar_03.png', displayNameFa: 'رستم'),
+    RadicalAvatarAsset(id: 'a04', assetPath: 'assets/images/avatar_gold.svg', displayNameFa: 'سیمرغ'),
+    RadicalAvatarAsset(id: 'a05', assetPath: 'assets/images/avatar_noir.svg', displayNameFa: 'نوار'),
+    RadicalAvatarAsset(id: 'a06', assetPath: 'assets/images/avatar_crimson.svg', displayNameFa: 'ارغوان'),
+    RadicalAvatarAsset(id: 'a07', assetPath: 'assets/images/avatar_shadow.svg', displayNameFa: 'سایه'),
+    RadicalAvatarAsset(id: 'a08', assetPath: 'assets/images/avatar_detective.svg', displayNameFa: 'کارآگاه'),
   ];
 
   static RadicalAvatarAsset byId(String id) => avatars.firstWhere(
