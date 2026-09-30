@@ -31,10 +31,10 @@ class MafiaRadicalLogo extends StatelessWidget {
             ),
             child: Padding(
               padding: EdgeInsets.all(size * .08),
-              child: SvgPicture.asset(
-                'assets/images/mafia_radical_wordmark.svg',
+              child: Image.asset(
+                'assets/images/mafia_radical_wordmark.png',
                 fit: BoxFit.contain,
-                semanticsLabel: 'MAFIA-RADICAL',
+                semanticLabel: 'MAFIA-RADICAL',
               ),
             ),
           ),

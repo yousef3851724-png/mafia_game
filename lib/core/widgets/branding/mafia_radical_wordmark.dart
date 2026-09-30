@@ -18,10 +18,10 @@ class MafiaRadicalWordmark extends StatelessWidget {
       child: SizedBox(
         width: width,
         height: resolvedHeight,
-        child: SvgPicture.asset(
-          'assets/images/mafia_radical_wordmark.svg',
+        child: Image.asset(
+          'assets/images/mafia_radical_wordmark.png',
           fit: BoxFit.contain,
-          semanticsLabel: 'MAFIA-RADICAL',
+          semanticLabel: 'MAFIA-RADICAL',
         ),
       ),
     );
