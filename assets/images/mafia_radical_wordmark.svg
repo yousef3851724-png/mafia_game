@@ -1,1 +1,12 @@
-(اینجا کل کد SVG را پیست کن)
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <circle cx="250" cy="250" r="230" fill="none" stroke="#D4AF37" stroke-width="14"/>
+  <circle cx="250" cy="250" r="200" fill="none" stroke="#111" stroke-width="8"/>
+  <path d="M 120 100 C 50 150, 30 240, 50 320 C 60 360, 80 400, 100 430 L 130 410 C 110 370, 90 320, 85 260 C 75 180, 95 130, 140 110 Z" fill="#1a1a1a" stroke="#D4AF37" stroke-width="3"/>
+  <path d="M 380 100 C 450 150, 470 240, 450 320 C 440 360, 420 400, 400 430 L 370 410 C 390 370, 410 320, 415 260 C 425 180, 405 130, 360 110 Z" fill="#1a1a1a" stroke="#D4AF37" stroke-width="3"/>
+  <path d="M 205 95 C 205 35, 295 35, 295 95 L 300 130 L 200 130 Z" fill="#1a1a1a" stroke="#D4AF37" stroke-width="4"/>
+  <circle cx="233" cy="75" r="10" fill="#ff0000" stroke="#fff" stroke-width="1.5"/>
+  <circle cx="267" cy="75" r="10" fill="#ff0000" stroke="#fff" stroke-width="1.5"/>
+  <path d="M 238 85 L 250 115 L 262 85 Z" fill="#B8860B" stroke="#D4AF37" stroke-width="2"/>
+  <path d="M 175 435 C 165 470, 190 495, 215 480" fill="none" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 325 435 C 335 470, 310 495, 285 480" fill="none" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round"/>
+</svg>
