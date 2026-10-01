@@ -25,7 +25,7 @@ jobs:
 
       - name: Decode Keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/mafia-release-v2.jks
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | tr -d "[:space:]" | base64 --decode > android/mafia-release-v2.jks
 
       - name: Create key.properties
         run: |
