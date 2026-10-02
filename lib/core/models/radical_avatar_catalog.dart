@@ -109,7 +109,7 @@ class RadicalAvatarAsset {
 
 class RadicalAvatarCatalog {
   static const List<RadicalAvatarAsset> avatars = [
-    RadicalAvatarAsset(id: 'a01', assetPath: 'assets/logo/radical_face_only.png', displayNameFa: 'گادفادر'),
+    RadicalAvatarAsset(id: 'a01', assetPath: 'assets/avatars/avatar_01.png', displayNameFa: 'گادفادر'),
     RadicalAvatarAsset(id: 'a02', assetPath: 'assets/avatars/avatar_02.jpg', displayNameFa: 'اژدها'),
     RadicalAvatarAsset(id: 'a03', assetPath: 'assets/avatars/avatar_03.png', displayNameFa: 'رستم'),
     RadicalAvatarAsset(id: 'a04', assetPath: 'assets/images/avatar_gold.svg', displayNameFa: 'سیمرغ'),
