@@ -1,5 +1,4 @@
 import '../models/diamond_type.dart';
-import 'radical_theme.dart';
 
 enum RadicalFrameTier {
   none(0, 'نیست', '', 0, DiamondType.blue, 'فریم ندارید', 0xFF808080),
