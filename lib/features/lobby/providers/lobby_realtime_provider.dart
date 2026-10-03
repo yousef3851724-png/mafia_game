@@ -6,8 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/lobby_socket.dart';
 import '../domain/lobby_realtime_state.dart';
 
-const kLobbyWsUrl = 'ws://127.0.0.1:8080/lobby';
-const kLobbyUseMock = false;
+const kLobbyWsUrl = 'wss://your-server.example.com/lobby';
+const kLobbyUseMock = true;
 
 final lobbyRealtimeProvider =
     StateNotifierProvider.autoDispose<LobbyRealtimeController, LobbyRealtimeState>(
