@@ -8,11 +8,6 @@ enum FrameType {
   fire,
   lightning,
   neon,
-  eagle,
-  pinkRose,
-  purpleOrchid,
-  prismaticCrown,
-  premiumPinkPurple,
 }
 
 extension FrameTypeSvg on FrameType {
@@ -26,16 +21,6 @@ extension FrameTypeSvg on FrameType {
         return 'assets/frames/frame_lightning.svg';
       case FrameType.neon:
         return 'assets/frames/frame_neon.svg';
-      case FrameType.eagle:
-        return 'assets/frames/mafia_radical_eagle.svg';
-      case FrameType.pinkRose:
-        return 'assets/frames/mafia_radical_pink_rose.svg';
-      case FrameType.purpleOrchid:
-        return 'assets/frames/mafia_radical_purple_orchid.svg';
-      case FrameType.prismaticCrown:
-        return 'assets/frames/mafia_radical_prismatic_crown.svg';
-      case FrameType.premiumPinkPurple:
-        return 'assets/frames/mafia_radical_premium_pink_purple.svg';
       case FrameType.none:
         return null;
     }
@@ -70,16 +55,6 @@ class AvatarFrameWidget extends StatelessWidget {
         return RadicalTheme.goldBright;
       case FrameType.neon:
         return RadicalTheme.violet;
-      case FrameType.eagle:
-        return RadicalTheme.goldBright;
-      case FrameType.pinkRose:
-        return const Color(0xFFFF7EB6);
-      case FrameType.purpleOrchid:
-        return RadicalTheme.violetSoft;
-      case FrameType.prismaticCrown:
-        return RadicalTheme.cyan;
-      case FrameType.premiumPinkPurple:
-        return RadicalTheme.violetBright;
       case FrameType.none:
         return Colors.transparent;
     }
