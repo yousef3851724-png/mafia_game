@@ -1,4 +1,4 @@
-// کاتالوگ آواتار — خالی. پرتره‌های واقعی بعداً اضافه می‌شوند.
+// ۷۰ آواتار رادیکال — set_70
 class RadicalAvatarAsset {
   final String id;
   final String assetPath;
@@ -13,10 +13,85 @@ class RadicalAvatarAsset {
 }
 
 class RadicalAvatarCatalog {
-  static const List<RadicalAvatarAsset> avatars = <RadicalAvatarAsset>[];
+  static const List<RadicalAvatarAsset> avatars = <RadicalAvatarAsset>[
+    RadicalAvatarAsset(id: 'a01', assetPath: 'assets/avatars/set_70/avatar_01.png', displayNameFa: 'آواتار 1'),
+    RadicalAvatarAsset(id: 'a02', assetPath: 'assets/avatars/set_70/avatar_02.png', displayNameFa: 'آواتار 2'),
+    RadicalAvatarAsset(id: 'a03', assetPath: 'assets/avatars/set_70/avatar_03.png', displayNameFa: 'آواتار 3'),
+    RadicalAvatarAsset(id: 'a04', assetPath: 'assets/avatars/set_70/avatar_04.png', displayNameFa: 'آواتار 4'),
+    RadicalAvatarAsset(id: 'a05', assetPath: 'assets/avatars/set_70/avatar_05.png', displayNameFa: 'آواتار 5'),
+    RadicalAvatarAsset(id: 'a06', assetPath: 'assets/avatars/set_70/avatar_06.png', displayNameFa: 'آواتار 6'),
+    RadicalAvatarAsset(id: 'a07', assetPath: 'assets/avatars/set_70/avatar_07.png', displayNameFa: 'آواتار 7'),
+    RadicalAvatarAsset(id: 'a08', assetPath: 'assets/avatars/set_70/avatar_08.png', displayNameFa: 'آواتار 8'),
+    RadicalAvatarAsset(id: 'a09', assetPath: 'assets/avatars/set_70/avatar_09.png', displayNameFa: 'آواتار 9'),
+    RadicalAvatarAsset(id: 'a10', assetPath: 'assets/avatars/set_70/avatar_10.png', displayNameFa: 'آواتار 10'),
+    RadicalAvatarAsset(id: 'a11', assetPath: 'assets/avatars/set_70/avatar_11.png', displayNameFa: 'آواتار 11'),
+    RadicalAvatarAsset(id: 'a12', assetPath: 'assets/avatars/set_70/avatar_12.png', displayNameFa: 'آواتار 12'),
+    RadicalAvatarAsset(id: 'a13', assetPath: 'assets/avatars/set_70/avatar_13.png', displayNameFa: 'آواتار 13'),
+    RadicalAvatarAsset(id: 'a14', assetPath: 'assets/avatars/set_70/avatar_14.png', displayNameFa: 'آواتار 14'),
+    RadicalAvatarAsset(id: 'a15', assetPath: 'assets/avatars/set_70/avatar_15.png', displayNameFa: 'آواتار 15'),
+    RadicalAvatarAsset(id: 'a16', assetPath: 'assets/avatars/set_70/avatar_16.png', displayNameFa: 'آواتار 16'),
+    RadicalAvatarAsset(id: 'a17', assetPath: 'assets/avatars/set_70/avatar_17.png', displayNameFa: 'آواتار 17'),
+    RadicalAvatarAsset(id: 'a18', assetPath: 'assets/avatars/set_70/avatar_18.png', displayNameFa: 'آواتار 18'),
+    RadicalAvatarAsset(id: 'a19', assetPath: 'assets/avatars/set_70/avatar_19.png', displayNameFa: 'آواتار 19'),
+    RadicalAvatarAsset(id: 'a20', assetPath: 'assets/avatars/set_70/avatar_20.png', displayNameFa: 'آواتار 20'),
+    RadicalAvatarAsset(id: 'a21', assetPath: 'assets/avatars/set_70/avatar_21.png', displayNameFa: 'آواتار 21'),
+    RadicalAvatarAsset(id: 'a22', assetPath: 'assets/avatars/set_70/avatar_22.png', displayNameFa: 'آواتار 22'),
+    RadicalAvatarAsset(id: 'a23', assetPath: 'assets/avatars/set_70/avatar_23.png', displayNameFa: 'آواتار 23'),
+    RadicalAvatarAsset(id: 'a24', assetPath: 'assets/avatars/set_70/avatar_24.png', displayNameFa: 'آواتار 24'),
+    RadicalAvatarAsset(id: 'a25', assetPath: 'assets/avatars/set_70/avatar_25.png', displayNameFa: 'آواتار 25'),
+    RadicalAvatarAsset(id: 'a26', assetPath: 'assets/avatars/set_70/avatar_26.png', displayNameFa: 'آواتار 26'),
+    RadicalAvatarAsset(id: 'a27', assetPath: 'assets/avatars/set_70/avatar_27.png', displayNameFa: 'آواتار 27'),
+    RadicalAvatarAsset(id: 'a28', assetPath: 'assets/avatars/set_70/avatar_28.png', displayNameFa: 'آواتار 28'),
+    RadicalAvatarAsset(id: 'a29', assetPath: 'assets/avatars/set_70/avatar_29.png', displayNameFa: 'آواتار 29'),
+    RadicalAvatarAsset(id: 'a30', assetPath: 'assets/avatars/set_70/avatar_30.png', displayNameFa: 'آواتار 30'),
+    RadicalAvatarAsset(id: 'a31', assetPath: 'assets/avatars/set_70/avatar_31.png', displayNameFa: 'آواتار 31'),
+    RadicalAvatarAsset(id: 'a32', assetPath: 'assets/avatars/set_70/avatar_32.png', displayNameFa: 'آواتار 32'),
+    RadicalAvatarAsset(id: 'a33', assetPath: 'assets/avatars/set_70/avatar_33.png', displayNameFa: 'آواتار 33'),
+    RadicalAvatarAsset(id: 'a34', assetPath: 'assets/avatars/set_70/avatar_34.png', displayNameFa: 'آواتار 34'),
+    RadicalAvatarAsset(id: 'a35', assetPath: 'assets/avatars/set_70/avatar_35.png', displayNameFa: 'آواتار 35'),
+    RadicalAvatarAsset(id: 'a36', assetPath: 'assets/avatars/set_70/avatar_36.png', displayNameFa: 'آواتار 36'),
+    RadicalAvatarAsset(id: 'a37', assetPath: 'assets/avatars/set_70/avatar_37.png', displayNameFa: 'آواتار 37'),
+    RadicalAvatarAsset(id: 'a38', assetPath: 'assets/avatars/set_70/avatar_38.png', displayNameFa: 'آواتار 38'),
+    RadicalAvatarAsset(id: 'a39', assetPath: 'assets/avatars/set_70/avatar_39.png', displayNameFa: 'آواتار 39'),
+    RadicalAvatarAsset(id: 'a40', assetPath: 'assets/avatars/set_70/avatar_40.png', displayNameFa: 'آواتار 40'),
+    RadicalAvatarAsset(id: 'a41', assetPath: 'assets/avatars/set_70/avatar_41.png', displayNameFa: 'آواتار 41'),
+    RadicalAvatarAsset(id: 'a42', assetPath: 'assets/avatars/set_70/avatar_42.png', displayNameFa: 'آواتار 42'),
+    RadicalAvatarAsset(id: 'a43', assetPath: 'assets/avatars/set_70/avatar_43.png', displayNameFa: 'آواتار 43'),
+    RadicalAvatarAsset(id: 'a44', assetPath: 'assets/avatars/set_70/avatar_44.png', displayNameFa: 'آواتار 44'),
+    RadicalAvatarAsset(id: 'a45', assetPath: 'assets/avatars/set_70/avatar_45.png', displayNameFa: 'آواتار 45'),
+    RadicalAvatarAsset(id: 'a46', assetPath: 'assets/avatars/set_70/avatar_46.png', displayNameFa: 'آواتار 46'),
+    RadicalAvatarAsset(id: 'a47', assetPath: 'assets/avatars/set_70/avatar_47.png', displayNameFa: 'آواتار 47'),
+    RadicalAvatarAsset(id: 'a48', assetPath: 'assets/avatars/set_70/avatar_48.png', displayNameFa: 'آواتار 48'),
+    RadicalAvatarAsset(id: 'a49', assetPath: 'assets/avatars/set_70/avatar_49.png', displayNameFa: 'آواتار 49'),
+    RadicalAvatarAsset(id: 'a50', assetPath: 'assets/avatars/set_70/avatar_50.png', displayNameFa: 'آواتار 50'),
+    RadicalAvatarAsset(id: 'a51', assetPath: 'assets/avatars/set_70/avatar_51.png', displayNameFa: 'آواتار 51'),
+    RadicalAvatarAsset(id: 'a52', assetPath: 'assets/avatars/set_70/avatar_52.png', displayNameFa: 'آواتار 52'),
+    RadicalAvatarAsset(id: 'a53', assetPath: 'assets/avatars/set_70/avatar_53.png', displayNameFa: 'آواتار 53'),
+    RadicalAvatarAsset(id: 'a54', assetPath: 'assets/avatars/set_70/avatar_54.png', displayNameFa: 'آواتار 54'),
+    RadicalAvatarAsset(id: 'a55', assetPath: 'assets/avatars/set_70/avatar_55.png', displayNameFa: 'آواتار 55'),
+    RadicalAvatarAsset(id: 'a56', assetPath: 'assets/avatars/set_70/avatar_56.png', displayNameFa: 'آواتار 56'),
+    RadicalAvatarAsset(id: 'a57', assetPath: 'assets/avatars/set_70/avatar_57.png', displayNameFa: 'آواتار 57'),
+    RadicalAvatarAsset(id: 'a58', assetPath: 'assets/avatars/set_70/avatar_58.png', displayNameFa: 'آواتار 58'),
+    RadicalAvatarAsset(id: 'a59', assetPath: 'assets/avatars/set_70/avatar_59.png', displayNameFa: 'آواتار 59'),
+    RadicalAvatarAsset(id: 'a60', assetPath: 'assets/avatars/set_70/avatar_60.png', displayNameFa: 'آواتار 60'),
+    RadicalAvatarAsset(id: 'a61', assetPath: 'assets/avatars/set_70/avatar_61.png', displayNameFa: 'آواتار 61'),
+    RadicalAvatarAsset(id: 'a62', assetPath: 'assets/avatars/set_70/avatar_62.png', displayNameFa: 'آواتار 62'),
+    RadicalAvatarAsset(id: 'a63', assetPath: 'assets/avatars/set_70/avatar_63.png', displayNameFa: 'آواتار 63'),
+    RadicalAvatarAsset(id: 'a64', assetPath: 'assets/avatars/set_70/avatar_64.png', displayNameFa: 'آواتار 64'),
+    RadicalAvatarAsset(id: 'a65', assetPath: 'assets/avatars/set_70/avatar_65.png', displayNameFa: 'آواتار 65'),
+    RadicalAvatarAsset(id: 'a66', assetPath: 'assets/avatars/set_70/avatar_66.png', displayNameFa: 'آواتار 66'),
+    RadicalAvatarAsset(id: 'a67', assetPath: 'assets/avatars/set_70/avatar_67.png', displayNameFa: 'آواتار 67'),
+    RadicalAvatarAsset(id: 'a68', assetPath: 'assets/avatars/set_70/avatar_68.png', displayNameFa: 'آواتار 68'),
+    RadicalAvatarAsset(id: 'a69', assetPath: 'assets/avatars/set_70/avatar_69.png', displayNameFa: 'آواتار 69'),
+    RadicalAvatarAsset(id: 'a70', assetPath: 'assets/avatars/set_70/avatar_70.png', displayNameFa: 'آواتار 70'),
+  ];
+
   static RadicalAvatarAsset? byId(String id) {
-    for (final a in avatars) { if (a.id == id) return a; }
+    for (final a in avatars) {
+      if (a.id == id) return a;
+    }
     return null;
   }
+
   static bool get isEmpty => avatars.isEmpty;
 }
