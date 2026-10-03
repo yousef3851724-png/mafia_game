@@ -33,3 +33,5 @@ keystore_base64.txt
 _deleted_backup/
 *.bak
 *.bak2
+_deleted_backup/
+*.bak
