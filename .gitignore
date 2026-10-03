@@ -29,3 +29,4 @@ android/key.properties
 *.keystore
 keystore_base64.txt
 *.jks
+*.bak
