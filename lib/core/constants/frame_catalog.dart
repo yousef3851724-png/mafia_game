@@ -20,46 +20,6 @@ class FrameMetadata {
 
 class FrameCatalog {
   static const Map<FrameType, FrameMetadata> frames = {
-    FrameType.eagle: FrameMetadata(
-      type: FrameType.eagle,
-      titleFa: 'عقاب طلایی',
-      description: 'فریم سلطنتی عقاب با حلقه‌های طلایی و جواهر',
-      gradientColors: [0xFFF5D27A, 0xFFA56B15, 0xFFF7E1A0],
-      hasParticleEffect: true,
-      animationSpeed: 1.2,
-    ),
-    FrameType.pinkRose: FrameMetadata(
-      type: FrameType.pinkRose,
-      titleFa: 'رز صورتی',
-      description: 'فریم گل رز صورتی با جواهر',
-      gradientColors: [0xFFFF7EB6, 0xFFD81B60, 0xFFFFC1D9],
-      hasParticleEffect: false,
-      animationSpeed: 1.0,
-    ),
-    FrameType.purpleOrchid: FrameMetadata(
-      type: FrameType.purpleOrchid,
-      titleFa: 'ارکیده بنفش',
-      description: 'فریم ارکیده بنفش، کمیاب و آرام',
-      gradientColors: [0xFFB98AF2, 0xFF7B1FA2, 0xFFE1BEE7],
-      hasParticleEffect: false,
-      animationSpeed: 1.0,
-    ),
-    FrameType.prismaticCrown: FrameMetadata(
-      type: FrameType.prismaticCrown,
-      titleFa: 'تاج منشوری',
-      description: 'تاج چندرنگ برای بزرگان شهر',
-      gradientColors: [0xFFFFD700, 0xFFFF4081, 0xFF00E5FF, 0xFF7C4DFF],
-      hasParticleEffect: true,
-      animationSpeed: 1.8,
-    ),
-    FrameType.premiumPinkPurple: FrameMetadata(
-      type: FrameType.premiumPinkPurple,
-      titleFa: 'پریمیوم صورتی بنفش',
-      description: 'فریم ویژه با ترکیب صورتی و بنفش',
-      gradientColors: [0xFFFF4D9D, 0xFF8B5CF6, 0xFFFFB3D9],
-      hasParticleEffect: true,
-      animationSpeed: 1.4,
-    ),
     FrameType.none: FrameMetadata(
       type: FrameType.none,
       titleFa: 'ساده',
