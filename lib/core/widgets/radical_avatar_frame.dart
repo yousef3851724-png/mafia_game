@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../models/radical_avatar_catalog.dart';
+import '../theme/radical_frame_tier.dart';
 import '../theme/radical_theme.dart';
 
 /// Shared Radical avatar renderer used by home, profile, picker and gameplay.
