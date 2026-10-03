@@ -2,7 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../theme/radical_theme.dart';
 
-enum FrameType { none, gold, fire, lightning, neon }
+enum FrameType {
+  none,
+  gold,
+  fire,
+  lightning,
+  neon,
+  eagle,
+  pinkRose,
+  purpleOrchid,
+  prismaticCrown,
+  premiumPinkPurple,
+}
+
+extension FrameTypeSvg on FrameType {
+  String? get svgAsset {
+    switch (this) {
+      case FrameType.eagle:
+        return 'assets/frames/mafia_radical_eagle.svg';
+      case FrameType.pinkRose:
+        return 'assets/frames/mafia_radical_pink_rose.svg';
+      case FrameType.purpleOrchid:
+        return 'assets/frames/mafia_radical_purple_orchid.svg';
+      case FrameType.prismaticCrown:
+        return 'assets/frames/mafia_radical_prismatic_crown.svg';
+      case FrameType.premiumPinkPurple:
+        return 'assets/frames/mafia_radical_premium_pink_purple.svg';
+      default:
+        return null;
+    }
+  }
+}
 
 class AvatarFrameWidget extends StatelessWidget {
   final String? imageUrl;
@@ -32,6 +62,16 @@ class AvatarFrameWidget extends StatelessWidget {
         return RadicalTheme.goldBright;
       case FrameType.neon:
         return RadicalTheme.violet;
+      case FrameType.eagle:
+        return RadicalTheme.goldBright;
+      case FrameType.pinkRose:
+        return const Color(0xFFFF7EB6);
+      case FrameType.purpleOrchid:
+        return RadicalTheme.violetSoft;
+      case FrameType.prismaticCrown:
+        return RadicalTheme.cyan;
+      case FrameType.premiumPinkPurple:
+        return RadicalTheme.violetBright;
       case FrameType.none:
         return Colors.transparent;
     }
@@ -44,9 +84,20 @@ class AvatarFrameWidget extends StatelessWidget {
     return SizedBox(
       width: size + 16,
       height: size + 16,
-      child: Stack(
+      child: Stack(clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
+          if (hasFrame && frameType.svgAsset != null)
+            IgnorePointer(
+              child: Opacity(
+                opacity: isAlive ? 1.0 : 0.35,
+                child: SvgPicture.asset(
+                  frameType.svgAsset!,
+                  width: size * 1.4,
+                  height: size * 1.4,
+                ),
+              ),
+            ),
           if (hasFrame && isAlive)
             Container(
               width: size + 10,
@@ -56,7 +107,7 @@ class AvatarFrameWidget extends StatelessWidget {
                 boxShadow: RadicalTheme.goldGlow(blur: 12, opacity: .10).map((shadow) => shadow.copyWith(color: frameColor.withValues(alpha: shadow.color.a * 0.7))).toList(),
               ),
             ),
-          if (hasFrame)
+          if (hasFrame && frameType.svgAsset == null)
             Container(
               width: size + 8,
               height: size + 8,
