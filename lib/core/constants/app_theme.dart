@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
+import '../theme/radical_theme.dart';
 
-/// Legacy-compatible palette used by the older game screens.
-/// All visual accents are intentionally normalized to the Radical palette:
-/// black + metallic gold + deep purple.
+/// Legacy-compatible palette.
+/// رنگ‌ها به RadicalTheme نگاشت شده‌اند: noir black + metallic gold.
 class AppColors {
-  static const Color background = Color(0xFF06070B);
-  static const Color surface = Color(0xFF0F1219);
-  static const Color surfaceLight = Color(0xFF171B25);
+  static const Color background = RadicalTheme.ink;
+  static const Color surface = RadicalTheme.panel;
+  static const Color surfaceLight = RadicalTheme.panel3;
 
-  // Kept under the legacy name so existing game logic/screens remain intact.
-  static const Color primaryRed = Color(0xFF8E5CCB);
-  static const Color accentCyan = Color(0xFFFFDFA0);
-  static const Color goldYellow = Color(0xFFE3B873);
-  static const Color medicGreen = Color(0xFFE3B873);
-  static const Color detectiveBlue = Color(0xFF9A72D9);
-  static const Color textMuted = Colors.white60;
+  static const Color primaryRed = RadicalTheme.crimson;
+  static const Color accentCyan = RadicalTheme.goldSoft;
+  static const Color goldYellow = RadicalTheme.gold;
+  static const Color medicGreen = RadicalTheme.gold;
+  static const Color detectiveBlue = RadicalTheme.goldDeep;
+  static const Color textMuted = RadicalTheme.smoke;
 }
