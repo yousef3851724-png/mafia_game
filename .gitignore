@@ -30,3 +30,6 @@ android/key.properties
 keystore_base64.txt
 *.jks
 *.bak
+_deleted_backup/
+*.bak
+*.bak2
