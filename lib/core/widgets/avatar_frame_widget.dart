@@ -18,6 +18,14 @@ enum FrameType {
 extension FrameTypeSvg on FrameType {
   String? get svgAsset {
     switch (this) {
+      case FrameType.gold:
+        return 'assets/frames/frame_gold.svg';
+      case FrameType.fire:
+        return 'assets/frames/frame_fire.svg';
+      case FrameType.lightning:
+        return 'assets/frames/frame_lightning.svg';
+      case FrameType.neon:
+        return 'assets/frames/frame_neon.svg';
       case FrameType.eagle:
         return 'assets/frames/mafia_radical_eagle.svg';
       case FrameType.pinkRose:
@@ -28,7 +36,7 @@ extension FrameTypeSvg on FrameType {
         return 'assets/frames/mafia_radical_prismatic_crown.svg';
       case FrameType.premiumPinkPurple:
         return 'assets/frames/mafia_radical_premium_pink_purple.svg';
-      default:
+      case FrameType.none:
         return null;
     }
   }
@@ -80,42 +88,17 @@ class AvatarFrameWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final frameColor = _getFrameColor();
+    final frameAsset = frameType.svgAsset;
     final hasFrame = frameType != FrameType.none;
+    final frameSize = size + 16;
+
     return SizedBox(
-      width: size + 16,
-      height: size + 16,
-      child: Stack(clipBehavior: Clip.none,
+      width: frameSize,
+      height: frameSize,
+      child: Stack(
+        clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
-          if (hasFrame && frameType.svgAsset != null)
-            IgnorePointer(
-              child: Opacity(
-                opacity: isAlive ? 1.0 : 0.35,
-                child: SvgPicture.asset(
-                  frameType.svgAsset!,
-                  width: size * 1.4,
-                  height: size * 1.4,
-                ),
-              ),
-            ),
-          if (hasFrame && isAlive)
-            Container(
-              width: size + 10,
-              height: size + 10,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: RadicalTheme.goldGlow(blur: 12, opacity: .10).map((shadow) => shadow.copyWith(color: frameColor.withValues(alpha: shadow.color.a * 0.7))).toList(),
-              ),
-            ),
-          if (hasFrame && frameType.svgAsset == null)
-            Container(
-              width: size + 8,
-              height: size + 8,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: isAlive ? frameColor : RadicalTheme.panel3, width: 3.5),
-              ),
-            ),
           Container(
             width: size,
             height: size,
@@ -125,12 +108,66 @@ class AvatarFrameWidget extends StatelessWidget {
             ),
             child: ClipOval(child: _buildImage()),
           ),
+          if (hasFrame && isAlive)
+            IgnorePointer(
+              child: Container(
+                width: frameSize,
+                height: frameSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: RadicalTheme.goldGlow(
+                    blur: 12,
+                    opacity: .10,
+                  )
+                      .map(
+                        (shadow) => shadow.copyWith(
+                          color: frameColor.withValues(
+                            alpha: shadow.color.a * 0.7,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            ),
+          if (hasFrame && frameAsset != null)
+            IgnorePointer(
+              child: Opacity(
+                opacity: isAlive ? 1.0 : 0.35,
+                child: SvgPicture.asset(
+                  frameAsset,
+                  width: frameSize,
+                  height: frameSize,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.center,
+                ),
+              ),
+            ),
+          if (hasFrame && frameAsset == null)
+            Container(
+              width: frameSize - 2,
+              height: frameSize - 2,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isAlive ? frameColor : RadicalTheme.panel3,
+                  width: 3.5,
+                ),
+              ),
+            ),
           if (!isAlive)
             Container(
               width: size,
               height: size,
-              decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xB806070B)),
-              child: const Icon(Icons.close, color: RadicalTheme.violetBright, size: 40),
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color(0xB806070B),
+              ),
+              child: const Icon(
+                Icons.close,
+                color: RadicalTheme.violetBright,
+                size: 40,
+              ),
             ),
         ],
       ),
@@ -168,9 +205,13 @@ class AvatarFrameWidget extends StatelessWidget {
   }
 
   Widget _buildFallback() => Center(
-    child: Text(
-      fallbackInitial.isNotEmpty ? fallbackInitial[0].toUpperCase() : '?',
-      style: TextStyle(fontSize: size * .4, fontWeight: FontWeight.bold, color: isAlive ? RadicalTheme.textPrimary : RadicalTheme.smoke),
-    ),
-  );
+        child: Text(
+          fallbackInitial.isNotEmpty ? fallbackInitial[0].toUpperCase() : '?',
+          style: TextStyle(
+            fontSize: size * .4,
+            fontWeight: FontWeight.bold,
+            color: isAlive ? RadicalTheme.textPrimary : RadicalTheme.smoke,
+          ),
+        ),
+      );
 }
