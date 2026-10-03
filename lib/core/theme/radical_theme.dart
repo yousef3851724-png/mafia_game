@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-/// Mafia Radical main theme: classic noir (warm black) + gold.
-/// Gold = brand/primary, crimson = danger/mafia team, violet = premium only.
+/// Mafia Radical theme — noir black + metallic gold.
+/// هیچ رنگ بنفش/آبی M3 خودکار تولید نمی‌شود.
 class RadicalTheme {
   RadicalTheme._();
 
-  // ---- Noir surfaces ----
+  // ─── Noir surfaces ───
   static const ink = Color(0xFF050507);
   static const panel = Color(0xFF0E0D12);
   static const panel2 = Color(0xFF15131A);
@@ -14,42 +14,42 @@ class RadicalTheme {
   static const black = ink;
   static const charcoalLight = panel3;
 
-  // ---- Text ----
+  // ─── Text ───
   static const textPrimary = Color(0xFFF5F0E6);
   static const cream = Color(0xFFF4EBD6);
   static const smoke = Color(0xFFA19A8C);
 
-  // ---- Gold ----
+  // ─── Gold ───
   static const gold = Color(0xFFD4AF37);
   static const goldBright = Color(0xFFF5D76E);
   static const goldDeep = Color(0xFF8A6A1C);
   static const goldSoft = Color(0xFFE8C872);
 
-  // ---- Crimson ----
+  // ─── Crimson ───
   static const crimson = Color(0xFF9B1B1B);
   static const crimsonBright = Color(0xFFD32F2F);
 
-  // ---- Violet (premium only) ----
+  // ─── Violet (فقط برای Rarity نمایشی، در theme استفاده نمی‌شود) ───
   static const violet = Color(0xFF8B5CF6);
   static const violetBright = Color(0xFFA855F7);
   static const violetSoft = Color(0xFFB98AF2);
 
-  // ---- Support ----
+  // ─── Support ───
   static const navy = Color(0xFF1A3A5C);
   static const navyBright = Color(0xFF2C5282);
   static const emerald = Color(0xFF10B981);
   static const cyan = Color(0xFF00E5FF);
 
-  // ---- Team colors ----
+  // ─── Team colors ───
   static const mafiaColor = crimsonBright;
   static const citizenColor = emerald;
   static const independentColor = goldBright;
 
-  // ---- Lines ----
+  // ─── Lines ───
   static const line = Color(0x1FFFFFFF);
   static const lineGold = Color(0x55D4AF37);
 
-  // ---- Gradients ----
+  // ─── Gradients ───
   static const LinearGradient backgroundGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
@@ -80,7 +80,7 @@ class RadicalTheme {
     colors: [violetBright, violet, Color(0xFF5A2EA6)],
   );
 
-  // ---- Glows ----
+  // ─── Glows ───
   static List<BoxShadow> goldGlow({double blur = 24, double opacity = .30}) => [
     BoxShadow(color: gold.withValues(alpha: opacity), blurRadius: blur, spreadRadius: 1),
     BoxShadow(color: gold.withValues(alpha: opacity * .35), blurRadius: blur * 2, spreadRadius: 2),
@@ -96,9 +96,14 @@ class RadicalTheme {
     BoxShadow(color: violetBright.withValues(alpha: opacity * .35), blurRadius: blur * 2, spreadRadius: 2),
   ];
 
-  static TextTheme get textTheme => dark().textTheme;
+  // ─── Theme Data (کش‌شده) ───
+  static final ThemeData _dark = _buildDark();
 
-  static ThemeData dark() {
+  static ThemeData dark() => _dark;
+
+  static TextTheme get textTheme => _dark.textTheme;
+
+  static ThemeData _buildDark() {
     const scheme = ColorScheme(
       brightness: Brightness.dark,
       primary: gold,
@@ -142,129 +147,150 @@ class RadicalTheme {
       canvasColor: ink,
       cardColor: panel,
       dividerColor: line,
-      splashColor: const Color(0x1FD4AF37),
-      highlightColor: const Color(0x0FD4AF37),
+      dialogBackgroundColor: panel2,
+      splashColor: Color(0x1FD4AF37),
+      highlightColor: Color(0x0FD4AF37),
       fontFamily: 'Roboto',
       visualDensity: VisualDensity.standard,
     );
 
     return base.copyWith(
-      pageTransitionsTheme: const PageTransitionsTheme(builders: {
+      appBarTheme: const AppBarTheme(
+        backgroundColor: ink,
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: textPrimary,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      cardTheme: CardThemeData(
+        color: panel,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(color: lineGold, width: 1),
+        ),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: panel,
+        surfaceTintColor: Colors.transparent,
+        modalBackgroundColor: panel2,
+        modalBarrierColor: Colors.black87,
+      ),
+      dialogTheme: const DialogThemeData(
+        backgroundColor: panel2,
+        surfaceTintColor: Colors.transparent,
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: gold,
+          foregroundColor: Color(0xFF17110A),
+          disabledBackgroundColor: panel3,
+          disabledForegroundColor: smoke,
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          textStyle: TextStyle(fontWeight: FontWeight.w900, fontSize: 15),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: gold,
+          foregroundColor: Color(0xFF17110A),
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: gold,
+          side: BorderSide(color: lineGold, width: 1.2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(foregroundColor: gold),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: panel2,
+        hintStyle: TextStyle(color: smoke),
+        labelStyle: TextStyle(color: smoke),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: line),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: gold, width: 1.4),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: panel2,
+        selectedColor: goldDeep,
+        side: BorderSide(color: line),
+        labelStyle: TextStyle(color: textPrimary),
+      ),
+      tabBarTheme: const TabBarThemeData(
+        labelColor: gold,
+        unselectedLabelColor: smoke,
+        indicatorColor: gold,
+        dividerColor: Colors.transparent,
+      ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: gold,
+        linearTrackColor: panel3,
+        circularTrackColor: panel3,
+      ),
+      dividerTheme: DividerThemeData(
+        color: line,
+        thickness: 1,
+        space: 1,
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: ink,
+        selectedItemColor: gold,
+        unselectedItemColor: smoke,
+        type: BottomNavigationBarType.fixed,
+        elevation: 0,
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: ink,
+        surfaceTintColor: Colors.transparent,
+        indicatorColor: Color(0x59B8860B),
+        labelTextStyle: WidgetStatePropertyAll(
+          TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: textPrimary),
+        ),
+        iconTheme: WidgetStatePropertyAll(
+          IconThemeData(color: gold),
+        ),
+      ),
+      iconTheme: IconThemeData(color: goldBright),
+      pageTransitionsTheme: PageTransitionsTheme(builders: {
         TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
         TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
       }),
       textTheme: base.textTheme
           .apply(bodyColor: textPrimary, displayColor: textPrimary)
           .copyWith(
-            headlineLarge: const TextStyle(fontSize: 30, fontWeight: FontWeight.w900, letterSpacing: -.7, color: textPrimary),
-            headlineMedium: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -.3, color: textPrimary),
-            titleLarge: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: textPrimary),
-            titleMedium: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: textPrimary),
-            bodyLarge: const TextStyle(fontSize: 15, height: 1.45, color: textPrimary),
-            bodyMedium: const TextStyle(fontSize: 13, height: 1.4, color: smoke),
-            labelLarge: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900),
+            headlineLarge: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, letterSpacing: -.7, color: textPrimary),
+            headlineMedium: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -.3, color: textPrimary),
+            titleLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: textPrimary),
+            titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: textPrimary),
+            bodyLarge: TextStyle(fontSize: 15, height: 1.45, color: textPrimary),
+            bodyMedium: TextStyle(fontSize: 13, height: 1.4, color: smoke),
+            labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w900),
           ),
-      iconTheme: const IconThemeData(color: goldBright),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.transparent,
-        foregroundColor: goldBright,
-        elevation: 0,
-        centerTitle: false,
-        surfaceTintColor: Colors.transparent,
-        scrolledUnderElevation: 0,
-        iconTheme: IconThemeData(color: goldBright),
-        actionsIconTheme: IconThemeData(color: goldBright),
-        titleTextStyle: TextStyle(color: goldBright, fontSize: 20, fontWeight: FontWeight.w900),
-      ),
-      cardTheme: CardThemeData(
-        color: panel,
-        elevation: 0,
-        margin: EdgeInsets.zero,
-        surfaceTintColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22), side: const BorderSide(color: line)),
-      ),
-      dialogTheme: DialogThemeData(
-        backgroundColor: panel2,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22), side: const BorderSide(color: lineGold)),
-      ),
-      popupMenuTheme: PopupMenuThemeData(
-        color: panel3,
-        surfaceTintColor: Colors.transparent,
-        textStyle: const TextStyle(color: goldBright, fontWeight: FontWeight.w800),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: const BorderSide(color: lineGold)),
-      ),
-      navigationBarTheme: const NavigationBarThemeData(
-        backgroundColor: Color(0xFF0A090D),
-        indicatorColor: Color(0x33D4AF37),
-        height: 72,
-        elevation: 12,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        labelTextStyle: WidgetStatePropertyAll(TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
-      ),
-      filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          backgroundColor: gold,
-          foregroundColor: const Color(0xFF17110A),
-          disabledBackgroundColor: panel3,
-          disabledForegroundColor: smoke,
-          minimumSize: const Size.fromHeight(54),
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(17)),
-          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
-        ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: panel3,
-          foregroundColor: goldBright,
-          disabledBackgroundColor: panel2,
-          disabledForegroundColor: smoke,
-          minimumSize: const Size.fromHeight(54),
-          elevation: 0,
-          side: const BorderSide(color: lineGold),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(17)),
-          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
-        ),
-      ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: goldBright,
-          minimumSize: const Size.fromHeight(52),
-          side: const BorderSide(color: lineGold, width: 1.2),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(17)),
-          textStyle: const TextStyle(fontWeight: FontWeight.w800),
-        ),
-      ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: goldBright,
-          minimumSize: const Size.fromHeight(46),
-          textStyle: const TextStyle(fontWeight: FontWeight.w900),
-        ),
-      ),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: gold,
-        foregroundColor: Color(0xFF17110A),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: panel,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 17, vertical: 16),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(17), borderSide: const BorderSide(color: line)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(17), borderSide: const BorderSide(color: line)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(17), borderSide: BorderSide(color: gold.withValues(alpha: .8), width: 1.4)),
-        labelStyle: const TextStyle(color: smoke),
-      ),
-      snackBarTheme: SnackBarThemeData(
-        backgroundColor: panel3,
-        contentTextStyle: const TextStyle(fontWeight: FontWeight.w700, color: textPrimary),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        behavior: SnackBarBehavior.floating,
-      ),
-      dividerTheme: const DividerThemeData(color: line, thickness: 1, space: 1),
     );
   }
 

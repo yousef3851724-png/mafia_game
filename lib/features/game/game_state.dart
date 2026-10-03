@@ -156,7 +156,7 @@ class GameController extends AutoDisposeNotifier<GameState> {
     final roles = _buildRandomRoles(count, scenario: scenario, customScenario: customScenario);
     const names = ['شما', 'آرش', 'سارا', 'بابک', 'نگار', 'کیان', 'مهسا', 'رضا', 'الناز', 'پارسا', 'ترانه', 'مانی', 'هلیا', 'سام', 'نیکا', 'یاسین', 'کیارش', 'مریم', 'رامین', 'نوشین'];
     const females = {'سارا', 'نگار', 'مهسا', 'الناز', 'ترانه', 'هلیا', 'نیکا', 'مریم', 'نوشین'};
-    final avatarIds = ['avatar_shadow', 'avatar_detective', 'avatar_crimson', 'avatar_gold', 'avatar_noir'];
+    final avatarIds = <String>[];
 
     // Build lobby identities first. Roles are assigned independently from these identities.
     final identities = List.generate(count, (index) {

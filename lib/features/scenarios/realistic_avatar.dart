@@ -61,24 +61,7 @@ class RealisticAvatar extends StatelessWidget {
     return 'https://i.pravatar.cc/256?img=$id';
   }
 
-  String? get _fallbackAsset {
-    switch (role) {
-      case 'کارآگاه':
-      case 'بازپرس':
-        return 'assets/images/avatar_detective.svg';
-      case 'مافیا':
-      case 'پدرخوانده':
-      case 'قاتل مستقل':
-        return 'assets/images/avatar_noir.svg';
-      case 'دلقک':
-      case 'جوکر':
-        return 'assets/images/avatar_crimson.svg';
-      case 'زامبی':
-        return 'assets/images/avatar_shadow.svg';
-      default:
-        return 'assets/images/avatar_gold.svg';
-    }
-  }
+  String? get _fallbackAsset => null;
 
   FrameType get _roleFrame {
     if (frameType != null) return frameType!;
