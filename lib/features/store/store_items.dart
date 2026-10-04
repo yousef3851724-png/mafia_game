@@ -24,7 +24,15 @@ class StoreItem {
 
 class StoreItems {
   // شماره آواتارهای لجندری (الماس)؛ بقیه معمولی (سکه)
-  static const Set<int> _legendary = {3, 4};
+  static const Set<int> _legendary = {3, 4, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+  static int _avatarPrice(int n) {
+    if (n <= 2) return 500;
+    if (n == 3 || n == 4) return 1500;
+    if (n <= 10) return 500 + (n - 4) * 100;
+    if (n <= 15) return 1500;
+    if (n <= 20) return 1800;
+    return 2000;
+  }
 
   static final List<StoreItem> avatars = List.generate(
     AvatarCatalog.count,
@@ -32,7 +40,7 @@ class StoreItems {
       id: 'av${(i + 1).toString().padLeft(2, '0')}',
       category: StoreCategory.avatar,
       nameFa: 'آواتار ${i + 1}',
-      price: _legendary.contains(i + 1) ? 1500 : 500,
+      price: _avatarPrice(i + 1),
       assetPath: AvatarCatalog.path(i),
       currency: _legendary.contains(i + 1)
           ? StoreCurrency.diamonds
