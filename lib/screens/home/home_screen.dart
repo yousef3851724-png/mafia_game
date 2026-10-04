@@ -1,3 +1,4 @@
+import '../../router/app_router.dart';
 import '../../core/theme/radical_frame_tier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -124,7 +125,7 @@ class _HomeTabBody extends StatelessWidget {
                 SizedBox(
                   width: 220,
                   child: ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () => context.go(RadicalRoutes.passAndPlay),
                     icon: const Icon(Icons.play_arrow_rounded),
                     label: const Text('ورود به بازی'),
                   ),
