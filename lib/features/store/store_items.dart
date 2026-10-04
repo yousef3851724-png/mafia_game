@@ -3,18 +3,22 @@ import '../../core/theme/frame_catalog.dart';
 
 enum StoreCategory { avatar, frame, sticker, gif, tombstone }
 
+enum StoreCurrency { coins, diamonds }
+
 class StoreItem {
   final String id;
   final StoreCategory category;
   final String nameFa;
   final int price;
   final String assetPath;
+  final StoreCurrency currency;
   const StoreItem({
     required this.id,
     required this.category,
     required this.nameFa,
     required this.price,
     required this.assetPath,
+    this.currency = StoreCurrency.diamonds,
   });
 }
 
