@@ -5,6 +5,7 @@ import '../../../core/providers/app_providers.dart';
 import '../../../core/theme/radical_frame_tier.dart';
 import '../../../core/theme/radical_theme.dart';
 import '../../../core/widgets/radical_avatar_frame.dart';
+import '../../../core/theme/frame_catalog.dart';
 import '../controllers/frame_ownership_controller.dart';
 
 class FrameShopScreen extends ConsumerWidget {
@@ -58,14 +59,15 @@ class FrameShopScreen extends ConsumerWidget {
               mainAxisSpacing: 16,
               crossAxisSpacing: 16,
             ),
-            itemCount: tiers.length,
+            itemCount: FrameCatalogPng.all.length,
             itemBuilder: (context, i) {
-              final tier = tiers[i];
+              final frame = FrameCatalogPng.all[i];
+                final tier = frame.tier;
               final ct = _toCat(tier);
               final data = RadicalFrameData.of(ct);
               final owned = ownership.ownedFrames.contains(tier);
               final equipped = ownership.equippedFrame == tier;
-              final price = data.diamondCost;
+              final price = frame.price;
 
               return GestureDetector(
                 onTap: () => _onTap(context, ref, tier, owned, price),
@@ -91,6 +93,7 @@ class FrameShopScreen extends ConsumerWidget {
                         tier: ct,
                         size: 72,
                         showBadge: false,
+                            framePath: frame.assetPath,
                       ),
                       const SizedBox(height: 10),
                       Text(data.displayNameFa,
