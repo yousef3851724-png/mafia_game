@@ -23,14 +23,20 @@ class StoreItem {
 }
 
 class StoreItems {
+  // شماره آواتارهای لجندری (الماس)؛ بقیه معمولی (سکه)
+  static const Set<int> _legendary = {3, 4};
+
   static final List<StoreItem> avatars = List.generate(
     AvatarCatalog.count,
     (i) => StoreItem(
       id: 'av${(i + 1).toString().padLeft(2, '0')}',
       category: StoreCategory.avatar,
       nameFa: 'آواتار ${i + 1}',
-      price: 100 + (i ~/ 10) * 100,
+      price: _legendary.contains(i + 1) ? 200 : 500,
       assetPath: AvatarCatalog.path(i),
+      currency: _legendary.contains(i + 1)
+          ? StoreCurrency.diamonds
+          : StoreCurrency.coins,
     ),
   );
 
