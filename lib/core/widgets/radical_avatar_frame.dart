@@ -129,6 +129,14 @@ class _RadicalAvatarFrameState extends State<RadicalAvatarFrame>
                   child: _buildAvatarImage(),
                 ),
               ),
+              if (widget.framePath != null)
+                Image.asset(
+                  widget.framePath!,
+                  width: widget.size + 16,
+                  height: widget.size + 16,
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.high,
+                ),
               if (widget.isOnline)
                 Positioned(
                   right: 3,
