@@ -36,6 +36,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/lobby/
     - assets/avatars/set_70/
     - assets/images/
     - assets/avatars/

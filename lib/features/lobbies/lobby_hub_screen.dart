@@ -308,7 +308,10 @@ class _LobbyHubScreenState extends ConsumerState<LobbyHubScreen> {
               color: label.color.withValues(alpha: .12),
               borderRadius: BorderRadius.circular(15),
             ),
-            child: Icon(label.icon, color: label.color),
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Image.asset('assets/lobby/radical_lobby_emblem.png', fit: BoxFit.cover),
+              ),
           ),
           const SizedBox(width: 10),
           Expanded(
