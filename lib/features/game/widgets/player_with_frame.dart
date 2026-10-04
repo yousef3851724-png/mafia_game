@@ -32,13 +32,13 @@ class PlayerWithFrame extends ConsumerWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: hasFrame ? Color(tier.color) : RadicalTheme.line,
+              color: hasFrame ? tier.color : RadicalTheme.line,
               width: hasFrame ? 3 : 1,
             ),
             boxShadow: hasFrame
                 ? [
                     BoxShadow(
-                      color: Color(tier.color).withValues(alpha: 0.5),
+                      color: tier.color.withValues(alpha: 0.5),
                       blurRadius: 20,
                       spreadRadius: 5,
                     )
