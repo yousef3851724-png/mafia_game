@@ -1,3 +1,4 @@
+import '../../features/store/store_hub_screen.dart';
 import '../../router/app_router.dart';
 import '../../core/theme/radical_frame_tier.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class HomeScreen extends ConsumerWidget {
               RadicalHomeTab.home => _HomeTabBody(wallet: wallet),
               RadicalHomeTab.lobby =>
                 const LobbyHubScreen(ownerId: 'local_creator'),
-              RadicalHomeTab.shop => const StoreScreen(),
+              RadicalHomeTab.shop => const StoreHubScreen(),
               RadicalHomeTab.profile => const ProfileScreen(),
             },
           ),
