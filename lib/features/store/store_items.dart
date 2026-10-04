@@ -32,7 +32,7 @@ class StoreItems {
       id: 'av${(i + 1).toString().padLeft(2, '0')}',
       category: StoreCategory.avatar,
       nameFa: 'آواتار ${i + 1}',
-      price: _legendary.contains(i + 1) ? 200 : 500,
+      price: _legendary.contains(i + 1) ? 1000 : 500,
       assetPath: AvatarCatalog.path(i),
       currency: _legendary.contains(i + 1)
           ? StoreCurrency.diamonds
