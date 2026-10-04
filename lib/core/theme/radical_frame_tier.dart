@@ -1,3 +1,4 @@
+import '../models/diamond_type.dart';
 import 'package:flutter/material.dart';
 
 /// سطح‌بندی فریم آواتار در پروژه مافیا رادیکال
@@ -98,3 +99,12 @@ class RadicalFrameData {
   static RadicalFrameData of(RadicalFrameTier tier) => catalog[tier]!;
 }
 
+
+extension RadicalFrameTierX on RadicalFrameTier {
+  RadicalFrameData get data => RadicalFrameData.of(this);
+  int get tierIndex => index;
+  String get displayName => data.displayNameFa;
+  Color get color => data.gradientColors.first;
+  DiamondType get diamondType => DiamondType.radical;
+  int get diamondPrice => data.diamondCost;
+}
