@@ -28,7 +28,7 @@ class StoreItems {
   static int _avatarPrice(int n) {
     if (n <= 2) return 500;
     if (n == 3 || n == 4) return 1500;
-    if (n <= 10) return 500 + (n - 4) * 100;
+    if (n <= 10) return 100 + (n - 5) * 20;
     if (n <= 15) return 1500;
     if (n <= 20) return 1800;
     return 2000;
