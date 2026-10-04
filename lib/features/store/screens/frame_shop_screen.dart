@@ -96,7 +96,7 @@ class FrameShopScreen extends ConsumerWidget {
                             framePath: frame.assetPath,
                       ),
                       const SizedBox(height: 10),
-                      Text(data.displayNameFa,
+                      Text(frame.nameFa,
                           style: RadicalTheme.textTheme.titleMedium),
                       const SizedBox(height: 6),
                       if (equipped)
