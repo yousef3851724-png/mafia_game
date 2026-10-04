@@ -1,3 +1,4 @@
+import '../../core/theme/radical_frame_tier.dart';
 import 'package:flutter/material.dart';
 import '../../core/models/radical_avatar_catalog.dart';
 import '../../core/widgets/radical_avatar_frame.dart';

@@ -10,22 +10,22 @@ import '../controllers/frame_ownership_controller.dart';
 class FrameShopScreen extends ConsumerWidget {
   const FrameShopScreen({super.key});
 
-  cat.RadicalFrameTier _toCat(RadicalFrameTier t) {
+  RadicalFrameTier _toCat(RadicalFrameTier t) {
     switch (t.tierIndex) {
       case 1:
-        return cat.RadicalFrameTier.bronze;
+        return RadicalFrameTier.bronze;
       case 2:
-        return cat.RadicalFrameTier.silver;
+        return RadicalFrameTier.silver;
       case 3:
-        return cat.RadicalFrameTier.gold;
+        return RadicalFrameTier.gold;
       case 4:
-        return cat.RadicalFrameTier.platinum;
+        return RadicalFrameTier.platinum;
       case 5:
-        return cat.RadicalFrameTier.diamond;
+        return RadicalFrameTier.diamond;
       case 6:
-        return cat.RadicalFrameTier.legendary;
+        return RadicalFrameTier.legendary;
       default:
-        return cat.RadicalFrameTier.none;
+        return RadicalFrameTier.none;
     }
   }
 
@@ -62,7 +62,7 @@ class FrameShopScreen extends ConsumerWidget {
             itemBuilder: (context, i) {
               final tier = tiers[i];
               final ct = _toCat(tier);
-              final data = cat.RadicalFrameData.of(ct);
+              final data = RadicalFrameData.of(ct);
               final owned = ownership.ownedFrames.contains(tier);
               final equipped = ownership.equippedFrame == tier;
               final price = data.diamondCost;
