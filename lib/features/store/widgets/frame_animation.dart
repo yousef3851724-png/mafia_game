@@ -50,10 +50,10 @@ class _FramePurchaseAnimationState extends State<FramePurchaseAnimation>
         height: 200,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: Color(widget.tier.color), width: 3),
+          border: Border.all(color: widget.tier.color, width: 3),
           boxShadow: [
             BoxShadow(
-              color: Color(widget.tier.color).withOpacity(0.8),
+              color: widget.tier.color.withOpacity(0.8),
               blurRadius: 40,
               spreadRadius: 10,
             ),
@@ -64,7 +64,7 @@ class _FramePurchaseAnimationState extends State<FramePurchaseAnimation>
             '✓',
             style: TextStyle(
               fontSize: 80,
-              color: Color(widget.tier.color),
+              color: widget.tier.color,
               fontWeight: FontWeight.bold,
             ),
           ),

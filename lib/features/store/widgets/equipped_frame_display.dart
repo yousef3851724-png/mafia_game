@@ -49,10 +49,10 @@ class EquippedFrameDisplay extends ConsumerWidget {
           height: size,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: Color(tier.color), width: 2),
+            border: Border.all(color: tier.color, width: 2),
             boxShadow: [
               BoxShadow(
-                color: Color(tier.color).withValues(alpha: 0.5),
+                color: tier.color.withValues(alpha: 0.5),
                 blurRadius: 15,
                 spreadRadius: 3,
               ),
@@ -63,7 +63,7 @@ class EquippedFrameDisplay extends ConsumerWidget {
               tier.displayName.isNotEmpty ? tier.displayName[0] : '?',
               style: TextStyle(
                 fontSize: size * 0.4,
-                color: Color(tier.color),
+                color: tier.color,
                 fontWeight: FontWeight.bold,
               ),
             ),
