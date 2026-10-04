@@ -45,7 +45,17 @@ class StoreItems {
       .toList();
 
   // برای اضافه کردن آیتم جدید، فقط یک StoreItem به این لیست‌ها اضافه کن.
-  static final List<StoreItem> stickers = <StoreItem>[];
+  static final List<StoreItem> stickers = List.generate(
+    8,
+    (i) => StoreItem(
+      id: 'st${(i + 1).toString().padLeft(2, '0')}',
+      category: StoreCategory.sticker,
+      nameFa: 'استیکر ${i + 1}',
+      price: 500,
+      assetPath: 'assets/stickers/set_1/sticker_${(i + 1).toString().padLeft(2, '0')}.png',
+      currency: StoreCurrency.coins,
+    ),
+  );
   static final List<StoreItem> gifs = <StoreItem>[];
   static final List<StoreItem> tombstones = <StoreItem>[];
 
