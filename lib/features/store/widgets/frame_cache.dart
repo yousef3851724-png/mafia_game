@@ -8,7 +8,7 @@ class FrameImageCache {
       return _cache[frameId]!;
     }
 
-    final provider = AssetImage('assets/frames/frame_$frameId.svg');
+    final provider = AssetImage(frameId.contains('/') ? frameId : 'assets/frames/frame_$frameId.svg');
     _cache[frameId] = provider;
     return provider;
   }
