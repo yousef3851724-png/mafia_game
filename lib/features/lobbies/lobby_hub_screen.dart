@@ -302,15 +302,15 @@ class _LobbyHubScreenState extends ConsumerState<LobbyHubScreen> {
       child: Row(
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 72,
+            height: 72,
             decoration: BoxDecoration(
-              color: label.color.withValues(alpha: .12),
+              color: Colors.transparent,
               borderRadius: BorderRadius.circular(15),
             ),
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
-                child: Image.asset('assets/lobby/radical_lobby_emblem.png', fit: BoxFit.cover),
+                child: Image.asset('assets/lobby/radical_lobby_emblem.png', fit: BoxFit.contain, filterQuality: FilterQuality.high),
               ),
           ),
           const SizedBox(width: 10),
