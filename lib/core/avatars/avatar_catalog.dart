@@ -1,5 +1,5 @@
 class AvatarCatalog {
-  static const int count = 70;
+  static const int count = 4;
 
   static List<String> get all => List.generate(count, path);
 
