@@ -11,6 +11,7 @@ class RadicalAvatarFrame extends StatefulWidget {
   final double size;
   final bool isOnline;
   final bool showBadge;
+  final String? framePath;
 
   const RadicalAvatarFrame({
     super.key,
@@ -19,6 +20,7 @@ class RadicalAvatarFrame extends StatefulWidget {
     this.size = 72,
     this.isOnline = false,
     this.showBadge = true,
+    this.framePath,
   });
 
   @override
@@ -93,7 +95,7 @@ class _RadicalAvatarFrameState extends State<RadicalAvatarFrame>
             alignment: Alignment.center,
             clipBehavior: Clip.none,
             children: [
-              if (widget.tier != RadicalFrameTier.none)
+              if (widget.framePath == null && widget.tier != RadicalFrameTier.none)
                 Transform.rotate(
                   angle: rotation,
                   child: Container(
