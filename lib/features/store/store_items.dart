@@ -26,9 +26,9 @@ class StoreItems {
   // شماره آواتارهای لجندری (الماس)؛ بقیه معمولی (سکه)
   static const Set<int> _legendary = {3, 4, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
   static int _avatarPrice(int n) {
-    if (n <= 2) return 500;
+    if (n <= 2) return 3000;
     if (n == 3 || n == 4) return 1500;
-    if (n <= 10) return 100 + (n - 5) * 20;
+    if (n <= 10) return 3000 + (n - 5) * 200;
     if (n <= 15) return 1500;
     if (n <= 20) return 1800;
     return 2000;
