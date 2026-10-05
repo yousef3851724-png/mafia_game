@@ -27,8 +27,11 @@ class _WalletPersistenceState extends ConsumerState<WalletPersistence> {
     final coins = p.getInt('wallet_coins');
     final diamonds = p.getInt('wallet_diamonds');
     if (coins != null && diamonds != null) {
-      ref.read(walletProvider.notifier).state =
-          RadicalWallet(coins: coins, diamonds: diamonds);
+      // حالت تست سازنده: حداقل موجودی (برای نسخه نهایی حذف شود)
+      ref.read(walletProvider.notifier).state = RadicalWallet(
+        coins: coins < 100000 ? 100000 : coins,
+        diamonds: diamonds < 10000 ? 10000 : diamonds,
+      );
     }
     if (mounted) setState(() => _loaded = true);
   }
