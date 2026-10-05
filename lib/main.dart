@@ -1,3 +1,4 @@
+import 'core/providers/wallet_persistence.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -33,7 +34,7 @@ void main() {
       debugPrint('FLUTTER ERROR: ${details.exceptionAsString()}');
     };
 
-    runApp(const ProviderScope(child: MafiaRadicalApp()));
+    runApp(const ProviderScope(child: WalletPersistence(child: MafiaRadicalApp())));
   }, (error, stack) {
     debugPrint('UNCAUGHT ASYNC ERROR: $error\n$stack');
   });
