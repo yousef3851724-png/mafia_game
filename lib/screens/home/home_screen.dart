@@ -140,7 +140,9 @@ class _HomeTabBody extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Column(
+              GestureDetector(
+                onTap: () => context.go(RadicalRoutes.passAndPlay),
+                child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
@@ -155,7 +157,10 @@ class _HomeTabBody extends StatelessWidget {
                       style: RadicalTheme.textTheme.bodyMedium),
                 ],
               ),
-              Column(
+              ),
+              GestureDetector(
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LobbyHubScreen(ownerId: 'local_creator'))),
+                child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
@@ -170,7 +175,11 @@ class _HomeTabBody extends StatelessWidget {
                       style: RadicalTheme.textTheme.bodyMedium),
                 ],
               ),
-              Column(
+              ),
+              GestureDetector(
+                onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('به‌زودی'))),
+                child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
@@ -184,6 +193,7 @@ class _HomeTabBody extends StatelessWidget {
                   Text('رویدادها',
                       style: RadicalTheme.textTheme.bodyMedium),
                 ],
+              ),
               ),
               GestureDetector(
                 onTap: () => context.push('/lucky-wheel'),
