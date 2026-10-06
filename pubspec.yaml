@@ -37,6 +37,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/frames/set_24/
+    - assets/frames/set_oval/
     - assets/lobby/
     - assets/avatars/set_70/
     - assets/avatars/set_29/
