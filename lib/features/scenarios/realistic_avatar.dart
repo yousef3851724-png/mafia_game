@@ -28,40 +28,35 @@ class RealisticAvatar extends StatelessWidget {
     return RadicalAvatarCatalog.byId(avatarId!);
   }
 
-  String get _portraitUrl {
-    final femaleIds = <String, int>{
-      'شهروند': 47,
-      'دکتر': 49,
-      'بازپرس': 45,
-      'کارآگاه': 44,
-      'مافیا': 43,
-      'پدرخوانده': 42,
-      'دلقک': 41,
-      'جوکر': 40,
-      'زامبی': 39,
-      'قاتل مستقل': 38,
-      'محافظ': 37,
-      'تکاور': 36,
-    };
-    final maleIds = <String, int>{
-      'شهروند': 12,
-      'دکتر': 13,
-      'بازپرس': 14,
-      'کارآگاه': 15,
-      'مافیا': 16,
-      'پدرخوانده': 17,
-      'دلقک': 18,
-      'جوکر': 19,
-      'زامبی': 20,
-      'قاتل مستقل': 21,
-      'محافظ': 22,
-      'تکاور': 23,
-    };
-    final id = (female ? femaleIds : maleIds)[role] ?? (female ? 47 : 12);
-    return 'https://i.pravatar.cc/256?img=$id';
+  static const Map<String, int> _femaleAvatarByRole = <String, int>{
+    'دکتر': 42, 'بازپرس': 33, 'کارآگاه': 66, 'مافیا': 22,
+    'پدرخوانده': 60, 'قاتل': 38, 'جوکر': 12, 'زامبی': 55,
+    'قاتل مستقل': 36, 'محافظ': 62, 'شهروند': 46,
+  };
+  static const Map<String, int> _maleAvatarByRole = <String, int>{
+    'دکتر': 23, 'بازپرس': 35, 'کارآگاه': 30, 'مافیا': 32,
+    'پدرخوانده': 56, 'قاتل': 61, 'جوکر': 48, 'زامبی': 63,
+    'قاتل مستقل': 10, 'محافظ': 45, 'شهروند': 1,
+  };
+  static const List<int> _femalePool = <int>[
+    2, 4, 7, 9, 12, 14, 17, 19, 22, 25, 28, 31, 33, 36, 38,
+    42, 44, 46, 49, 52, 55, 58, 60, 62, 64, 66,
+  ];
+  static const List<int> _malePool = <int>[
+    1, 3, 5, 6, 8, 10, 11, 13, 15, 16, 18, 20, 21, 23, 24, 26, 27, 29, 30,
+    32, 34, 35, 37, 39, 40, 41, 43, 45, 47, 48, 50, 51, 53, 54, 56, 57, 59,
+    61, 63, 65, 67, 68, 69, 70,
+  ];
+
+  String get _localPortraitAsset {
+    final byRole = female ? _femaleAvatarByRole : _maleAvatarByRole;
+    final pool = female ? _femalePool : _malePool;
+    final sum = role.codeUnits.fold<int>(0, (a, c) => a + c);
+    final n = byRole[role] ?? pool[sum % pool.length];
+    return 'assets/avatars/set_70/avatar_${n.toString().padLeft(2, '0')}.png';
   }
 
-  String? get _fallbackAsset => null;
+  String? get _fallbackAsset => _localPortraitAsset;
 
   FrameType get _roleFrame {
     if (frameType != null) return frameType!;
@@ -94,7 +89,7 @@ class RealisticAvatar extends StatelessWidget {
           : '?',
       // Catalog avatars are local-only. Legacy role-based avatars may still
       // use the existing network source when no catalog id is supplied.
-      imageUrl: catalogAvatar == null ? _portraitUrl : null,
+      imageUrl: null,
       fallbackAsset: catalogAvatar?.assetPath ?? _fallbackAsset,
     );
   }
