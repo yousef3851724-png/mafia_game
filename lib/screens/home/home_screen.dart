@@ -1,3 +1,6 @@
+import '../../features/store/controllers/store_controller.dart';
+import '../../features/store/store_items.dart';
+import '../../features/store/equip_screen.dart';
 import '../../features/store/store_hub_screen.dart';
 import '../../router/app_router.dart';
 import '../../core/theme/radical_frame_tier.dart';
@@ -46,23 +49,37 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-class _HomeTabBody extends StatelessWidget {
+class _HomeTabBody extends ConsumerWidget {
   final RadicalWallet wallet;
   const _HomeTabBody({required this.wallet});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final store = ref.watch(storeControllerProvider);
+    final avId = store.equipped[StoreCategory.avatar];
+    final frId = store.equipped[StoreCategory.frame];
+    final avPath = avId == null
+        ? 'assets/logo/radical_face_only.png'
+        : StoreItems.avatars.firstWhere((e) => e.id == avId).assetPath;
+    final frPath = frId == null
+        ? null
+        : StoreItems.frames.firstWhere((e) => e.id == frId).assetPath;
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
           child: Row(
             children: [
-              RadicalAvatarFrame(
-                avatarAssetPath: 'assets/logo/radical_face_only.png',
-                tier: RadicalFrameTier.gold,
-                size: 52,
-                isOnline: true,
+              GestureDetector(
+                onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const EquipScreen())),
+                child: RadicalAvatarFrame(
+                  avatarAssetPath: avPath,
+                  framePath: frPath,
+                  tier: frPath == null ? RadicalFrameTier.none : RadicalFrameTier.gold,
+                  size: 52,
+                  isOnline: true,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
