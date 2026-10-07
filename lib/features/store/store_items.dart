@@ -137,18 +137,26 @@ class StoreItems {
   ];
   static final List<StoreItem> gifs = <StoreItem>[];
   static final List<StoreItem> tombstones = <StoreItem>[
-    StoreItem(id: 'ts01', category: StoreCategory.tombstone, nameFa: 'کلاسیک', price: 300, assetPath: 'assets/tombstones/tombstone_01_classic.png', currency: StoreCurrency.coins),
-    StoreItem(id: 'ts02', category: StoreCategory.tombstone, nameFa: 'صلیب', price: 500, assetPath: 'assets/tombstones/tombstone_02_cross.png', currency: StoreCurrency.coins),
-    StoreItem(id: 'ts03', category: StoreCategory.tombstone, nameFa: 'ستون', price: 800, assetPath: 'assets/tombstones/tombstone_03_obelisk.png', currency: StoreCurrency.coins),
-    StoreItem(id: 'ts04', category: StoreCategory.tombstone, nameFa: 'گوتیک', price: 1000, assetPath: 'assets/tombstones/tombstone_04_gothic.png', currency: StoreCurrency.coins),
-    StoreItem(id: 'ts05', category: StoreCategory.tombstone, nameFa: 'جمجمه', price: 1500, assetPath: 'assets/tombstones/tombstone_05_skull.png', currency: StoreCurrency.coins),
-    StoreItem(id: 'ts06', category: StoreCategory.tombstone, nameFa: 'رز', price: 2000, assetPath: 'assets/tombstones/tombstone_06_rose.png', currency: StoreCurrency.coins),
-    StoreItem(id: 'ts07', category: StoreCategory.tombstone, nameFa: 'تاج', price: 3000, assetPath: 'assets/tombstones/tombstone_07_crown.png', currency: StoreCurrency.coins),
-    StoreItem(id: 'ts08', category: StoreCategory.tombstone, nameFa: 'مافیا', price: 3500, assetPath: 'assets/tombstones/tombstone_08_mafia.png', currency: StoreCurrency.coins),
-    StoreItem(id: 'ts09', category: StoreCategory.tombstone, nameFa: 'کلاغ', price: 4000, assetPath: 'assets/tombstones/tombstone_09_raven.png', currency: StoreCurrency.coins),
-    StoreItem(id: 'ts10', category: StoreCategory.tombstone, nameFa: 'ماه', price: 600, assetPath: 'assets/tombstones/tombstone_10_moon.png', currency: StoreCurrency.diamonds),
-    StoreItem(id: 'ts11', category: StoreCategory.tombstone, nameFa: 'مرمر', price: 900, assetPath: 'assets/tombstones/tombstone_11_marble.png', currency: StoreCurrency.diamonds),
-    StoreItem(id: 'ts12', category: StoreCategory.tombstone, nameFa: 'طلایی', price: 1500, assetPath: 'assets/tombstones/tombstone_12_gold.png', currency: StoreCurrency.diamonds),
+    StoreItem(id: 'ts01', category: StoreCategory.tombstone, nameFa: 'رفتی… اما فراموش نمی‌شوی', price: 8000, assetPath: 'assets/tombstones/tomb_01.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts02', category: StoreCategory.tombstone, nameFa: 'یک نام، یک تاریخ', price: 9000, assetPath: 'assets/tombstones/tomb_02.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts03', category: StoreCategory.tombstone, nameFa: 'ما همیشه زنده‌ایم', price: 10000, assetPath: 'assets/tombstones/tomb_03.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts04', category: StoreCategory.tombstone, nameFa: 'سکوت سنگین‌تر از حرف‌هاست', price: 11000, assetPath: 'assets/tombstones/tomb_04.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts05', category: StoreCategory.tombstone, nameFa: 'گذشتگان همیشه زنده‌اند', price: 12000, assetPath: 'assets/tombstones/tomb_05.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts06', category: StoreCategory.tombstone, nameFa: 'حکایت ما ادامه دارد', price: 14000, assetPath: 'assets/tombstones/tomb_06.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts07', category: StoreCategory.tombstone, nameFa: 'پایان، فقط یک شروع است', price: 16000, assetPath: 'assets/tombstones/tomb_07.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts08', category: StoreCategory.tombstone, nameFa: 'وفاداری تا آخرین نفس', price: 18000, assetPath: 'assets/tombstones/tomb_08.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts09', category: StoreCategory.tombstone, nameFa: 'شیران هرگز نمی‌میرند', price: 20000, assetPath: 'assets/tombstones/tomb_09.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts10', category: StoreCategory.tombstone, nameFa: 'بازی تمام نشده', price: 22000, assetPath: 'assets/tombstones/tomb_10.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts11', category: StoreCategory.tombstone, nameFa: 'دل‌های بزرگ', price: 25000, assetPath: 'assets/tombstones/tomb_11.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts12', category: StoreCategory.tombstone, nameFa: 'مردان واقعی', price: 28000, assetPath: 'assets/tombstones/tomb_12.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts13', category: StoreCategory.tombstone, nameFa: 'خون، تعهد، مافیا', price: 31000, assetPath: 'assets/tombstones/tomb_13.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts14', category: StoreCategory.tombstone, nameFa: 'تا ابد در داستان', price: 34000, assetPath: 'assets/tombstones/tomb_14.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts15', category: StoreCategory.tombstone, nameFa: 'پادشاهان نمی‌میرند', price: 37000, assetPath: 'assets/tombstones/tomb_15.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts16', category: StoreCategory.tombstone, nameFa: 'یک افسانه برای همیشه', price: 40000, assetPath: 'assets/tombstones/tomb_16.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts17', category: StoreCategory.tombstone, nameFa: 'عشق، خیانت و مافیا', price: 43000, assetPath: 'assets/tombstones/tomb_17.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts18', category: StoreCategory.tombstone, nameFa: 'قدرت هرگز نمی‌میرد', price: 46000, assetPath: 'assets/tombstones/tomb_18.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts19', category: StoreCategory.tombstone, nameFa: 'داستان ما ادامه دارد', price: 48000, assetPath: 'assets/tombstones/tomb_19.png', currency: StoreCurrency.coins),
+    StoreItem(id: 'ts20', category: StoreCategory.tombstone, nameFa: 'افسانه‌ها پایان ندارند', price: 50000, assetPath: 'assets/tombstones/tomb_20.png', currency: StoreCurrency.coins),
   ];
 
   static List<StoreItem> of(StoreCategory c) {
