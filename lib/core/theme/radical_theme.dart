@@ -7,27 +7,27 @@ class RadicalTheme {
   RadicalTheme._();
 
   // ─── Noir surfaces ───
-  static const ink = Color(0xFF050507);
-  static const panel = Color(0xFF0E0D12);
-  static const panel2 = Color(0xFF15131A);
-  static const panel3 = Color(0xFF1D1A24);
+  static const ink = Color(0xFF060508);
+  static const panel = Color(0xFF100E14);
+  static const panel2 = Color(0xFF1A1721);
+  static const panel3 = Color(0xFF26212D);
   static const black = ink;
   static const charcoalLight = panel3;
 
   // ─── Text ───
   static const textPrimary = Color(0xFFF5F0E6);
   static const cream = Color(0xFFF4EBD6);
-  static const smoke = Color(0xFFA19A8C);
+  static const smoke = Color(0xFFB3AB9B);
 
   // ─── Gold ───
-  static const gold = Color(0xFFD4AF37);
-  static const goldBright = Color(0xFFF5D76E);
-  static const goldDeep = Color(0xFF8A6A1C);
-  static const goldSoft = Color(0xFFE8C872);
+  static const gold = Color(0xFFD6A94A);
+  static const goldBright = Color(0xFFF2CC6B);
+  static const goldDeep = Color(0xFF9A6B1E);
+  static const goldSoft = Color(0xFFE9C98A);
 
   // ─── Crimson ───
-  static const crimson = Color(0xFF9B1B1B);
-  static const crimsonBright = Color(0xFFD32F2F);
+  static const crimson = Color(0xFF8E1A22);
+  static const crimsonBright = Color(0xFFD63341);
 
   // ─── Violet (فقط برای Rarity نمایشی، در theme استفاده نمی‌شود) ───
   static const violet = Color(0xFF8B5CF6);
@@ -47,7 +47,7 @@ class RadicalTheme {
 
   // ─── Lines ───
   static const line = Color(0x1FFFFFFF);
-  static const lineGold = Color(0x55D4AF37);
+  static const lineGold = Color(0x55D6A94A);
 
   // ─── Gradients ───
   static const LinearGradient backgroundGradient = LinearGradient(
