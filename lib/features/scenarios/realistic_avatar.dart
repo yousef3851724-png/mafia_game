@@ -53,7 +53,7 @@ class RealisticAvatar extends StatelessWidget {
     final pool = female ? _femalePool : _malePool;
     final sum = role.codeUnits.fold<int>(0, (a, c) => a + c);
     final n = byRole[role] ?? pool[sum % pool.length];
-    return 'assets/avatars/set_70/avatar_${n.toString().padLeft(2, '0')}.png';
+    return 'assets/avatars_v2/avatar_${n.toString().padLeft(3, '0')}.png';
   }
 
   String? get _fallbackAsset => _localPortraitAsset;

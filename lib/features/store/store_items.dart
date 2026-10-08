@@ -1,5 +1,6 @@
 import '../../core/avatars/avatar_catalog.dart';
 import '../../core/theme/frame_catalog.dart';
+import 'package:mafia_radical/data/avatar_catalog.dart';
 
 enum StoreCategory { avatar, frame, sticker, gif, tombstone }
 
@@ -124,18 +125,14 @@ class StoreItems {
   };
 
   static final List<StoreItem> avatars = List.generate(
-    AvatarCatalog.count,
+    kAvatarCatalog.length,
     (i) => StoreItem(
       id: 'av${(i + 1).toString().padLeft(2, '0')}',
       category: StoreCategory.avatar,
       nameFa: 'آواتار ${i + 1}',
-      price: _coinOverrides[i + 1] ?? _avatarPrice(i + 1),
-      assetPath: AvatarCatalog.path(i),
-      currency: _coinOverrides.containsKey(i + 1)
-            ? StoreCurrency.coins
-            : (_legendary.contains(i + 1)
-                ? StoreCurrency.diamonds
-                : StoreCurrency.coins),
+      price: kAvatarCatalog[i].price,
+      assetPath: kAvatarCatalog[i].asset,
+      currency: StoreCurrency.coins,
     ),
   );
 
