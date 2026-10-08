@@ -17,6 +17,6 @@ class _PhaseShell extends StatelessWidget {
   Widget build(BuildContext context) => RadicalScaffold(
     appBar: AppBar(title: Text(title)),
     padded: true,
-    child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(icon, color: const RadicalTheme.goldSoft, size: 72), const SizedBox(height: 20), Text(title, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900)), const SizedBox(height: 10), const Text('این فاز یک صفحه مستقل از جریان بازی است.'), if (action != null) ...[const SizedBox(height: 24), FilledButton(onPressed: action, child: Text(actionText))]])),
+    child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(icon, color: RadicalTheme.goldSoft, size: 72), const SizedBox(height: 20), Text(title, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900)), const SizedBox(height: 10), const Text('این فاز یک صفحه مستقل از جریان بازی است.'), if (action != null) ...[const SizedBox(height: 24), FilledButton(onPressed: action, child: Text(actionText))]])),
   );
 }

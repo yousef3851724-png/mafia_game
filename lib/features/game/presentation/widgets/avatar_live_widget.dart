@@ -16,7 +16,7 @@ class AvatarLiveWidget extends StatefulWidget {
     required this.imageProvider,
     this.size = 96,
     this.eyeRegion,
-    this.frameColor = const RadicalTheme.gold,
+    this.frameColor = RadicalTheme.gold,
     this.frameOverlay,
     this.isAlive = true,
   });

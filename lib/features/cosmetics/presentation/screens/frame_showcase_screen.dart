@@ -19,7 +19,7 @@ class _FrameShowcaseScreenState extends State<FrameShowcaseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const RadicalTheme.ink,
+      backgroundColor: RadicalTheme.ink,
       appBar: AppBar(
         title: const Text('ویترین فریم‌های رادیکال'),
         backgroundColor: Colors.transparent,
@@ -90,7 +90,7 @@ class _FrameShowcaseScreenState extends State<FrameShowcaseScreen> {
                   onTap: () => setState(() => _selected = frame),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isCurrent ? const RadicalTheme.panel2 : const RadicalTheme.panel,
+                      color: isCurrent ? RadicalTheme.panel2 : RadicalTheme.panel,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: isCurrent ? Colors.amber : Colors.white10,

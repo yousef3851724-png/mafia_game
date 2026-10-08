@@ -121,7 +121,7 @@ class _GameRoomScreenState extends State<GameRoomScreen> {
             margin: const EdgeInsets.all(12),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: const RadicalTheme.panel,
+              color: RadicalTheme.panel,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(

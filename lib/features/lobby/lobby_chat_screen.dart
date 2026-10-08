@@ -38,7 +38,7 @@ class _LobbyChatScreenState extends State<LobbyChatScreen> {
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 8),
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(color: const RadicalTheme.panel, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x33E3B873))),
+                  decoration: BoxDecoration(color: RadicalTheme.panel, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x33E3B873))),
                   child: Text(_messages[i]),
                 ),
               ),

@@ -70,7 +70,7 @@ class _RadicalAvatarPickerState extends State<RadicalAvatarPicker> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected ? const RadicalTheme.goldBright : Colors.white70,
+                  color: isSelected ? RadicalTheme.goldBright : Colors.white70,
                 ),
               ),
               if (avatar.isPremium)

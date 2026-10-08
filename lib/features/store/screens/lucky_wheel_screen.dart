@@ -126,7 +126,7 @@ class _LuckyWheelScreenState extends ConsumerState<LuckyWheelScreen>
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const RadicalTheme.panel,
+        backgroundColor: RadicalTheme.panel,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: const BorderSide(color: _gold),
@@ -160,7 +160,7 @@ class _LuckyWheelScreenState extends ConsumerState<LuckyWheelScreen>
     final wheelSize = math.min(width - 48, 340.0);
 
     return Scaffold(
-      backgroundColor: const RadicalTheme.ink,
+      backgroundColor: RadicalTheme.ink,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -179,7 +179,7 @@ class _LuckyWheelScreenState extends ConsumerState<LuckyWheelScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    color: const RadicalTheme.panel,
+                    color: RadicalTheme.panel,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: _gold.withValues(alpha: .4)),
                   ),
@@ -213,7 +213,7 @@ class _LuckyWheelScreenState extends ConsumerState<LuckyWheelScreen>
                                 height: wheelSize * .24,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: const RadicalTheme.ink,
+                                  color: RadicalTheme.ink,
                                   border: Border.all(color: _gold, width: 3),
                                   boxShadow: [
                                     BoxShadow(

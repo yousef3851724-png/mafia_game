@@ -335,7 +335,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
               ],
             ),
             border: Border.all(
-              color: const RadicalTheme.goldSoft,
+              color: RadicalTheme.goldSoft,
               width: 2.2,
             ),
             boxShadow: const [
@@ -406,7 +406,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: const RadicalTheme.goldSoft,
+                color: RadicalTheme.goldSoft,
                 width: 2,
               ),
             ),
@@ -518,7 +518,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
   void _showManagementSheet() {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const RadicalTheme.panel,
+      backgroundColor: RadicalTheme.panel,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(24),
@@ -592,7 +592,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
   void _showBackgroundPicker() {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const RadicalTheme.panel,
+      backgroundColor: RadicalTheme.panel,
       builder: (context) {
         return SafeArea(
           child: ListView(
@@ -648,7 +648,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
   void _showModePicker() {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const RadicalTheme.panel,
+      backgroundColor: RadicalTheme.panel,
       builder: (context) {
         return SafeArea(
           child: Column(
@@ -711,7 +711,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
 
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const RadicalTheme.panel,
+      backgroundColor: RadicalTheme.panel,
       builder: (context) {
         return SafeArea(
           child: ListView(
@@ -770,7 +770,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
 
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const RadicalTheme.panel,
+      backgroundColor: RadicalTheme.panel,
       builder: (context) {
         return SafeArea(
           child: Column(
