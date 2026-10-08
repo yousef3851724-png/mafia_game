@@ -1,3 +1,6 @@
+import '../store/controllers/store_controller.dart';
+import '../store/store_items.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'floating_panels.dart';
 import 'dart:math' as math;
 
@@ -39,7 +42,7 @@ class LobbyBackground {
   });
 }
 
-class RoundLobby extends StatefulWidget {
+class RoundLobby extends ConsumerStatefulWidget {
   final List<LobbyPlayer> players;
   final int maxPlayers;
   final LobbyGameMode gameMode;
@@ -66,10 +69,10 @@ class RoundLobby extends StatefulWidget {
   });
 
   @override
-  State<RoundLobby> createState() => _RoundLobbyState();
+  ConsumerState<RoundLobby> createState() => _RoundLobbyState();
 }
 
-class _RoundLobbyState extends State<RoundLobby> {
+class _RoundLobbyState extends ConsumerState<RoundLobby> {
   late LobbyGameMode _gameMode;
   late String _managerId;
   int _backgroundIndex = 0;
@@ -381,7 +384,7 @@ class _RoundLobbyState extends State<RoundLobby> {
           },
         ),
         Positioned.fill(child: FloatingPanels(
-          stickerAssets: const [],
+          stickerAssets: [for (final i in StoreItems.of(StoreCategory.sticker)) if (ref.watch(storeControllerProvider).isOwned(i)) i.assetPath],
           onSendText: (t) => debugPrint('chat: ' + t),
           onSendEmoji: (e) => debugPrint('emoji: ' + e),
           onSendSticker: (a) => debugPrint('sticker: ' + a),
