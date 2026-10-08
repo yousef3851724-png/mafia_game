@@ -34,6 +34,12 @@ dev_dependencies:
   flutter_native_splash: ^2.4.1
 
 flutter:
+  fonts:
+    - family: Vazirmatn
+      fonts:
+        - asset: assets/fonts/Vazirmatn-Regular.ttf
+        - asset: assets/fonts/Vazirmatn-Bold.ttf
+          weight: 700
   uses-material-design: true
   assets:
     - assets/avatars_v2/

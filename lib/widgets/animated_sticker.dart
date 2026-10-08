@@ -63,6 +63,10 @@ class _AnimatedStickerState extends State<AnimatedSticker>
       fit: BoxFit.contain,
       gaplessPlayback: true,
     );
+    final _a = widget.asset.toLowerCase();
+    if (_a.endsWith('.gif') || _a.endsWith('.webp')) {
+      return RepaintBoundary(child: img);
+    }
     return RepaintBoundary(
       child: AnimatedBuilder(
         animation: _c,
