@@ -11,7 +11,6 @@ import '../../core/providers/app_providers.dart';
 import '../../core/theme/radical_theme.dart';
 import '../../core/widgets/radical_avatar_frame.dart';
 import '../../core/widgets/radical_bottom_nav.dart';
-import '../../core/widgets/radical_logo.dart';
 import '../../features/lobbies/lobby_hub_screen.dart';
 import '../../features/profile/profile_screen.dart';
 
@@ -106,12 +105,13 @@ class _HomeTabBody extends ConsumerWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color(0xB3060508),
+                Color(0xF2060508),
+                Color(0xF2060508),
                 Color(0x00060508),
                 Color(0x00060508),
                 Color(0xE6060508),
               ],
-              stops: [0.0, 0.25, 0.5, 1.0],
+              stops: [0.0, 0.14, 0.34, 0.55, 1.0],
             ),
           ),
         ),
@@ -172,7 +172,7 @@ class _HomeTabBody extends ConsumerWidget {
                   children: [
                     Positioned(
                       left: 12,
-                      top: 18,
+                      top: 12,
                       child: Column(
                         children: [
                           _SideAction(
@@ -180,19 +180,19 @@ class _HomeTabBody extends ConsumerWidget {
                             label: 'جوایز روزانه',
                             onTap: () => context.push('/lucky-wheel'),
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 6),
                           _SideAction(
                             icon: Icons.emoji_events_outlined,
                             label: 'ماموریت‌ها',
                             onTap: () => _soon(context),
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 6),
                           _SideAction(
                             icon: Icons.event_outlined,
                             label: 'رویدادها',
                             onTap: () => _soon(context),
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 6),
                           _SideAction(
                             icon: Icons.storefront_rounded,
                             label: 'فروشگاه',
@@ -210,16 +210,12 @@ class _HomeTabBody extends ConsumerWidget {
                           child: SizedBox(
                             width: c.maxWidth,
                             child: Padding(
-                              padding: const EdgeInsets.only(bottom: 96),
+                              padding: const EdgeInsets.only(bottom: 14),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const RadicalLogoMark(size: 120),
-                                  const SizedBox(height: 6),
-                                  Text('مافیا رادیکال',
-                                      style:
-                                          RadicalTheme.textTheme.displayLarge),
-                                  const SizedBox(height: 18),
+                                  const _TitleLogo(),
+                                  const SizedBox(height: 16),
                                   FractionallySizedBox(
                                     widthFactor: 0.92,
                                     child: _AngledButton(
@@ -272,6 +268,8 @@ class _HomeTabBody extends ConsumerWidget {
                                             label: 'مسابقات',
                                             icon: Icons.emoji_events_rounded,
                                             height: 48,
+                                            fontSize: 13,
+                                            showArrow: false,
                                             colors: const [
                                               Color(0xFF3F1D66),
                                               Color(0xFF1A0B2E),
@@ -286,6 +284,8 @@ class _HomeTabBody extends ConsumerWidget {
                                             label: 'جدول رده‌بندی',
                                             icon: Icons.leaderboard_rounded,
                                             height: 48,
+                                            fontSize: 13,
+                                            showArrow: false,
                                             colors: const [
                                               Color(0xFF2E2511),
                                               Color(0xFF14110A),
@@ -371,19 +371,20 @@ class _SideAction extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 48,
-              height: 48,
+              width: 44,
+              height: 44,
               decoration: RadicalTheme.glassCard(radius: 14),
-              child: Icon(icon, color: RadicalTheme.gold, size: 24),
+              child: Icon(icon, color: RadicalTheme.gold, size: 22),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 10.5,
+                fontSize: 10,
+                height: 1.1,
                 fontWeight: FontWeight.w700,
                 color: RadicalTheme.textPrimary,
               ),
@@ -403,6 +404,8 @@ class _AngledButton extends StatelessWidget {
   final Color border;
   final VoidCallback onTap;
   final double height;
+  final double fontSize;
+  final bool showArrow;
   const _AngledButton({
     required this.label,
     required this.icon,
@@ -410,6 +413,8 @@ class _AngledButton extends StatelessWidget {
     required this.border,
     required this.onTap,
     this.height = 56,
+    this.fontSize = 16,
+    this.showArrow = true,
   });
 
   @override
@@ -447,15 +452,71 @@ class _AngledButton extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: RadicalTheme.textTheme.titleMedium,
+                  style: RadicalTheme.textTheme.titleMedium
+                      ?.copyWith(fontSize: fontSize),
                 ),
               ),
             ),
-            Icon(Icons.keyboard_double_arrow_left_rounded,
-                color: border, size: 20),
+            if (showArrow)
+              Icon(Icons.keyboard_double_arrow_left_rounded,
+                  color: border, size: 20),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// لوگوی متنی: «مافیا» نقره‌ای و «رادیکال» قرمز، با حاشیه‌ی تیره برای خوانایی.
+class _TitleLogo extends StatelessWidget {
+  const _TitleLogo();
+
+  Widget _word(String text, double size, List<Color> colors) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: size,
+            fontWeight: FontWeight.w900,
+            height: 1.15,
+            foreground: Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 6
+              ..strokeJoin = StrokeJoin.round
+              ..color = const Color(0xFF060508),
+          ),
+        ),
+        ShaderMask(
+          blendMode: BlendMode.srcIn,
+          shaderCallback: (r) => LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: colors,
+          ).createShader(r),
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: size,
+              fontWeight: FontWeight.w900,
+              height: 1.15,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _word('مافیا', 56, const [Color(0xFFFFFFFF), Color(0xFFB4B4C0)]),
+        _word('رادیکال', 40, const [Color(0xFFFF5A5A), Color(0xFFB11226)]),
+      ],
     );
   }
 }
