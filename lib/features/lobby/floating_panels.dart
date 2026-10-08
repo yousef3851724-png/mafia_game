@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../widgets/animated_sticker.dart';
+import '../../core/theme/radical_theme.dart';
 
 class FloatingPanels extends StatefulWidget {
   final List<String> stickerAssets;
@@ -24,7 +25,7 @@ class _FloatingPanelsState extends State<FloatingPanels> {
   bool _pickerOpen = false;
   int _tab = 0;
   final _ctrl = TextEditingController();
-  static const _gold = Color(0xFFD4AF37);
+  static const _gold = RadicalTheme.gold;
   static const _emojis = ['😂','😭','😍','😎','😡','😱','🤔','😊','👍','👎','❤️','💔','🔥','👏','💯'];
 
   @override

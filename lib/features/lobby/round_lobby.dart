@@ -82,9 +82,9 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
       id: 'night',
       name: 'شب رادیکال',
       colors: [
-        Color(0xFF090D15),
+        RadicalTheme.ink,
         Color(0xFF18243A),
-        Color(0xFF0A101C),
+        RadicalTheme.ink,
       ],
       icon: Icons.nightlight_round,
     ),
@@ -94,7 +94,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
       colors: [
         Color(0xFF16070A),
         Color(0xFF48151B),
-        Color(0xFF09090D),
+        RadicalTheme.ink,
       ],
       icon: Icons.local_fire_department,
     ),
@@ -227,7 +227,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
               onPressed: _showManagementSheet,
               icon: const Icon(
                 Icons.admin_panel_settings,
-                color: Color(0xFFD4AF87),
+                color: RadicalTheme.goldSoft,
               ),
             ),
         ],
@@ -316,7 +316,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: Color(0xFFD4AF87).withValues(alpha: 0.18),
+              color: RadicalTheme.goldSoft.withValues(alpha: 0.18),
               width: 2,
             ),
           ),
@@ -331,11 +331,11 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
               colors: [
                 Color(0xFF394961),
                 Color(0xFF1C2739),
-                Color(0xFF101722),
+                RadicalTheme.panel,
               ],
             ),
             border: Border.all(
-              color: const Color(0xFFD4AF87),
+              color: const RadicalTheme.goldSoft,
               width: 2.2,
             ),
             boxShadow: const [
@@ -406,14 +406,14 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: const Color(0xFFD4AF87),
+                color: const RadicalTheme.goldSoft,
                 width: 2,
               ),
             ),
             child: const Icon(
               Icons.local_police,
               size: 32,
-              color: Color(0xFFD4AF87),
+              color: RadicalTheme.goldSoft,
             ),
           ),
           const SizedBox(height: 8),
@@ -423,7 +423,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
               fontSize: 17,
               fontWeight: FontWeight.w900,
               letterSpacing: 3,
-              color: Color(0xFFD4AF87),
+              color: RadicalTheme.goldSoft,
             ),
           ),
           SizedBox(height: 4),
@@ -518,7 +518,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
   void _showManagementSheet() {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xFF151C28),
+      backgroundColor: const RadicalTheme.panel,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(24),
@@ -542,7 +542,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
                 ListTile(
                   leading: const Icon(
                     Icons.image,
-                    color: Color(0xFFD4AF87),
+                    color: RadicalTheme.goldSoft,
                   ),
                   title: const Text('تغییر تصویر زمینه'),
                   onTap: () {
@@ -592,7 +592,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
   void _showBackgroundPicker() {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xFF151C28),
+      backgroundColor: const RadicalTheme.panel,
       builder: (context) {
         return SafeArea(
           child: ListView(
@@ -648,7 +648,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
   void _showModePicker() {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xFF151C28),
+      backgroundColor: const RadicalTheme.panel,
       builder: (context) {
         return SafeArea(
           child: Column(
@@ -711,7 +711,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
 
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xFF151C28),
+      backgroundColor: const RadicalTheme.panel,
       builder: (context) {
         return SafeArea(
           child: ListView(
@@ -770,7 +770,7 @@ class _RoundLobbyState extends ConsumerState<RoundLobby> {
 
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xFF151C28),
+      backgroundColor: const RadicalTheme.panel,
       builder: (context) {
         return SafeArea(
           child: Column(
@@ -848,7 +848,7 @@ class _PlayerSeat extends StatelessWidget {
                           : isManager
                               ? Color(0xFF64B5F6)
                               : exists
-                                  ? Color(0xFFD4AF87)
+                                  ? RadicalTheme.goldSoft
                                   : Colors.white.withValues(alpha: 0.24),
                       width: isCreator || isManager ? 2.5 : 1.8,
                     ),
@@ -870,7 +870,7 @@ class _PlayerSeat extends StatelessWidget {
                     height: 23,
                     alignment: Alignment.center,
                     decoration: const BoxDecoration(
-                      color: Color(0xFF101722),
+                      color: RadicalTheme.panel,
                       shape: BoxShape.circle,
                     ),
                     child: Text(
@@ -999,7 +999,7 @@ class _TableGlowPainter extends CustomPainter {
     final paint = Paint()
       ..shader = RadialGradient(
         colors: [
-          Color(0xFFD4AF87).withValues(alpha: 0.10),
+          RadicalTheme.goldSoft.withValues(alpha: 0.10),
           Colors.transparent,
         ],
       ).createShader(

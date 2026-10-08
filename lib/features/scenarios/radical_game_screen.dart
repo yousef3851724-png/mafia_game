@@ -133,7 +133,7 @@ class RadicalGameScreen extends StatelessWidget {
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [accent.withValues(alpha: .95), const Color(0xFF171B25)]),
+          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [accent.withValues(alpha: .95), const RadicalTheme.panel]),
           boxShadow: [BoxShadow(color: accent.withValues(alpha: .20), blurRadius: 16, spreadRadius: 1)],
         ),
         child: ClipOval(child: RealisticAvatar(role: 'شهروند', female: female, size: 54, avatarId: avatarId)),

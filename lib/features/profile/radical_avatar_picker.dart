@@ -2,6 +2,7 @@ import '../../core/theme/radical_frame_tier.dart';
 import 'package:flutter/material.dart';
 import '../../core/models/radical_avatar_catalog.dart';
 import '../../core/widgets/radical_avatar_frame.dart';
+import '../../core/theme/radical_theme.dart';
 
 /// گرید انتخاب آواتار برای پروفایل/ساخت شخصیت.
 /// آواتار انتخاب‌شده با فریم فعلی کاربر پیش‌نمایش داده می‌شود.
@@ -69,7 +70,7 @@ class _RadicalAvatarPickerState extends State<RadicalAvatarPicker> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected ? const Color(0xFFFFD700) : Colors.white70,
+                  color: isSelected ? const RadicalTheme.goldBright : Colors.white70,
                 ),
               ),
               if (avatar.isPremium)

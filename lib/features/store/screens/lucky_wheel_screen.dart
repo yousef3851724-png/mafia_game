@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../../core/theme/radical_theme.dart';
 
-const _gold = Color(0xFFE3B873);
+const _gold = RadicalTheme.goldSoft;
 const _goldBright = Color(0xFFFFD86B);
 
 const List<int> _segments = [20, 50, 30, 100, 20, 150, 50, 200, 30, 100, 50, 500];
@@ -125,7 +126,7 @@ class _LuckyWheelScreenState extends ConsumerState<LuckyWheelScreen>
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF14141C),
+        backgroundColor: const RadicalTheme.panel,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: const BorderSide(color: _gold),
@@ -159,7 +160,7 @@ class _LuckyWheelScreenState extends ConsumerState<LuckyWheelScreen>
     final wheelSize = math.min(width - 48, 340.0);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0B0B12),
+      backgroundColor: const RadicalTheme.ink,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -178,7 +179,7 @@ class _LuckyWheelScreenState extends ConsumerState<LuckyWheelScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF14141C),
+                    color: const RadicalTheme.panel,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: _gold.withValues(alpha: .4)),
                   ),
@@ -212,7 +213,7 @@ class _LuckyWheelScreenState extends ConsumerState<LuckyWheelScreen>
                                 height: wheelSize * .24,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: const Color(0xFF0B0B12),
+                                  color: const RadicalTheme.ink,
                                   border: Border.all(color: _gold, width: 3),
                                   boxShadow: [
                                     BoxShadow(

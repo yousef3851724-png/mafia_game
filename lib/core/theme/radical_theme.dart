@@ -146,7 +146,6 @@ class RadicalTheme {
     );
 
     final base = ThemeData(
-      fontFamily: 'Vazirmatn',
       brightness: Brightness.dark,
       useMaterial3: true,
       colorScheme: scheme,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/frame_catalog.dart';
 import '../../../../core/widgets/avatar_frame_widget.dart';
 import '../../../../core/widgets/frames/animated_avatar_frame.dart';
+import '../../../../core/theme/radical_theme.dart';
 
 class FrameShowcaseScreen extends StatefulWidget {
   const FrameShowcaseScreen({super.key});
@@ -18,7 +19,7 @@ class _FrameShowcaseScreenState extends State<FrameShowcaseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121216),
+      backgroundColor: const RadicalTheme.ink,
       appBar: AppBar(
         title: const Text('ویترین فریم‌های رادیکال'),
         backgroundColor: Colors.transparent,
@@ -89,7 +90,7 @@ class _FrameShowcaseScreenState extends State<FrameShowcaseScreen> {
                   onTap: () => setState(() => _selected = frame),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isCurrent ? const Color(0xFF282836) : const Color(0xFF1B1B22),
+                      color: isCurrent ? const RadicalTheme.panel2 : const RadicalTheme.panel,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: isCurrent ? Colors.amber : Colors.white10,

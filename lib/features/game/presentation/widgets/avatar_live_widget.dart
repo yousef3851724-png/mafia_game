@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../../../../core/theme/radical_theme.dart';
 
 class AvatarLiveWidget extends StatefulWidget {
   final ImageProvider imageProvider;
@@ -15,7 +16,7 @@ class AvatarLiveWidget extends StatefulWidget {
     required this.imageProvider,
     this.size = 96,
     this.eyeRegion,
-    this.frameColor = const Color(0xFFD4AF37),
+    this.frameColor = const RadicalTheme.gold,
     this.frameOverlay,
     this.isAlive = true,
   });
