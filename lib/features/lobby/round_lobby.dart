@@ -1,3 +1,4 @@
+import 'floating_panels.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -379,6 +380,12 @@ class _RoundLobbyState extends State<RoundLobby> {
             );
           },
         ),
+        Positioned.fill(child: FloatingPanels(
+          stickerAssets: const [],
+          onSendText: (t) => debugPrint('chat: ' + t),
+          onSendEmoji: (e) => debugPrint('emoji: ' + e),
+          onSendSticker: (a) => debugPrint('sticker: ' + a),
+        )),
       ],
     );
   }
