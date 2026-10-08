@@ -1,3 +1,4 @@
+import '../../widgets/animated_sticker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/app_providers.dart';
@@ -127,8 +128,10 @@ class _CategoryGrid extends ConsumerWidget {
             child: Column(
               children: [
                 Expanded(
-                  child: Image.asset(item.assetPath,
-                      fit: BoxFit.contain, filterQuality: FilterQuality.high),
+                  child: item.assetPath.contains('stickers/')
+                      ? AnimatedSticker(asset: item.assetPath, size: 80, animate: false)
+                      : Image.asset(item.assetPath,
+                          fit: BoxFit.contain, filterQuality: FilterQuality.high),
                 ),
                 const SizedBox(height: 4),
                 Text(item.nameFa,

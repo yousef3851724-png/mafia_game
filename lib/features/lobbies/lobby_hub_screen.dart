@@ -1,3 +1,4 @@
+import '../../widgets/animated_sticker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -464,6 +465,7 @@ class _LobbyHubScreenState extends ConsumerState<LobbyHubScreen> {
 
   Widget _message(LobbyChatMessage message) {
     final isSystem = message.type == LobbyChatMessageType.system;
+    final isStickerAsset = message.type == LobbyChatMessageType.sticker && message.content.startsWith('assets/');
     final sender = _chatPlayer(message.senderId);
     final prefix = switch (message.type) {
       LobbyChatMessageType.text => '${message.senderName}: ',
@@ -484,7 +486,11 @@ class _LobbyHubScreenState extends ConsumerState<LobbyHubScreen> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Flexible(
+              if (isStickerAsset) ...[
+                Text('${message.senderName}: ', style: const TextStyle(fontSize: 12)),
+                AnimatedSticker(asset: message.content, size: 64),
+              ],
+              if (!isStickerAsset) Flexible(
                 child: Text(
                   '$prefix${message.content}',
                   style: TextStyle(
