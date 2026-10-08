@@ -97,7 +97,13 @@ class RadicalTheme {
   ];
 
   // ─── Theme Data (کش‌شده) ───
-  static final ThemeData _dark = _buildDark();
+  static final ThemeData _dark = (() {
+    final t = _buildDark();
+    return t.copyWith(
+      textTheme: t.textTheme.apply(fontFamily: 'Vazirmatn'),
+      primaryTextTheme: t.primaryTextTheme.apply(fontFamily: 'Vazirmatn'),
+    );
+  })();
 
   static ThemeData dark() => _dark;
 
@@ -140,6 +146,7 @@ class RadicalTheme {
     );
 
     final base = ThemeData(
+      fontFamily: 'Vazirmatn',
       brightness: Brightness.dark,
       useMaterial3: true,
       colorScheme: scheme,
