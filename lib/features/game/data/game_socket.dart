@@ -82,7 +82,7 @@ class GameSocket {
       _send({'type': 'game_join', 'roomId': roomId, 'playerId': playerId, if (playerName != null && playerName.trim().isNotEmpty) 'name': playerName.trim()});
     } catch (e) {
       _errorCtrl.add(e.toString());
-      _scheduleReconnect(roomId, playerId, token);
+      _scheduleReconnect(roomId, playerId, token, playerName);
     }
   }
 
