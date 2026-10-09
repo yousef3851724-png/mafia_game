@@ -32,6 +32,7 @@ class _GameRealtimeScreenState extends ConsumerState<GameRealtimeScreen> {
       ref.read(gameRealtimeProvider.notifier).join(
             roomId: widget.roomId,
             playerId: widget.playerId,
+            playerName: widget.playerName,
           );
     });
   }
