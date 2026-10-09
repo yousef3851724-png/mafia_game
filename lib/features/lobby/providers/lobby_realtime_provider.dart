@@ -33,6 +33,7 @@ class LobbyRealtimeController extends StateNotifier<LobbyRealtimeState> {
     required String roomId,
     required String playerId,
     String? token,
+    String? playerName,
   }) async {
     if (_socket != null) {
       await _socket!.disconnect();
@@ -63,6 +64,7 @@ class LobbyRealtimeController extends StateNotifier<LobbyRealtimeState> {
       roomId: roomId,
       playerId: playerId,
       token: token,
+      playerName: playerName,
     );
 
     state = state.copyWith(roomId: roomId, myId: playerId);
