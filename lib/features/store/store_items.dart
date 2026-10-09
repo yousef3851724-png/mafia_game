@@ -136,11 +136,7 @@ class StoreItems {
     ),
   );
 
-  static final List<StoreItem> frames = (List<StoreItem>.of(FrameCatalogPng.all)
-    ..sort((a, b) {
-      final c = a.price.compareTo(b.price);
-      return c != 0 ? c : a.id.compareTo(b.id);
-    }))
+  static final List<StoreItem> frames = FrameCatalogPng.all
       .map((f) => StoreItem(
             id: f.id,
             category: StoreCategory.frame,
@@ -148,7 +144,11 @@ class StoreItems {
             price: f.price,
             assetPath: f.assetPath,
           ))
-      .toList();
+      .toList()
+    ..sort((a, b) {
+      final c = a.price.compareTo(b.price);
+      return c != 0 ? c : a.id.compareTo(b.id);
+    });
 
   // برای اضافه کردن آیتم جدید، فقط یک StoreItem به این لیست‌ها اضافه کن.
   static final List<StoreItem> stickers = <StoreItem>[
