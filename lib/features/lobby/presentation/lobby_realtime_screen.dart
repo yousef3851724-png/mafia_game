@@ -30,6 +30,7 @@ class _LobbyRealtimeScreenState extends ConsumerState<LobbyRealtimeScreen> {
       ref.read(lobbyRealtimeProvider.notifier).join(
             roomId: widget.roomId,
             playerId: widget.playerId,
+            playerName: widget.playerName,
           );
     });
   }
