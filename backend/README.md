@@ -35,6 +35,16 @@ The `backend/ai/` folder contains an initial, deterministic foundation now conne
 
 **Important:** this is an early integration, not a connected generative AI model. Bot behavior is simple and can be predictable; the moderation patterns are only a basic baseline. The current Flutter UI does not yet expose add-bot or assistant controls, and no AI provider API key is required. The AI player protocol and exact game rules still need end-to-end validation.
 
+## Connect the Flutter app after backend deployment
+
+The realtime providers accept compile-time configuration without editing Dart source files. Replace the example host with the deployed HTTPS host converted to WebSocket scheme (`https://` → `wss://`), and use the same endpoint for lobby and game:
+
+```sh
+flutter run --dart-define=MAFIA_WS_URL=wss://YOUR-DEPLOYED-HOST/lobby --dart-define=MAFIA_USE_MOCK=false
+```
+
+For a release APK, use the same two `--dart-define` flags with `flutter build apk --release`. Until a real backend is deployed and verified, the app defaults to mock mode. Do not use the placeholder host in a public build.
+
 ## Required before public launch
 - **Authentication is not implemented.** Client-supplied player IDs are not secure identities; do not treat this service as protected against impersonation or cheating.
 - Rooms, sessions, and game state exist only in memory and are lost on restart. Multiple app instances will not share state.
