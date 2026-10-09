@@ -2,10 +2,11 @@
   "name": "mafia-radical",
   "version": "0.1.0",
   "private": true,
-  "description": "Liara Node.js entry point for the Mafia Radical backend",
+  "description": "Node.js WebSocket backend for Mafia Radical",
   "scripts": {
     "start": "node backend/server.js",
-    "check": "node --check backend/server.js"
+    "check": "node --check backend/server.js && node --check backend/server.test.js",
+    "test": "node --test backend/*.test.js"
   },
   "engines": {
     "node": ">=20"
