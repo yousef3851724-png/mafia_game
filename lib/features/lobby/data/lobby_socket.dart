@@ -65,7 +65,7 @@ class LobbySocket {
         onDone: () {
           _statusCtrl.add(LobbyConnectionStatus.disconnected);
           if (!_closedByUser) {
-            _scheduleReconnect(roomId, playerId, token);
+            _scheduleReconnect(roomId, playerId, token, playerName);
           }
         },
       );
