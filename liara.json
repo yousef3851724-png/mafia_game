@@ -1,0 +1,5 @@
+{
+  "app": "mafia-radical",
+  "platform": "node",
+  "port": 8080
+}
