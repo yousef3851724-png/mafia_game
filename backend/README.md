@@ -27,13 +27,13 @@ The server accepts the existing `join` and `game_join` messages and emits `playe
 
 ## AI foundation (phase 1)
 
-The `backend/ai/` folder contains an initial, deterministic foundation:
-- `strategy.js`: role-aware night target and vote selection helpers with easy/normal/hard difficulty inputs
+The `backend/ai/` folder contains an initial, deterministic foundation now connected to the Node.js WebSocket server:
+- `strategy.js`: role-aware night target and vote selection helpers with easy/normal/hard difficulty inputs; host can request bots with a WebSocket `add_ai` message while in the lobby, and bots act during night/voting phases
 - `moderation.js`: a small Persian chat filter baseline
-- `assistant.js`: fixed FAQ answers for rules, roles, wallet safety, and reporting
+- `assistant.js`: fixed FAQ answers for rules, roles, wallet safety, and reporting, requested with an `assistant` message carrying `question`
 - `ai.test.js`: unit tests for these helpers
 
-**Important:** these helpers are not yet wired into live WebSocket rooms. They are not a connected generative AI model, and the moderation patterns are only a basic baseline. No AI provider API key is required for this first phase. Integration must happen only after protocol and game rules are validated.
+**Important:** this is an early integration, not a connected generative AI model. Bot behavior is simple and can be predictable; the moderation patterns are only a basic baseline. The current Flutter UI does not yet expose add-bot or assistant controls, and no AI provider API key is required. The AI player protocol and exact game rules still need end-to-end validation.
 
 ## Required before public launch
 - **Authentication is not implemented.** Client-supplied player IDs are not secure identities; do not treat this service as protected against impersonation or cheating.
