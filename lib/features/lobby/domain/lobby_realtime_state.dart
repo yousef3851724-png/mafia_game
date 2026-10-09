@@ -28,7 +28,7 @@ class LobbyPlayerRT extends Equatable {
         avatarUrl: j['avatarUrl'] as String?,
         ready: j['ready'] as bool? ?? false,
         isHost: j['isHost'] as bool? ?? false,
-        isAlive: j['isAlive'] as bool? ?? true,
+        isAlive: j['isAlive'] as bool? ?? j['alive'] as bool? ?? true,
         seat: j['seat'] as int? ?? 0,
       );
 

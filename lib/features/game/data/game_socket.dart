@@ -48,6 +48,7 @@ class GameSocket {
     required String roomId,
     required String playerId,
     String? token,
+    String? playerName,
   }) async {
     _closedByUser = false;
     _myId = playerId;
@@ -71,25 +72,25 @@ class GameSocket {
         _onMessage,
         onError: (e) {
           _errorCtrl.add(e.toString());
-          _scheduleReconnect(roomId, playerId, token);
+          _scheduleReconnect(roomId, playerId, token, playerName);
         },
         onDone: () {
-          if (!_closedByUser) _scheduleReconnect(roomId, playerId, token);
+          if (!_closedByUser) _scheduleReconnect(roomId, playerId, token, playerName);
         },
       );
 
-      _send({'type': 'game_join', 'roomId': roomId, 'playerId': playerId});
+      _send({'type': 'game_join', 'roomId': roomId, 'playerId': playerId, if (playerName != null && playerName.trim().isNotEmpty) 'name': playerName.trim()});
     } catch (e) {
       _errorCtrl.add(e.toString());
-      _scheduleReconnect(roomId, playerId, token);
+      _scheduleReconnect(roomId, playerId, token, playerName);
     }
   }
 
-  void _scheduleReconnect(String roomId, String playerId, String? token) {
+  void _scheduleReconnect(String roomId, String playerId, String? token, String? playerName) {
     if (!autoReconnect || _closedByUser) return;
     _reconnectTimer?.cancel();
     _reconnectTimer = Timer(reconnectDelay, () {
-      connect(roomId: roomId, playerId: playerId, token: token);
+      connect(roomId: roomId, playerId: playerId, token: token, playerName: playerName);
     });
   }
 
@@ -110,6 +111,24 @@ class GameSocket {
           break;
         case 'eliminated':
           _handleEliminated(data);
+          break;
+        case 'investigation_result':
+          final current = _lastState;
+          if (current != null) {
+            _lastState = current.copyWith(
+              lastEvent: data['message'] as String? ?? 'نتیجه بررسی دریافت شد.',
+            );
+            _stateCtrl.add(_lastState!);
+          }
+          break;
+        case 'game_over':
+          final current = _lastState ?? const GameRealtimeState();
+          _lastState = current.copyWith(
+            phase: GamePhase.ended,
+            secondsLeft: 0,
+            lastEvent: data['message'] as String? ?? 'بازی پایان یافت.',
+          );
+          _stateCtrl.add(_lastState!);
           break;
         case 'error':
           _errorCtrl.add(data['message'] as String? ?? 'خطای ناشناخته');
@@ -138,6 +157,7 @@ class GameSocket {
       secondsLeft: data['seconds'] as int? ?? 0,
       lastEvent: data['message'] as String?,
     );
+    _lastState = newState;
     _stateCtrl.add(newState);
     _startTicker(newState.secondsLeft);
   }

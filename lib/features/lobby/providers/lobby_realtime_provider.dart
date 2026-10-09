@@ -6,8 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/lobby_socket.dart';
 import '../domain/lobby_realtime_state.dart';
 
-const kLobbyWsUrl = 'wss://your-server.example.com/lobby';
-const kLobbyUseMock = true;
+const kLobbyWsUrl = String.fromEnvironment(
+  'MAFIA_WS_URL',
+  defaultValue: 'wss://your-server.example.com/lobby',
+);
+const kLobbyUseMock = bool.fromEnvironment('MAFIA_USE_MOCK', defaultValue: true);
 
 final lobbyRealtimeProvider =
     StateNotifierProvider.autoDispose<LobbyRealtimeController, LobbyRealtimeState>(
@@ -30,6 +33,7 @@ class LobbyRealtimeController extends StateNotifier<LobbyRealtimeState> {
     required String roomId,
     required String playerId,
     String? token,
+    String? playerName,
   }) async {
     if (_socket != null) {
       await _socket!.disconnect();
@@ -60,6 +64,7 @@ class LobbyRealtimeController extends StateNotifier<LobbyRealtimeState> {
       roomId: roomId,
       playerId: playerId,
       token: token,
+      playerName: playerName,
     );
 
     state = state.copyWith(roomId: roomId, myId: playerId);
@@ -89,7 +94,9 @@ class LobbyRealtimeController extends StateNotifier<LobbyRealtimeState> {
   }
 
   void startGame() {
-    if (!state.isHost || !state.allReady) return;
+    if (!state.isHost) return;
+    // Host has no separate Ready button in the current UI, so mark the host ready first.
+    _socket?.setReady(true);
     _socket?.startGame();
   }
 

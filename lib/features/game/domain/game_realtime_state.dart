@@ -157,8 +157,8 @@ class GameRealtimeState extends Equatable {
   bool get isVoting => phase == GamePhase.voting;
 
   /// آیا بازی تموم شده؟
-  bool get isEnded =>
-      phase == GamePhase.ended || phase == GamePhase.result;
+  // 'result' is a short transition between rounds, not the end of the match.
+  bool get isEnded => phase == GamePhase.ended;
 
   /// آیا من زنده‌ام؟
   bool get amAlive => me?.alive ?? false;
