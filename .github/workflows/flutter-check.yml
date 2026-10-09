@@ -17,6 +17,10 @@ on:
       - '.github/workflows/flutter-check.yml'
   workflow_dispatch:
 
+concurrency:
+  group: flutter-checks-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
