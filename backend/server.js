@@ -1,6 +1,9 @@
 'use strict';
 const http = require('node:http');
 const { WebSocketServer, WebSocket } = require('ws');
+const { chooseNightAction, chooseVote } = require('./ai/strategy');
+const { moderateChat } = require('./ai/moderation');
+const { answerQuestion } = require('./ai/assistant');
 
 const PORT = Number(process.env.PORT || 8080);
 const MAX_PLAYERS = Math.max(3, Math.min(20, Number(process.env.MAX_PLAYERS_PER_ROOM || 20)));
@@ -15,7 +18,7 @@ const server = http.createServer((req, res) => {
   res.writeHead(404, { 'content-type': 'application/json; charset=utf-8' }); res.end(JSON.stringify({ error: 'not_found' }));
 });
 const wss = new WebSocketServer({ server, maxPayload: 16 * 1024 });
-const send = (ws, x) => { if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(x)); };
+const send = (ws, x) => { if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(x)); };
 const err = (ws, message, code = 'invalid_action') => send(ws, { type: 'error', code, message });
 function roomFor(id) {
   if (!rooms.has(id)) rooms.set(id, { id, players: new Map(), phase: 'lobby', round: 0, votes: new Map(), actions: new Map(), doctorTarget: null, timer: null, deadline: null, lastEvent: null });
@@ -24,7 +27,7 @@ function roomFor(id) {
 function stopTimer(r) { if (r.timer) clearTimeout(r.timer); r.timer = null; r.deadline = null; }
 function broadcast(r, x) { for (const p of r.players.values()) send(p.ws, x); }
 function publicPlayers(r, reveal = false) {
-  return [...r.players.values()].map(p => ({ id: p.id, name: p.name, isHost: p.isHost, ready: p.ready, seat: p.seat, alive: p.alive, ...(reveal ? { role: p.role } : {}), votesAgainst: [...r.votes.values()].filter(id => id === p.id).length, hasActed: r.phase === 'night' ? r.actions.has(p.id) : r.votes.has(p.id) }));
+  return [...r.players.values()].map(p => ({ id: p.id, name: p.name, isHost: p.isHost, ready: p.ready, seat: p.seat, alive: p.alive, isAI: Boolean(p.isAI), ...(reveal ? { role: p.role } : {}), votesAgainst: [...r.votes.values()].filter(id => id === p.id).length, hasActed: r.phase === 'night' ? r.actions.has(p.id) : r.votes.has(p.id) }));
 }
 function broadcastPlayers(r) { broadcast(r, { type: 'players', players: publicPlayers(r) }); }
 function state(r, p) { return { type: 'game_state', phase: r.phase, round: r.round, seconds: r.deadline ? Math.max(0, Math.ceil((r.deadline - Date.now()) / 1000)) : 0, players: publicPlayers(r, r.phase === 'ended'), myRole: p.role || null, myTarget: r.votes.get(p.id) || r.actions.get(p.id) || null, message: r.lastEvent }; }
@@ -63,7 +66,7 @@ function resolveNight(r) {
   if (winnerCheck(r)) return;
   phase(r, 'day', DURATIONS.day, r.lastEvent); timer(r, DURATIONS.day, () => beginVoting(r));
 }
-function beginVoting(r) { if (r.phase !== 'day') return; r.votes.clear(); phase(r, 'voting', DURATIONS.voting, 'رأی‌گیری آغاز شد.'); timer(r, DURATIONS.voting, () => resolveVoting(r)); }
+function beginVoting(r) { if (r.phase !== 'day') return; r.votes.clear(); phase(r, 'voting', DURATIONS.voting, 'رأی‌گیری آغاز شد.'); timer(r, DURATIONS.voting, () => resolveVoting(r)); setTimeout(() => runAiVoting(r), 250).unref?.(); }\nfunction runAiVoting(r) {\n  if (r.phase !== 'voting') return;\n  const alive = [...r.players.values()].filter(p => p.alive);\n  for (const p of alive.filter(x => x.isAI)) {\n    const knownMafiaIds = p.role === 'mafia' ? alive.filter(x => x.role === 'mafia' && x.id !== p.id).map(x => x.id) : [];\n    const targetId = chooseVote({ selfId: p.id, players: alive, knownMafiaIds, difficulty: p.difficulty || 'normal' });\n    if (targetId) r.votes.set(p.id, targetId); else r.votes.set(p.id, '');\n  }\n  if (alive.every(x => r.votes.has(x.id))) resolveVoting(r);\n}
 function resolveVoting(r) {
   if (r.phase !== 'voting') return;
   const counts = new Map();
@@ -119,7 +122,7 @@ function handle(ws,raw) {
   switch(d.type){
     case 'ready': if(r.phase!=='lobby')return err(ws,'بازی شروع شده است.');p.ready=Boolean(d.value);broadcastPlayers(r);break;
     case 'seat': {if(r.phase!=='lobby')return err(ws,'تغییر صندلی پس از شروع مجاز نیست.');const s=Number(d.seat);if(!Number.isInteger(s)||s<0||s>=MAX_PLAYERS)return err(ws,'شماره صندلی معتبر نیست.');const o=[...r.players.values()].find(x=>x.seat===s&&x.id!==p.id);if(o)o.seat=p.seat;p.seat=s;broadcastPlayers(r);break;}
-    case 'chat': {const text=String(d.text||'').trim().slice(0,500);if(!text)break;if(r.phase!=='lobby'&&!['day','voting'].includes(r.phase))return err(ws,'چت در این مرحله غیرفعال است.');if(r.phase!=='lobby'&&!p.alive)return err(ws,'بازیکن حذف‌شده نمی‌تواند پیام بدهد.');broadcast(r,{type:'chat',playerId:p.id,name:p.name,text,sentAt:new Date().toISOString()});break;}
+    case 'chat': {const text=String(d.text||'').trim().slice(0,500);if(!text)break;if(r.phase!=='lobby'&&!['day','voting'].includes(r.phase))return err(ws,'چت در این مرحله غیرفعال است.');if(r.phase!=='lobby'&&!p.alive)return err(ws,'بازیکن حذف‌شده نمی‌تواند پیام بدهد.');const moderation=moderateChat(text);if(!moderation.allowed)return err(ws,moderation.reason,'chat_moderated');broadcast(r,{type:'chat',playerId:p.id,name:p.name,text,sentAt:new Date().toISOString()});break;}\n    case 'assistant': {const result=answerQuestion(d.question);send(ws,{type:'assistant_response',...result});break;}\n    case 'add_ai': {if(r.phase!=='lobby'||!p.isHost)return err(ws,'فقط میزبان می‌تواند در لابی بازیکن هوش مصنوعی اضافه کند.');const count=Math.max(1,Math.min(10,Number(d.count)||1));const difficulty=['easy','normal','hard'].includes(d.difficulty)?d.difficulty:'normal';let added=0;for(let i=0;i<count&&r.players.size<MAX_PLAYERS;i++){const id='ai_'+require('node:crypto').randomUUID();r.players.set(id,{id,name:['دستیار','بازیکن هوشمند','رقیب هوشمند'][i%3]+' '+(r.players.size+1),isHost:false,ready:true,seat:r.players.size,alive:true,role:null,ws:null,isAI:true,difficulty});added++;}if(!added)return err(ws,'ظرفیت اتاق برای بازیکن هوش مصنوعی کافی نیست.');broadcastPlayers(r);send(ws,{type:'ai_players_added',count:added,difficulty});break;}
     case 'kick': {if(r.phase!=='lobby'||!p.isHost)return err(ws,'فقط میزبان در لابی می‌تواند اخراج کند.');const t=r.players.get(String(d.playerId));if(!t||t.id===p.id)return err(ws,'بازیکن هدف معتبر نیست.');send(t.ws,{type:'error',code:'kicked',message:'از اتاق اخراج شدید.'});t.ws.close(4002,'kicked');remove(t.ws);break;}
     case 'start': if(!p.isHost)return err(ws,'فقط میزبان می‌تواند بازی را شروع کند.');if(!startGame(r))return err(ws, 'حداقل بازیکنان لازم باید حاضر و همگی آماده باشند.');break;
     case 'vote': {if(r.phase!=='voting'||!p.alive)return err(ws,'در حال حاضر امکان رأی‌دادن ندارید.');const id=String(d.targetId||'');const t=r.players.get(id);if(!t||!t.alive||id===p.id)return err(ws,'هدف رأی معتبر نیست.');r.votes.set(p.id,id);broadcastPlayers(r);sendStates(r);if([...r.players.values()].filter(x=>x.alive).every(x=>r.votes.has(x.id)))resolveVoting(r);break;}
