@@ -34,6 +34,7 @@ class GameRealtimeController extends StateNotifier<GameRealtimeState> {
     required String roomId,
     required String playerId,
     String? token,
+    String? playerName,
   }) async {
     if (_socket != null) {
       await _socket!.disconnect();
@@ -57,6 +58,7 @@ class GameRealtimeController extends StateNotifier<GameRealtimeState> {
       roomId: roomId,
       playerId: playerId,
       token: token,
+      playerName: playerName,
     );
   }
 
