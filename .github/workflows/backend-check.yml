@@ -15,6 +15,10 @@ on:
       - '.github/workflows/backend-check.yml'
   workflow_dispatch:
 
+concurrency:
+  group: backend-checks-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
