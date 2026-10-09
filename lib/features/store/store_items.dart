@@ -1,5 +1,6 @@
 import '../../core/avatars/avatar_catalog.dart';
 import '../../core/theme/frame_catalog.dart';
+import '../../core/theme/radical_frame_tier.dart';
 import 'package:mafia_radical/data/avatar_catalog.dart';
 
 enum StoreCategory { avatar, frame, sticker, gif, tombstone }
@@ -136,19 +137,22 @@ class StoreItems {
     ),
   );
 
-  static final List<StoreItem> frames = (List<StoreItem>.of(FrameCatalogPng.all)
-    ..sort((a, b) {
-      final c = a.price.compareTo(b.price);
-      return c != 0 ? c : a.id.compareTo(b.id);
-    }))
-      .map((f) => StoreItem(
-            id: f.id,
+  static final List<StoreItem> frames = FrameCatalogPng.all
+      .map((frame) => StoreItem(
+            id: frame.id,
             category: StoreCategory.frame,
-            nameFa: f.nameFa,
-            price: f.price,
-            assetPath: f.assetPath,
+            nameFa: frame.nameFa,
+            price: frame.price,
+            assetPath: frame.assetPath,
+            currency: frame.tier == RadicalFrameTier.legendary
+                ? StoreCurrency.diamonds
+                : StoreCurrency.coins,
           ))
-      .toList();
+      .toList()
+    ..sort((a, b) {
+      final priceOrder = a.price.compareTo(b.price);
+      return priceOrder != 0 ? priceOrder : a.id.compareTo(b.id);
+    });
 
   // برای اضافه کردن آیتم جدید، فقط یک StoreItem به این لیست‌ها اضافه کن.
   static final List<StoreItem> stickers = <StoreItem>[
