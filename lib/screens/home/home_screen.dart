@@ -182,9 +182,9 @@ class _HomeTabBody extends ConsumerWidget {
                           ),
                           const SizedBox(height: 6),
                           _SideAction(
-                            icon: Icons.emoji_events_outlined,
-                            label: 'ماموریت‌ها',
-                            onTap: () => _soon(context),
+                            icon: Icons.casino_rounded,
+                            label: 'گردونه شانس',
+                            onTap: () => context.push('/lucky-wheel'),
                           ),
                           const SizedBox(height: 6),
                           _SideAction(
