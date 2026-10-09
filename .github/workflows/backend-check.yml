@@ -1,0 +1,39 @@
+name: Backend checks
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'package.json'
+      - '.github/workflows/backend-check.yml'
+  push:
+    branches: [feat/mafia-ai-foundation]
+    paths:
+      - 'backend/**'
+      - 'package.json'
+      - '.github/workflows/backend-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Check JavaScript syntax
+        run: npm run check
+      - name: Run backend tests
+        run: npm test
