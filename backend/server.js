@@ -30,7 +30,7 @@ function broadcastPlayers(r) { broadcast(r, { type: 'players', players: publicPl
 function state(r, p) { return { type: 'game_state', phase: r.phase, round: r.round, seconds: r.deadline ? Math.max(0, Math.ceil((r.deadline - Date.now()) / 1000)) : 0, players: publicPlayers(r, r.phase === 'ended'), myRole: p.role || null, myTarget: r.votes.get(p.id) || r.actions.get(p.id) || null, message: r.lastEvent }; }
 function sendStates(r) { for (const p of r.players.values()) send(p.ws, state(r, p)); }
 function phase(r, name, seconds, message) {
-  r.phase = name; r.lastEvent = message || null;
+  r.phase = name; r.deadline = seconds > 0 ? Date.now() + seconds * 1000 : null; r.lastEvent = message || null;
   broadcast(r, { type: 'phase_changed', phase: name, round: r.round, seconds, message: r.lastEvent });
   broadcastPlayers(r); sendStates(r);
 }
