@@ -27,7 +27,7 @@ function publicPlayers(r, reveal = false) {
   return [...r.players.values()].map(p => ({ id: p.id, name: p.name, isHost: p.isHost, ready: p.ready, seat: p.seat, alive: p.alive, ...(reveal ? { role: p.role } : {}), votesAgainst: [...r.votes.values()].filter(id => id === p.id).length, hasActed: r.phase === 'night' ? r.actions.has(p.id) : r.votes.has(p.id) }));
 }
 function broadcastPlayers(r) { broadcast(r, { type: 'players', players: publicPlayers(r) }); }
-function state(r, p) { return { type: 'game_state', phase: r.phase, round: r.round, seconds: r.deadline ? Math.max(0, Math.ceil((r.deadline - Date.now()) / 1000)) : 0, players: publicPlayers(r, ['result','ended'].includes(r.phase)), myRole: p.role || null, myTarget: r.votes.get(p.id) || r.actions.get(p.id) || null, message: r.lastEvent }; }
+function state(r, p) { return { type: 'game_state', phase: r.phase, round: r.round, seconds: r.deadline ? Math.max(0, Math.ceil((r.deadline - Date.now()) / 1000)) : 0, players: publicPlayers(r, r.phase === 'ended'), myRole: p.role || null, myTarget: r.votes.get(p.id) || r.actions.get(p.id) || null, message: r.lastEvent }; }
 function sendStates(r) { for (const p of r.players.values()) send(p.ws, state(r, p)); }
 function phase(r, name, seconds, message) {
   r.phase = name; r.lastEvent = message || null;
