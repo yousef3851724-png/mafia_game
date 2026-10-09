@@ -25,6 +25,16 @@ Health endpoint: `http://localhost:8080/health`. The server listens on `PORT` su
 ## Flutter protocol
 The server accepts the existing `join` and `game_join` messages and emits `players`, `game_state`, `phase_changed`, `eliminated`-compatible state updates, `chat`, `error`, and `investigation_result` events. The Flutter endpoint constants and mock-mode configuration still need to be deliberately switched after deployment and end-to-end testing.
 
+## AI foundation (phase 1)
+
+The `backend/ai/` folder contains an initial, deterministic foundation:
+- `strategy.js`: role-aware night target and vote selection helpers with easy/normal/hard difficulty inputs
+- `moderation.js`: a small Persian chat filter baseline
+- `assistant.js`: fixed FAQ answers for rules, roles, wallet safety, and reporting
+- `ai.test.js`: unit tests for these helpers
+
+**Important:** these helpers are not yet wired into live WebSocket rooms. They are not a connected generative AI model, and the moderation patterns are only a basic baseline. No AI provider API key is required for this first phase. Integration must happen only after protocol and game rules are validated.
+
 ## Required before public launch
 - **Authentication is not implemented.** Client-supplied player IDs are not secure identities; do not treat this service as protected against impersonation or cheating.
 - Rooms, sessions, and game state exist only in memory and are lost on restart. Multiple app instances will not share state.
