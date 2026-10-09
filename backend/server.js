@@ -54,6 +54,20 @@ function beginNight(r) {
   r.round++; r.votes.clear(); r.actions.clear(); r.doctorTarget = null;
   phase(r, 'night', DURATIONS.night, 'شب فرا رسید.');
   timer(r, DURATIONS.night, () => resolveNight(r));
+  setTimeout(() => runAiNight(r), 250).unref?.();
+}
+function runAiNight(r) {
+  if (r.phase !== 'night') return;
+  const alive = [...r.players.values()].filter(p => p.alive);
+  for (const p of alive.filter(x => x.isAI && ['mafia','doctor','detective'].includes(x.role))) {
+    const targetId = chooseNightAction({ role: p.role, selfId: p.id, players: alive, difficulty: p.difficulty || 'normal' });
+    if (!targetId) { if (p.role !== 'mafia') r.actions.set(p.id, ''); continue; }
+    if (p.role === 'mafia') r.actions.set(p.id, targetId);
+    else if (p.role === 'doctor') { r.doctorTarget = targetId; r.actions.set(p.id, targetId); }
+    else r.actions.set(p.id, targetId);
+  }
+  const living = [...r.players.values()].filter(x => x.alive);
+  if (living.filter(x => x.role === 'mafia').every(x => r.actions.has(x.id)) && living.filter(x => ['doctor','detective'].includes(x.role)).every(x => r.actions.has(x.id))) resolveNight(r);
 }
 function resolveNight(r) {
   if (r.phase !== 'night') return;
