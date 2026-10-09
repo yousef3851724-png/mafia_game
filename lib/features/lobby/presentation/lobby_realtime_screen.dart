@@ -254,7 +254,12 @@ class _BottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final canStart = state.isHost && state.allReady;
+    final otherPlayersReady = state.players
+        .where((player) => player.id != state.myId)
+        .every((player) => player.ready);
+    final canStart = state.isHost &&
+        state.players.length >= 5 &&
+        otherPlayersReady;
 
     return Container(
       padding: const EdgeInsets.all(12),
