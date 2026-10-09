@@ -8,8 +8,11 @@ import '../domain/entities/game_phase.dart';
 import '../domain/entities/game_role.dart';
 import '../domain/game_realtime_state.dart';
 
-const kGameWsUrl = 'wss://your-server.example.com/lobby';
-const kGameUseMock = true;
+const kGameWsUrl = String.fromEnvironment(
+  'MAFIA_WS_URL',
+  defaultValue: 'wss://your-server.example.com/lobby',
+);
+const kGameUseMock = bool.fromEnvironment('MAFIA_USE_MOCK', defaultValue: true);
 
 final gameRealtimeProvider =
     StateNotifierProvider.autoDispose<GameRealtimeController, GameRealtimeState>(
