@@ -75,7 +75,7 @@ class LobbySocket {
     } catch (e) {
       _errorCtrl.add(e.toString());
       _statusCtrl.add(LobbyConnectionStatus.error);
-      _scheduleReconnect(roomId, playerId, token);
+      _scheduleReconnect(roomId, playerId, token, playerName);
     }
   }
 
