@@ -111,6 +111,24 @@ class GameSocket {
         case 'eliminated':
           _handleEliminated(data);
           break;
+        case 'investigation_result':
+          final current = _lastState;
+          if (current != null) {
+            _lastState = current.copyWith(
+              lastEvent: data['message'] as String? ?? 'نتیجه بررسی دریافت شد.',
+            );
+            _stateCtrl.add(_lastState!);
+          }
+          break;
+        case 'game_over':
+          final current = _lastState ?? const GameRealtimeState();
+          _lastState = current.copyWith(
+            phase: GamePhase.ended,
+            secondsLeft: 0,
+            lastEvent: data['message'] as String? ?? 'بازی پایان یافت.',
+          );
+          _stateCtrl.add(_lastState!);
+          break;
         case 'error':
           _errorCtrl.add(data['message'] as String? ?? 'خطای ناشناخته');
           break;
@@ -138,6 +156,7 @@ class GameSocket {
       secondsLeft: data['seconds'] as int? ?? 0,
       lastEvent: data['message'] as String?,
     );
+    _lastState = newState;
     _stateCtrl.add(newState);
     _startTicker(newState.secondsLeft);
   }
