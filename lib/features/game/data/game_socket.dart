@@ -75,7 +75,7 @@ class GameSocket {
           _scheduleReconnect(roomId, playerId, token, playerName);
         },
         onDone: () {
-          if (!_closedByUser) _scheduleReconnect(roomId, playerId, token);
+          if (!_closedByUser) _scheduleReconnect(roomId, playerId, token, playerName);
         },
       );
 
