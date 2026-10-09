@@ -39,7 +39,7 @@ class LobbySocket {
   // ============================================================
   // اتصال
   // ============================================================
-  Future<void> connect({required String roomId, required String playerId, String? token}) async {
+  Future<void> connect({required String roomId, required String playerId, String? token, String? playerName}) async {
     _closedByUser = false;
     _statusCtrl.add(LobbyConnectionStatus.connecting);
 
@@ -60,7 +60,7 @@ class LobbySocket {
         onError: (e) {
           _errorCtrl.add(e.toString());
           _statusCtrl.add(LobbyConnectionStatus.error);
-          _scheduleReconnect(roomId, playerId, token);
+          _scheduleReconnect(roomId, playerId, token, playerName);
         },
         onDone: () {
           _statusCtrl.add(LobbyConnectionStatus.disconnected);
@@ -71,7 +71,7 @@ class LobbySocket {
       );
 
       // پیام خوش‌آمد
-      _send({'type': 'join', 'roomId': roomId, 'playerId': playerId});
+      _send({'type': 'join', 'roomId': roomId, 'playerId': playerId, if (playerName != null && playerName.trim().isNotEmpty) 'name': playerName.trim()});
     } catch (e) {
       _errorCtrl.add(e.toString());
       _statusCtrl.add(LobbyConnectionStatus.error);
@@ -79,12 +79,12 @@ class LobbySocket {
     }
   }
 
-  void _scheduleReconnect(String roomId, String playerId, String? token) {
+  void _scheduleReconnect(String roomId, String playerId, String? token, String? playerName) {
     if (!autoReconnect || _closedByUser) return;
     _reconnectTimer?.cancel();
     _statusCtrl.add(LobbyConnectionStatus.reconnecting);
     _reconnectTimer = Timer(reconnectDelay, () {
-      connect(roomId: roomId, playerId: playerId, token: token);
+      connect(roomId: roomId, playerId: playerId, token: token, playerName: playerName);
     });
   }
 
