@@ -136,7 +136,11 @@ class StoreItems {
     ),
   );
 
-  static final List<StoreItem> frames = FrameCatalogPng.all
+  static final List<StoreItem> frames = (List<StoreItem>.of(FrameCatalogPng.all)
+    ..sort((a, b) {
+      final c = a.price.compareTo(b.price);
+      return c != 0 ? c : a.id.compareTo(b.id);
+    }))
       .map((f) => StoreItem(
             id: f.id,
             category: StoreCategory.frame,
