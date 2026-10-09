@@ -48,6 +48,7 @@ class GameSocket {
     required String roomId,
     required String playerId,
     String? token,
+    String? playerName,
   }) async {
     _closedByUser = false;
     _myId = playerId;
@@ -71,25 +72,25 @@ class GameSocket {
         _onMessage,
         onError: (e) {
           _errorCtrl.add(e.toString());
-          _scheduleReconnect(roomId, playerId, token);
+          _scheduleReconnect(roomId, playerId, token, playerName);
         },
         onDone: () {
           if (!_closedByUser) _scheduleReconnect(roomId, playerId, token);
         },
       );
 
-      _send({'type': 'game_join', 'roomId': roomId, 'playerId': playerId});
+      _send({'type': 'game_join', 'roomId': roomId, 'playerId': playerId, if (playerName != null && playerName.trim().isNotEmpty) 'name': playerName.trim()});
     } catch (e) {
       _errorCtrl.add(e.toString());
       _scheduleReconnect(roomId, playerId, token);
     }
   }
 
-  void _scheduleReconnect(String roomId, String playerId, String? token) {
+  void _scheduleReconnect(String roomId, String playerId, String? token, String? playerName) {
     if (!autoReconnect || _closedByUser) return;
     _reconnectTimer?.cancel();
     _reconnectTimer = Timer(reconnectDelay, () {
-      connect(roomId: roomId, playerId: playerId, token: token);
+      connect(roomId: roomId, playerId: playerId, token: token, playerName: playerName);
     });
   }
 
