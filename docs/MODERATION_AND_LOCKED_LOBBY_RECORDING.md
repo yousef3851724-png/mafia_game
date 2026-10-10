@@ -83,3 +83,31 @@ It does **not** yet implement the HTTP/WebSocket endpoints, role policy middlewa
 - No player receives another player's hidden role through state snapshots or WebSocket broadcasts.
 - Recording objects are private, encrypted, expire according to retention policy, and are not publicly linkable.
 - AI alerts lead to human review, not automatic permanent punishment.
+
+
+## Implemented moderation API foundation (branch only)
+
+The backend now mounts authenticated endpoints under `/api/v1/moderation`:
+- `GET /roles` — requires `roles.read`.
+- `POST /roles` — creator-only role grants; accepts only `admin` or `supervisor`, explicit permission list, expiry, and reason.
+- `POST /roles/:assignmentId/revoke` — creator-only revocation; creator assignments cannot be revoked through this route.
+- `POST /roles/:assignmentId/suspend` — creator/admin suspension of a supervisor assignment, up to 30 days.
+- `POST /bans` — enforces supervisor durations of 1/3/7 days and admin/creator durations of 1–30 days, subject to explicit `moderation.ban` permission for non-creators.
+- `GET /audit` — requires `audit.read`.
+
+Role grants require an existing player UUID; an email or client-provided role alone never grants authority. Creator status must be established out-of-band by a trusted database operator after verifying the account. Example template (replace the UUID only after independently verifying it; never expose this as a public API):
+
+```sql
+INSERT INTO moderation_role_assignments (player_id, role, permissions)
+SELECT id, 'creator', '[]'::jsonb
+FROM players
+WHERE id = 'REPLACE-WITH-VERIFIED-PLAYER-UUID'
+  AND NOT EXISTS (
+    SELECT 1 FROM moderation_role_assignments
+    WHERE role = 'creator' AND revoked_at IS NULL
+  );
+```
+
+This SQL is an operator procedure, not an automatic seed; it does not identify the account by email and does not run on application startup. Review and execute it manually only after confirming the correct player UUID.
+
+The moderation routes and schema are not yet production-verified: PostgreSQL migrations and integration tests have not been run in a connected test environment. Ban records are currently persisted, but login/session enforcement and IP-ban enforcement still need to be wired into authentication/request handling. Audio capture, consent UI, private object storage, retention jobs, creator web panel, AI alert pipeline, and Flutter integration remain unimplemented. Do not treat this branch as a production release.
