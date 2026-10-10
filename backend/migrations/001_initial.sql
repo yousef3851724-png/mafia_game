@@ -1,5 +1,3 @@
-BEGIN;
-
 CREATE TABLE IF NOT EXISTS players (
   id UUID PRIMARY KEY,
   username VARCHAR(24) NOT NULL,
@@ -55,5 +53,3 @@ CREATE TABLE IF NOT EXISTS game_events (
 CREATE INDEX IF NOT EXISTS idx_game_events_room_id_id ON game_events(room_id, id);
 CREATE INDEX IF NOT EXISTS idx_rooms_status_updated ON game_rooms(status, updated_at);
 CREATE INDEX IF NOT EXISTS idx_room_players_player ON room_players(player_id);
-
-COMMIT;
