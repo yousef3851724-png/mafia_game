@@ -63,7 +63,8 @@ class FrameShopScreen extends ConsumerWidget {
               final owned = ownership.ownedFrames.contains(tier);
               final equipped = ownership.equippedFrame == tier;
               final price = frame.price;
-              final usesDiamonds = tier == RadicalFrameTier.legendary;
+              // تمام قاب‌ها، از معمولی تا Legendary، فقط با الماس خریداری می‌شوند.
+              const usesDiamonds = true;
 
               return GestureDetector(
                 onTap: () => _onTap(
