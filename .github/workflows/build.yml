@@ -66,12 +66,11 @@ jobs:
       - name: Publish public test APK download
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: test-build
-          name: Mafia Radical — Test Build
+          tag_name: test-build-${{ github.run_number }}
+          name: Mafia Radical — Test Build ${{ github.run_number }}
           body: |
             Public test build of Mafia Radical.
             This is for testing only and is not the final public release.
           prerelease: true
           make_latest: false
           files: build/app/outputs/flutter-apk/app-release.apk
-          overwrite_files: true
