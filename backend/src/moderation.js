@@ -197,6 +197,42 @@ function createModerationRouter({ pool, auth }) {
     } catch (error) { next(error); }
   });
 
+  router.post('/bans/:banId/revoke', async (req, res, next) => {
+    try {
+      const actor = await getActor(req);
+      if (!actor) return res.status(403).json({ error: { code: 'MODERATION_ACCESS_DENIED', message: 'دسترسی مدیریتی فعال ندارید.' } });
+      if (actor.role !== 'creator' && !(actor.role === 'admin' && actor.permissions.includes('moderation.unban'))) {
+        return res.status(403).json({ error: { code: 'PERMISSION_DENIED', message: 'لغو بن فقط برای سازنده یا ادمین دارای مجوز مجاز است.' } });
+      }
+      const banId = z.string().uuid().safeParse(req.params.banId);
+      const body = z.object({ reason: reasonSchema }).safeParse(req.body);
+      if (!banId.success || !body.success) return res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'شناسه یا دلیل معتبر نیست.' } });
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+        const result = await client.query(
+          `UPDATE player_bans SET revoked_at = NOW(), revoked_by = $2, revoke_reason = $3
+           WHERE id = $1 AND revoked_at IS NULL AND ends_at > NOW()
+           RETURNING id, player_id`,
+          [banId.data, req.auth.sub, body.data.reason]
+        );
+        if (!result.rowCount) {
+          await client.query('ROLLBACK');
+          return res.status(404).json({ error: { code: 'ACTIVE_BAN_NOT_FOUND', message: 'بن فعال پیدا نشد.' } });
+        }
+        await client.query(
+          `INSERT INTO moderation_actions(id, target_player_id, actor_player_id, actor_role, action_type, reason, metadata)
+           VALUES ($1,$2,$3,$4,'unban',$5,$6::jsonb)`,
+          [crypto.randomUUID(), result.rows[0].player_id, req.auth.sub, actor.role, body.data.reason, JSON.stringify({ banId: banId.data })]
+        );
+        await audit(client, { player_id: req.auth.sub, role: actor.role }, 'player_unbanned', result.rows[0].player_id, body.data.reason, { banId: banId.data });
+        await client.query('COMMIT');
+        return res.json({ revoked: true, banId: banId.data });
+      } catch (error) { await client.query('ROLLBACK'); throw error; }
+      finally { client.release(); }
+    } catch (error) { next(error); }
+  });
+
   router.get('/audit', async (req, res, next) => {
     try {
       const actor = await requirePermission(req, res, 'audit.read');
