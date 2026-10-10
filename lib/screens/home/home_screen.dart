@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/providers/app_providers.dart';
+import '../../core/providers/player_profile.dart';
 import '../../core/theme/radical_theme.dart';
 import '../../core/widgets/radical_avatar_frame.dart';
 import '../../core/widgets/radical_bottom_nav.dart';
@@ -75,6 +76,7 @@ class _HomeTabBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final store = ref.watch(storeControllerProvider);
+    final profile = ref.watch(playerProfileProvider).valueOrNull;
     final avId = store.equipped[StoreCategory.avatar];
     final frId = store.equipped[StoreCategory.frame];
     final avPath = avId == null
@@ -142,11 +144,11 @@ class _HomeTabBody extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('یوسف',
+                          Text(profile?.name ?? '...',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: RadicalTheme.textTheme.titleMedium),
-                          Text('سطح ۱۲',
+                          Text('سطح ${_fa(profile?.level ?? 1)}',
                               style: RadicalTheme.textTheme.bodyMedium),
                         ],
                       ),
