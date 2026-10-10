@@ -68,7 +68,7 @@ class FrameShopScreen extends ConsumerWidget {
 
               return GestureDetector(
                 onTap: () => _onTap(
-                  context, ref, tier, owned, price, usesDiamonds,
+                  context, ref, tier, owned, price,
                 ),
                 child: Container(
                   decoration: BoxDecoration(
@@ -152,7 +152,6 @@ class FrameShopScreen extends ConsumerWidget {
     RadicalFrameTier tier,
     bool owned,
     int price,
-    bool usesDiamonds,
   ) async {
     final ctrl = ref.read(frameOwnershipProvider.notifier);
     if (owned) {
@@ -162,13 +161,12 @@ class FrameShopScreen extends ConsumerWidget {
     final ok = await ctrl.buyWithWallet(
       tier,
       price,
-      usesDiamonds: usesDiamonds,
     );
     if (!ok && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            usesDiamonds ? 'الماس کافی نیست' : 'سکه کافی نیست',
+            'الماس کافی نیست',
           ),
         ),
       );
