@@ -88,29 +88,16 @@ class FrameOwnershipController extends StateNotifier<FrameOwnershipState> {
     }
   }
 
-  /// Legendary frames use diamonds; all other catalog frames use coins.
-  Future<bool> buyWithWallet(
-    RadicalFrameTier tier,
-    int price, {
-    bool usesDiamonds = true,
-  }) async {
+  /// همه قاب‌ها، بدون استثنا، فقط با الماس خریداری می‌شوند.
+  Future<bool> buyWithWallet(RadicalFrameTier tier, int price) async {
     final w = ref.read(walletProvider);
-
-    if (usesDiamonds) {
-      if (w.diamonds < price) {
-        state = state.copyWith(error: 'الماس کافی نیست');
-        return false;
-      }
-      ref.read(walletProvider.notifier).state =
-          RadicalWallet(coins: w.coins, diamonds: w.diamonds - price);
-    } else {
-      if (w.coins < price) {
-        state = state.copyWith(error: 'سکه کافی نیست');
-        return false;
-      }
-      ref.read(walletProvider.notifier).state =
-          RadicalWallet(coins: w.coins - price, diamonds: w.diamonds);
+    if (w.diamonds < price) {
+      state = state.copyWith(error: 'الماس کافی نیست');
+      return false;
     }
+
+    ref.read(walletProvider.notifier).state =
+        RadicalWallet(coins: w.coins, diamonds: w.diamonds - price);
 
     await equipFrame(tier);
     return true;
