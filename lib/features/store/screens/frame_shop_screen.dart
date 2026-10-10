@@ -63,12 +63,13 @@ class FrameShopScreen extends ConsumerWidget {
               final owned = ownership.ownedFrames.contains(tier);
               final equipped = ownership.equippedFrame == tier;
               final price = frame.price;
+              final ownerOnly = frame.ownerOnly;
               // تمام قاب‌ها، از معمولی تا Legendary، فقط با الماس خریداری می‌شوند.
               const usesDiamonds = true;
 
               return GestureDetector(
                 onTap: () => _onTap(
-                  context, ref, tier, owned, price,
+                  context, ref, tier, owned, price, ownerOnly,
                 ),
                 child: Container(
                   decoration: BoxDecoration(
@@ -98,7 +99,10 @@ class FrameShopScreen extends ConsumerWidget {
                       Text(frame.nameFa,
                           style: RadicalTheme.textTheme.titleMedium),
                       const SizedBox(height: 6),
-                      if (equipped)
+                      if (ownerOnly && !owned)
+                        const Text('اختصاصی مالک بازی 🔒',
+                            style: TextStyle(color: Colors.orangeAccent))
+                      else if (equipped)
                         const Text('تجهیز شده',
                             style: TextStyle(color: RadicalTheme.gold))
                       else if (owned)
@@ -152,8 +156,15 @@ class FrameShopScreen extends ConsumerWidget {
     RadicalFrameTier tier,
     bool owned,
     int price,
+    bool ownerOnly,
   ) async {
     final ctrl = ref.read(frameOwnershipProvider.notifier);
+    if (ownerOnly && !owned) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('این قاب اختصاصی مالک بازی است و از فروشگاه قابل خرید نیست.')),
+      );
+      return;
+    }
     if (owned) {
       await ctrl.equipFrame(tier);
       return;
