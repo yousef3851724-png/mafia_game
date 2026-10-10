@@ -321,10 +321,3 @@ class RadicalTheme {
   );
 }
 
-class RadicalColors {
-  RadicalColors._();
-  static const backgroundDark = RadicalTheme.ink;
-  static const surfaceDark = RadicalTheme.panel;
-  static const goldAccent = RadicalTheme.goldBright;
-  static const crimsonPrimary = RadicalTheme.crimson;
-}
