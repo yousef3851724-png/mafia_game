@@ -93,6 +93,7 @@ The backend now mounts authenticated endpoints under `/api/v1/moderation`:
 - `POST /roles/:assignmentId/revoke` — creator-only revocation; creator assignments cannot be revoked through this route.
 - `POST /roles/:assignmentId/suspend` — creator/admin suspension of a supervisor assignment, up to 30 days.
 - `POST /bans` — enforces supervisor durations of 1/3/7 days and admin/creator durations of 1–30 days, subject to explicit `moderation.ban` permission for non-creators.
+- `POST /bans/:banId/revoke` — creator or admin with `moderation.unban`; reason and audit record required.
 - `GET /audit` — requires `audit.read`.
 
 Role grants require an existing player UUID; an email or client-provided role alone never grants authority. Creator status must be established out-of-band by a trusted database operator after verifying the account. Example template (replace the UUID only after independently verifying it; never expose this as a public API):
@@ -110,4 +111,4 @@ WHERE id = 'REPLACE-WITH-VERIFIED-PLAYER-UUID'
 
 This SQL is an operator procedure, not an automatic seed; it does not identify the account by email and does not run on application startup. Review and execute it manually only after confirming the correct player UUID.
 
-The moderation routes and schema are not yet production-verified: PostgreSQL migrations and integration tests have not been run in a connected test environment. Ban records are currently persisted, but login/session enforcement and IP-ban enforcement still need to be wired into authentication/request handling. Audio capture, consent UI, private object storage, retention jobs, creator web panel, AI alert pipeline, and Flutter integration remain unimplemented. Do not treat this branch as a production release.
+The moderation routes and schema are not yet production-verified: PostgreSQL migrations and integration tests have not been run in a connected test environment. Active player bans are checked on authenticated API requests and lobby WebSocket upgrades. Login may still issue a token to a banned account, but subsequent authenticated requests are denied. IP-ban storage/enforcement and proxy-safe client IP handling are not implemented. Audio capture, consent UI, private object storage, retention jobs, creator web panel, AI alert pipeline, and Flutter integration remain unimplemented. Do not treat this branch as a production release.
