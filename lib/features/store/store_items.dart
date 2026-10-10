@@ -144,9 +144,7 @@ class StoreItems {
             nameFa: frame.nameFa,
             price: frame.price,
             assetPath: frame.assetPath,
-            currency: frame.tier == RadicalFrameTier.legendary
-                ? StoreCurrency.diamonds
-                : StoreCurrency.coins,
+            currency: StoreCurrency.diamonds,
           ))
       .toList()
     ..sort((a, b) {

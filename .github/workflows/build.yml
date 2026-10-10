@@ -7,7 +7,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
   attestations: write
 
@@ -55,10 +55,28 @@ jobs:
         with:
           subject-path: build/app/outputs/flutter-apk/app-release.apk
 
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: mafia-radical-release
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
           retention-days: 30
+
+      - name: Create draft test release and upload APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: test-build-${{ github.run_number }}
+          name: Mafia Radical — Test Build ${{ github.run_number }}
+          body: |
+            Public test build of Mafia Radical.
+            This is for testing only and is not the final public release.
+          draft: true
+          prerelease: true
+          make_latest: false
+          files: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Publish test release after APK upload
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "test-build-${{ github.run_number }}" --draft=false
