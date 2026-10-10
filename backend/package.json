@@ -11,8 +11,9 @@
   "scripts": {
     "start": "node src/server.js",
     "start:dev": "node --watch src/server.js",
+    "migrate": "node src/migrate.js",
     "test": "node --test",
-    "check": "node --check src/server.js"
+    "check": "node --check src/server.js && node --check src/config.js && node --check src/db.js && node --check src/security.js && node --check src/game-rules.js && node --check src/migrate.js"
   },
   "dependencies": {
     "argon2": "^0.43.1",
