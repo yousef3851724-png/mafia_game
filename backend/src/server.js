@@ -32,7 +32,7 @@ app.use(express.json({ limit: '32kb', strict: true }));
 app.use(rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: 'draft-8', legacyHeaders: false }));
 
 const authLimiter = rateLimit({ windowMs: 15 * 60_000, limit: 10, standardHeaders: 'draft-8', legacyHeaders: false });
-const auth = requireAuth(config);
+const auth = requireAuth(config, pool);
 app.use('/api/v1/moderation', createModerationRouter({ pool, auth }));
 const usernameSchema = z.string().trim().min(3).max(24).regex(/^[\p{L}\p{N}_-]+$/u);
 const passwordSchema = z.string().min(10).max(128);
@@ -299,6 +299,11 @@ server.on('upgrade', async (request, socket, head) => {
     const token = url.searchParams.get('token');
     if (!token) return socket.destroy();
     const identity = verifyAccessToken(token, config);
+    const activeBan = await pool.query(
+      'SELECT 1 FROM player_bans WHERE player_id = $1 AND revoked_at IS NULL AND starts_at <= NOW() AND ends_at > NOW() LIMIT 1',
+      [identity.sub]
+    );
+    if (activeBan.rowCount) return socket.destroy();
     const roomCode = roomCodeSchema.safeParse(url.searchParams.get('roomCode'));
     if (!roomCode.success) return socket.destroy();
     const roomResult = await pool.query('SELECT id, code, status FROM game_rooms WHERE code = $1', [roomCode.data]);
