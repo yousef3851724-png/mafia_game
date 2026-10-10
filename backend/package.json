@@ -1,0 +1,30 @@
+{
+  "name": "mafia-radical-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production backend for Mafia Radical online play",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "start:dev": "node --watch src/server.js",
+    "migrate": "node src/migrate.js",
+    "test": "node --test",
+    "check": "node --check src/server.js && node --check src/config.js && node --check src/db.js && node --check src/security.js && node --check src/game-rules.js && node --check src/migrate.js"
+  },
+  "dependencies": {
+    "argon2": "^0.43.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3",
+    "express-rate-limit": "^8.1.0",
+    "ws": "^8.18.3",
+    "zod": "^4.1.11"
+  }
+}
