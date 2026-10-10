@@ -14,7 +14,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -35,6 +35,33 @@ jobs:
       - name: Flutter doctor
         run: flutter doctor -v
 
+      - name: Validate production signing secrets
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          test -n "$KEYSTORE_B64" || (echo "::error::Missing KEYSTORE_BASE64 repository secret" && exit 1)
+          test -n "$STORE_PASSWORD" || (echo "::error::Missing KEYSTORE_PASSWORD repository secret" && exit 1)
+          test -n "$KEY_ALIAS" || (echo "::error::Missing KEY_ALIAS repository secret" && exit 1)
+          test -n "$KEY_PASSWORD" || (echo "::error::Missing KEY_PASSWORD repository secret" && exit 1)
+
+      - name: Prepare production signing key
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          printf '%s' "$KEYSTORE_B64" | tr -d "[:space:]" | base64 --decode > android/mafia-release.jks
+          cat > android/key.properties <<EOF
+          storePassword=$STORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=../mafia-release.jks
+          EOF
+
       - name: Get dependencies
         run: flutter pub get
 
@@ -44,11 +71,16 @@ jobs:
       - name: Test
         run: flutter test
 
-      - name: Build release APK
-        run: flutter build apk --release
+      - name: Build signed release APK with unique Android versionCode
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: flutter build apk --release --build-number "$BUILD_NUMBER"
 
-      - name: Verify release APK
-        run: test -s build/app/outputs/flutter-apk/app-release.apk
+      - name: Verify APK exists and is signed
+        run: |
+          APK=build/app/outputs/flutter-apk/app-release.apk
+          test -s "$APK"
+          "$ANDROID_HOME"/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)/apksigner verify --verbose "$APK"
 
       - name: Attest release APK provenance
         uses: actions/attest-build-provenance@v2
@@ -58,7 +90,7 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mafia-radical-release
+          name: mafia-radical-v${{ github.run_number }}-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
           retention-days: 30
@@ -67,10 +99,12 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: test-build-${{ github.run_number }}
-          name: Mafia Radical — Test Build ${{ github.run_number }}
+          name: Mafia Radical — Build ${{ github.run_number }}
           body: |
-            Public test build of Mafia Radical.
-            This is for testing only and is not the final public release.
+            Mafia Radical test build.
+            Android versionCode: ${{ github.run_number }}
+            Built from commit: ${{ github.sha }}
+            Install this build over a previous build only if it was signed with the same Mafia Radical release key.
           draft: true
           prerelease: true
           make_latest: false
@@ -80,3 +114,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release edit "test-build-${{ github.run_number }}" --draft=false
+
+      - name: Clean up signing material
+        if: always()
+        run: rm -f android/mafia-release.jks android/key.properties
