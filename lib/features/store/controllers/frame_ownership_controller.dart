@@ -51,8 +51,10 @@ class FrameOwnershipController extends StateNotifier<FrameOwnershipState> {
           prefs.getInt('equipped_frame') ?? RadicalFrameTier.none.index;
 
       final owned = ownedJson
-          .map((e) => RadicalFrameTier.values
-              .firstWhere((t) => t.name == e, orElse: () => RadicalFrameTier.none))
+          .map((e) => RadicalFrameTier.values.firstWhere(
+                (t) => t.name == e,
+                orElse: () => RadicalFrameTier.none,
+              ))
           .toList();
 
       final equipped = RadicalFrameTier.values.firstWhere(
@@ -70,8 +72,10 @@ class FrameOwnershipController extends StateNotifier<FrameOwnershipState> {
     try {
       state = state.copyWith(isLoading: true);
 
-      if (ref.read(diamondControllerProvider.notifier).canSpend(type: tier.diamondType, amount: tier.diamondPrice)) {
-        ref.read(diamondControllerProvider.notifier).spend(tier.diamondType, tier.diamondPrice);
+      if (ref.read(diamondControllerProvider.notifier).canSpend(
+          type: tier.diamondType, amount: tier.diamondPrice)) {
+        ref.read(diamondControllerProvider.notifier).spend(
+            tier.diamondType, tier.diamondPrice);
         await equipFrame(tier);
       } else {
         state = state.copyWith(
@@ -84,15 +88,30 @@ class FrameOwnershipController extends StateNotifier<FrameOwnershipState> {
     }
   }
 
-  /// خرید با الماس واحد (walletProvider). true یعنی موفق.
-  Future<bool> buyWithWallet(RadicalFrameTier tier, int price) async {
+  /// Legendary frames use diamonds; all other catalog frames use coins.
+  Future<bool> buyWithWallet(
+    RadicalFrameTier tier,
+    int price, {
+    bool usesDiamonds = true,
+  }) async {
     final w = ref.read(walletProvider);
-    if (w.diamonds < price) {
-      state = state.copyWith(error: 'الماس کافی نیست');
-      return false;
+
+    if (usesDiamonds) {
+      if (w.diamonds < price) {
+        state = state.copyWith(error: 'الماس کافی نیست');
+        return false;
+      }
+      ref.read(walletProvider.notifier).state =
+          RadicalWallet(coins: w.coins, diamonds: w.diamonds - price);
+    } else {
+      if (w.coins < price) {
+        state = state.copyWith(error: 'سکه کافی نیست');
+        return false;
+      }
+      ref.read(walletProvider.notifier).state =
+          RadicalWallet(coins: w.coins - price, diamonds: w.diamonds);
     }
-    ref.read(walletProvider.notifier).state =
-        RadicalWallet(coins: w.coins, diamonds: w.diamonds - price);
+
     await equipFrame(tier);
     return true;
   }
@@ -100,7 +119,7 @@ class FrameOwnershipController extends StateNotifier<FrameOwnershipState> {
   Future<void> equipFrame(RadicalFrameTier tier) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final owned = state.ownedFrames;
+      final owned = List<RadicalFrameTier>.from(state.ownedFrames);
 
       if (!owned.contains(tier)) {
         owned.add(tier);
