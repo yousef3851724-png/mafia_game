@@ -44,8 +44,6 @@ class FrameShopScreen extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              _chip(Icons.monetization_on, RadicalTheme.gold, '${wallet.coins}'),
-              const SizedBox(width: 8),
               _chip(Icons.diamond, Colors.cyanAccent, '${wallet.diamonds}'),
             ],
           ),
