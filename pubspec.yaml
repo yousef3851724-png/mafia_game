@@ -7,6 +7,7 @@ environment:
   sdk: '>=3.5.0 <4.0.0'
 
 dependencies:
+  audioplayers: ^6.0.0
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -42,6 +43,7 @@ flutter:
           weight: 700
   uses-material-design: true
   assets:
+    - assets/audio/narrator/
     - assets/avatars_v2/
     - assets/frames/set_24/
     - assets/frames/set_oval/
@@ -71,9 +73,3 @@ flutter_native_splash:
   android_12:
     color: "#0D0D0D"
     image: assets/images/app_icon.png
-    dependencies:
-  audioplayers: ^6.0.0
-
-flutter:
-  assets:
-    - assets/audio/narrator/
