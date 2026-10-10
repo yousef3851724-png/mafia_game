@@ -14,6 +14,7 @@ const { loadConfig } = require('./config');
 const { createDatabase, withTransaction } = require('./db');
 const { signAccessToken, verifyAccessToken, requireAuth } = require('./security');
 const { assignRoles, getWinner } = require('./game-rules');
+const { createModerationRouter } = require('./moderation');
 
 const config = loadConfig();
 const pool = createDatabase(config);
@@ -32,6 +33,7 @@ app.use(rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: 'draft-8', le
 
 const authLimiter = rateLimit({ windowMs: 15 * 60_000, limit: 10, standardHeaders: 'draft-8', legacyHeaders: false });
 const auth = requireAuth(config);
+app.use('/api/v1/moderation', createModerationRouter({ pool, auth }));
 const usernameSchema = z.string().trim().min(3).max(24).regex(/^[\p{L}\p{N}_-]+$/u);
 const passwordSchema = z.string().min(10).max(128);
 const roomCodeSchema = z.string().trim().toUpperCase().regex(/^[A-Z2-9]{6}$/);
