@@ -157,7 +157,6 @@ class MafiaApiClient {
       request.headers.set(HttpHeaders.acceptHeader, 'application/json');
       if (body != null) request.headers.contentType = ContentType.json;
       if (authenticated) request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $_token');
-      request.connectionTimeout = const Duration(seconds: 10);
       if (body != null) request.write(jsonEncode(body));
       final response = await request.close().timeout(const Duration(seconds: 15));
       final text = await response.transform(utf8.decoder).join();
