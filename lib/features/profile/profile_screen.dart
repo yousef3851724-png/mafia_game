@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/providers/player_profile.dart';
 import '../../core/theme/radical_theme.dart';
 import '../../core/widgets/radical_scaffold.dart';
 import '../scenarios/realistic_avatar.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   String _name = 'بازیکن رادیکال';
   String _avatar = 'شهروند مرد';
   int _level = 1;
@@ -66,6 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (value == null || value.isEmpty) return;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('player_name', value);
+    await ref.read(playerProfileProvider.notifier).rename(value);
     if (mounted) setState(() => _name = value);
   }
 

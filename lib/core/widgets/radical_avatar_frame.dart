@@ -48,6 +48,13 @@ class _RadicalAvatarFrameState extends State<RadicalAvatarFrame>
   }
 
 
+  /// فریم‌های بالدار (وسط خالی کوچک‌تر از کل تصویر): نسبت بزرگ‌نمایی نسبت به آواتار.
+  static double? _wingScale(String path) {
+    if (path.contains('frame_12_eagle')) return 2.54;
+    if (path.contains('frame_13_phoenix')) return 2.508;
+    return null;
+  }
+
   Widget _buildAvatarImage() {
     final path = widget.avatarAssetPath;
     Widget fallback() => Container(
@@ -129,13 +136,27 @@ class _RadicalAvatarFrameState extends State<RadicalAvatarFrame>
                   child: _buildAvatarImage(),
                 ),
               ),
-              if (widget.framePath != null)
+              if (widget.framePath != null && _wingScale(widget.framePath!) == null)
                 Image.asset(
                   widget.framePath!,
                   width: widget.size + 16,
                   height: widget.size + 16,
                   fit: BoxFit.contain,
                   filterQuality: FilterQuality.high,
+                ),
+              if (widget.framePath != null && _wingScale(widget.framePath!) != null)
+                OverflowBox(
+                  minWidth: (widget.size - 2) * _wingScale(widget.framePath!)! * 0.98,
+                  maxWidth: (widget.size - 2) * _wingScale(widget.framePath!)! * 0.98,
+                  minHeight: (widget.size - 2) * _wingScale(widget.framePath!)! * 0.98,
+                  maxHeight: (widget.size - 2) * _wingScale(widget.framePath!)! * 0.98,
+                  child: Image.asset(
+                    widget.framePath!,
+                    width: (widget.size - 2) * _wingScale(widget.framePath!)! * 0.98,
+                    height: (widget.size - 2) * _wingScale(widget.framePath!)! * 0.98,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
+                  ),
                 ),
               if (widget.isOnline)
                 Positioned(

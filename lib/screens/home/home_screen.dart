@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/providers/player_profile.dart';
+import '../../core/services/owner_access.dart';
 import '../../core/theme/radical_theme.dart';
 import '../../core/widgets/radical_avatar_frame.dart';
 import '../../core/widgets/radical_bottom_nav.dart';
@@ -62,6 +63,34 @@ String _fa(num n) {
       .split('')
       .map((c) => RegExp(r'\d').hasMatch(c) ? digits[int.parse(c)] : c)
       .join();
+}
+
+Future<void> _ownerDialog(BuildContext context, WidgetRef ref) async {
+  final c = TextEditingController();
+  final code = await showDialog<String>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('کد مالک'),
+      content: TextField(
+        controller: c,
+        autofocus: true,
+        obscureText: true,
+        textDirection: TextDirection.ltr,
+      ),
+      actions: [
+        TextButton(
+            onPressed: () => Navigator.pop(ctx), child: const Text('انصراف')),
+        FilledButton(
+            onPressed: () => Navigator.pop(ctx, c.text),
+            child: const Text('تأیید')),
+      ],
+    ),
+  );
+  if (code == null || code.isEmpty) return;
+  final ok = await OwnerAccess.tryUnlock(ref, code);
+  if (!context.mounted) return;
+  ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(ok ? 'دسترسی مالک فعال شد' : 'کد نادرست است')));
 }
 
 void _soon(BuildContext context) {
@@ -144,10 +173,13 @@ class _HomeTabBody extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(profile?.name ?? '...',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: RadicalTheme.textTheme.titleMedium),
+                          GestureDetector(
+                            onLongPress: () => _ownerDialog(context, ref),
+                            child: Text(profile?.name ?? '...',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: RadicalTheme.textTheme.titleMedium),
+                          ),
                           Text('سطح ${_fa(profile?.level ?? 1)}',
                               style: RadicalTheme.textTheme.bodyMedium),
                         ],

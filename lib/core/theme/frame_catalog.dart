@@ -51,6 +51,9 @@ class FrameCatalogPng {
     FramePng(id: 'f33', assetPath: 'assets/frames/set_oval/frame_09_dragon.png', nameFa: 'دراگون', tier: RadicalFrameTier.legendary, price: 5000),
     FramePng(id: 'f34', assetPath: 'assets/frames/set_oval/frame_10_galaxy.png', nameFa: 'گلکسی', tier: RadicalFrameTier.diamond, price: 3500),
     FramePng(id: 'f35', assetPath: 'assets/frames/set_oval/frame_11_thunder.png', nameFa: 'تندر', tier: RadicalFrameTier.platinum, price: 2600),
+    // فریم‌های اختصاصی مالک بازی (قیمت خیلی بالا؛ فقط با کد مالک باز می‌شوند)
+    FramePng(id: 'f36', assetPath: 'assets/frames/set_oval/frame_12_eagle.png', nameFa: 'عقاب سلطنتی (اختصاصی)', tier: RadicalFrameTier.legendary, price: 99999999),
+    FramePng(id: 'f37', assetPath: 'assets/frames/set_oval/frame_13_phoenix.png', nameFa: 'ققنوس آتشین (اختصاصی)', tier: RadicalFrameTier.legendary, price: 99999999),
   ];
 
   static final List<FramePng> all = <FramePng>[..._base, ..._extra];
