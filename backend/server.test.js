@@ -14,7 +14,7 @@ async function freePort() {
 
 test('backend starts and serves a healthy HTTP response', async () => {
   const port = await freePort();
-  const child = spawn(process.execPath, ['backend/server.js'], {
+  const child = spawn(process.execPath, [require('node:path').join(__dirname, 'server.js')], {
     env: { ...process.env, PORT: String(port) },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
