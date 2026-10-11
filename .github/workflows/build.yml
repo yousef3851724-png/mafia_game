@@ -55,7 +55,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           printf '%s' "$KEYSTORE_B64" | tr -d "[:space:]" | base64 --decode > android/mafia-release.jks
-          cat > android/key.properties <<EOF
+          cat  android/key.properties <<EOF
           storePassword=$STORE_PASSWORD
           keyPassword=$KEY_PASSWORD
           keyAlias=$KEY_ALIAS
