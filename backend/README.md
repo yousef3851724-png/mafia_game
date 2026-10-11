@@ -21,7 +21,7 @@ Never commit `.env`, database credentials, production JWT secrets, signing keys,
 ## API currently implemented
 
 - `GET /health` — process/database health
-- `POST /api/v1/auth/register` — creates a persistent account with an initial wallet (1000 coins, 10 diamonds)
+- `POST /api/v1/auth/register` — creates a persistent account with an initial wallet (100,000 coins, 100,000 diamonds)
 - `POST /api/v1/auth/login` — password verification and signed access token
 - `GET /api/v1/me` — authenticated player profile
 - `GET /api/v1/rooms` — list waiting rooms
