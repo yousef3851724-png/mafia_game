@@ -69,20 +69,21 @@ jobs:
           test -n "$STORE_PASSWORD" || (echo "::error::Missing KEYSTORE_PASSWORD repository secret" && exit 1)
           test -n "$KEY_ALIAS" || (echo "::error::Missing KEY_ALIAS repository secret" && exit 1)
           test -n "$KEY_PASSWORD" || (echo "::error::Missing KEY_PASSWORD repository secret" && exit 1)
-     - name: آماده‌سازی کلید امضای محصول
+
+      - name: Prepare production signing key
         env:
-       KEYSTORE_B64 : ${{ secrets.KEYSTORE_BASE64 }}
-       STORE_PASSWORD : ${{ secrets.KEYSTORE_PASSWORD }}
-       KEY_ALIAS : ${{ secrets.KEY_ALIAS }}
-       KEY_PASSWORD : ${{ secrets.KEY_PASSWORD }}
-       run: |
-       echo "$KEYSTORE_B64" | tr -d "[:space:]" | openssl base64 -d -A -out android/mafia-release.jks
-       cat > android/key.properties <<EOF
-       storePassword=$STORE_PASSWORD
-       keyPassword=$KEY_PASSWORD
-       keyAlias=$KEY_ALIAS
-       storeFile=../mafia-release.jks
-       EOF
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_B64" | tr -d "[:space:]" | openssl base64 -d -A -out android/mafia-release.jks
+          cat > android/key.properties <<EOF
+          storePassword=$STORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=../mafia-release.jks
+          EOF
 
       - name: Get dependencies
         run: flutter pub get
