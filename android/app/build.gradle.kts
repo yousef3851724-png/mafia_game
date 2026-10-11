@@ -14,7 +14,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mafia_game" // اگه اسم پکیجت فرق داره اینو عوض کن
+    namespace = "com.example.mafia_game"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -28,7 +28,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.mafia_game" // اگه اسم پکیجت فرق داره اینو عوض کن
+        applicationId = "com.example.mafia_game"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
