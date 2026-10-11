@@ -9,10 +9,18 @@ pluginManagement {
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
 
     repositories {
+        // ۱. میرورهای ایرانی (اولویت اول برای سرعت)
+        maven { url = uri("https://maven.myket.ir") }
+        maven { url = uri("https://maven.devneeds.ir") }
+        maven { url = uri("https://gradle.iranrepo.ir") }
+        maven { url = uri("https://gradle.jamko.ir") }
+        
+        // ۲. میرورهای چین (Aliyun) - بسیار مطمئن برای دانلود AGP
         maven { url = uri("https://maven.aliyun.com/repository/google") }
         maven { url = uri("https://maven.aliyun.com/repository/public") }
         maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
-        maven { url = uri("https://maven.myket.ir") }
+        
+        // ۳. منابع رسمی (پشتیبان)
         google()
         mavenCentral()
         gradlePluginPortal()
