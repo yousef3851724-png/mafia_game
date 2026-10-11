@@ -38,6 +38,12 @@ The existing Flutter lobby/game socket clients use a placeholder URL and mock mo
 
 This is a backend foundation, not a claim that all online Mafia gameplay is finished. Server-authoritative voting, night-action validation/resolution, phase timers, elimination, reconnection recovery, economy transactions, moderation, and end-to-end client integration still need to be completed before calling the online game production-ready. The game role-count policy also needs confirmation against the current in-app role distribution before release.
 
+## Moderation and locked-lobby recording status
+
+See [`docs/MODERATION_AND_LOCKED_LOBBY_RECORDING.md`](../docs/MODERATION_AND_LOCKED_LOBBY_RECORDING.md) for the role/permission policy, locked-lobby monitoring requirements, continuous audio recording and consent policy, AI alert workflow, privacy/retention requirements, and acceptance criteria. Migration `002_moderation_recording.sql` adds the database foundation for role assignments, moderation/audit records, consent, recording metadata, AI alerts, and recording access logs.
+
+**Important:** these are schema and specification changes, not a deployed recording system. The current backend does not yet implement the moderation APIs, creator web panel, media/SFU pipeline, audio storage/upload, speech recognition, beep filtering, retention worker, or AI alert delivery. Do not advertise locked-lobby audio recording as active until those components are implemented and end-to-end tested. Audio recording must be gated by clear notice/consent and use private storage with a defined retention period.
+
 ## Tests
 
 Run `npm test` for the pure game-rule tests and `npm run check` for a syntax check. Database integration tests require a disposable PostgreSQL test database and should be run before deployment.

@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/providers/app_providers.dart';
 import '../../router/app_router.dart';
@@ -40,11 +41,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   Future<void> _resolveNextRoute() async {
     final minDelay = Future.delayed(const Duration(milliseconds: 1800));
     final hasSeenOnboarding = await ref.read(hasSeenOnboardingProvider.future);
+    final prefs = await SharedPreferences.getInstance();
+    final hasToken = (prefs.getString('mafia_radical_access_token') ?? '').isNotEmpty;
     await minDelay;
     if (!mounted) return;
-    context.go(
-      hasSeenOnboarding ? RadicalRoutes.home : RadicalRoutes.onboarding,
-    );
+    context.go(!hasSeenOnboarding
+        ? RadicalRoutes.onboarding
+        : hasToken ? RadicalRoutes.home : RadicalRoutes.auth);
   }
 
   @override

@@ -219,7 +219,7 @@ versionCode: 3
 کلید release نباید داخل repository قرار بگیرد. workflow تولیدی از چهار GitHub Actions secret استفاده می‌کند:
 
 ```text
-MAFIA_RELEASE_KEYSTORE_BASE64
+KEYSTORE_BASE64
 MAFIA_RELEASE_STORE_PASSWORD
 MAFIA_RELEASE_KEY_ALIAS
 MAFIA_RELEASE_KEY_PASSWORD
