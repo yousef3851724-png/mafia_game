@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../theme/radical_theme.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
+/// لوگوی رسمی مافیا رادیکال؛ فایل اصلی کلاه و ستاره از assets/icon می‌آید.
 class RadicalLogoMark extends StatelessWidget {
   final double size;
 
@@ -8,21 +9,15 @@ class RadicalLogoMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadicalTheme.goldButtonGradient,
-        boxShadow: RadicalTheme.goldGlow(blur: size * 0.25, opacity: 0.45),
-        border: Border.all(color: RadicalTheme.ink, width: size * 0.02),
-      ),
-      child: Center(
-        child: Icon(
-          Icons.auto_awesome,
-          size: size * 0.5,
-          color: RadicalTheme.ink,
-        ),
+      child: SvgPicture.asset(
+        'assets/icon/app_icon_foreground.svg',
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        semanticsLabel: 'لوگوی مافیا رادیکال، کلاه با ستاره',
       ),
     );
   }

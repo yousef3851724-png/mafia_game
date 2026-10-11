@@ -1,37 +1,49 @@
-# Mafia Radical Node.js backend
+# Mafia Radical backend
 
-This is a **playable in-memory backend MVP**, not production-ready infrastructure.
+This service is intended to be the persistent online backend for the Flutter game. It uses PostgreSQL for player accounts, rooms, membership, and event history. It does not use mock players or an in-memory database.
 
-## Included
-- HTTP health endpoint: `/health`
-- WebSocket lobby: join/reconnect by player ID, ready state, seat changes, chat, host kick
-- Server-side start validation and randomized roles (mafia, citizen, doctor, detective)
-- Timed night/day/voting/result phases, night actions, doctor protection, detective result, voting, elimination, and win checks
-- Payload size limit and a basic per-connection message rate limit
-- Basic automated HTTP health smoke test
+## Requirements
 
-## Run locally
-Requires Node.js 20 or newer.
+- Node.js 22 or newer
+- PostgreSQL 15 or newer
+- A private, persistent PostgreSQL database in the deployment environment
 
-```sh
-npm install
-npm run check
-npm test
-npm start
-```
+## Local setup
 
-Health endpoint: `http://localhost:8080/health`. The server listens on `PORT` supplied by the hosting platform.
+1. Copy `.env.example` to `.env` and set `DATABASE_URL` and a randomly generated `JWT_SECRET` of at least 32 characters.
+2. Create the PostgreSQL database and database user with least-privilege permissions.
+3. Install dependencies with `npm ci` after committing the generated lockfile from the supported deployment environment, or run `npm install` to generate it.
+4. Apply migrations using `npm run migrate`.
+5. Start the service using `npm start`.
 
-## Flutter protocol
-The server accepts the existing `join` and `game_join` messages and emits `players`, `game_state`, `phase_changed`, `eliminated`-compatible state updates, `chat`, `error`, and `investigation_result` events. The Flutter endpoint constants and mock-mode configuration still need to be deliberately switched after deployment and end-to-end testing.
+Never commit `.env`, database credentials, production JWT secrets, signing keys, or user data.
 
-## Required before public launch
-- **Authentication is not implemented.** Client-supplied player IDs are not secure identities; do not treat this service as protected against impersonation or cheating.
-- Rooms, sessions, and game state exist only in memory and are lost on restart. Multiple app instances will not share state.
-- No database, account system, durable coins/diamonds, purchases, inventory, rankings, or moderation is implemented.
-- Role counts and phase timing are MVP defaults and must be verified against Mafia Radical's intended rules before launch.
-- Reconnect recovery is limited; this is not a substitute for durable sessions or secure authentication.
-- The included automated test is a smoke test, not comprehensive game, security, or load testing.
-- Do not use this MVP for real-money purchases, paid diamonds, or valuable account state.
+## API currently implemented
 
-Deploy to a staging app first, run the health and WebSocket tests, then verify the complete Flutter flow with multiple real devices before any public release.
+- `GET /health` — process/database health
+- `POST /api/v1/auth/register` — creates a persistent account with an initial wallet (100,000 coins, 100,000 diamonds)
+- `POST /api/v1/auth/login` — password verification and signed access token
+- `GET /api/v1/me` — authenticated player profile
+- `GET /api/v1/rooms` — list waiting rooms
+- `POST /api/v1/rooms` — create room
+- `POST /api/v1/rooms/join` — join by room code
+- `POST /api/v1/rooms/:code/ready` — set ready state
+- `POST /api/v1/rooms/:code/start` — owner starts a game after readiness checks
+- `GET /api/v1/rooms/:code/state` — private role and public game state for a room member
+- WebSocket `/lobby?roomCode=XXXXXX&token=...` — authenticated room membership, player snapshots, ready updates, and persistent room chat
+
+## Important integration status
+
+The existing Flutter lobby/game socket clients use a placeholder URL and mock mode. They must be updated in a separate, reviewed Flutter change to use the deployed HTTPS/WSS origin and the token-based protocol. Do not point a release build at a local phone-only address.
+
+This is a backend foundation, not a claim that all online Mafia gameplay is finished. Server-authoritative voting, night-action validation/resolution, phase timers, elimination, reconnection recovery, economy transactions, moderation, and end-to-end client integration still need to be completed before calling the online game production-ready. The game role-count policy also needs confirmation against the current in-app role distribution before release.
+
+## Moderation and locked-lobby recording status
+
+See [`docs/MODERATION_AND_LOCKED_LOBBY_RECORDING.md`](../docs/MODERATION_AND_LOCKED_LOBBY_RECORDING.md) for the role/permission policy, locked-lobby monitoring requirements, continuous audio recording and consent policy, AI alert workflow, privacy/retention requirements, and acceptance criteria. Migration `002_moderation_recording.sql` adds the database foundation for role assignments, moderation/audit records, consent, recording metadata, AI alerts, and recording access logs.
+
+**Important:** these are schema and specification changes, not a deployed recording system. The current backend does not yet implement the moderation APIs, creator web panel, media/SFU pipeline, audio storage/upload, speech recognition, beep filtering, retention worker, or AI alert delivery. Do not advertise locked-lobby audio recording as active until those components are implemented and end-to-end tested. Audio recording must be gated by clear notice/consent and use private storage with a defined retention period.
+
+## Tests
+
+Run `npm test` for the pure game-rule tests and `npm run check` for a syntax check. Database integration tests require a disposable PostgreSQL test database and should be run before deployment.

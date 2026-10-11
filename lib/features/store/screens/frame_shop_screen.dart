@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/models/radical_avatar_catalog.dart' as cat;
 import '../../../core/providers/app_providers.dart';
 import '../../../core/theme/radical_frame_tier.dart';
 import '../../../core/theme/radical_theme.dart';
@@ -34,8 +33,6 @@ class FrameShopScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ownership = ref.watch(frameOwnershipProvider);
     final wallet = ref.watch(walletProvider);
-    final tiers =
-        RadicalFrameTier.values.where((t) => t.tierIndex > 0).toList();
 
     return Column(
       children: [
@@ -44,8 +41,6 @@ class FrameShopScreen extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              _chip(Icons.monetization_on, RadicalTheme.gold, '${wallet.coins}'),
-              const SizedBox(width: 8),
               _chip(Icons.diamond, Colors.cyanAccent, '${wallet.diamonds}'),
             ],
           ),
@@ -62,15 +57,20 @@ class FrameShopScreen extends ConsumerWidget {
             itemCount: FrameCatalogPng.all.length,
             itemBuilder: (context, i) {
               final frame = FrameCatalogPng.all[i];
-                final tier = frame.tier;
+              final tier = frame.tier;
               final ct = _toCat(tier);
               final data = RadicalFrameData.of(ct);
               final owned = ownership.ownedFrames.contains(tier);
               final equipped = ownership.equippedFrame == tier;
               final price = frame.price;
+              final ownerOnly = frame.ownerOnly;
+              // تمام قاب‌ها، از معمولی تا Legendary، فقط با الماس خریداری می‌شوند.
+              const usesDiamonds = true;
 
               return GestureDetector(
-                onTap: () => _onTap(context, ref, tier, owned, price),
+                onTap: () => _onTap(
+                  context, ref, tier, owned, price, ownerOnly,
+                ),
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
@@ -93,13 +93,16 @@ class FrameShopScreen extends ConsumerWidget {
                         tier: ct,
                         size: 72,
                         showBadge: false,
-                            framePath: frame.assetPath,
+                        framePath: frame.assetPath,
                       ),
                       const SizedBox(height: 10),
                       Text(frame.nameFa,
                           style: RadicalTheme.textTheme.titleMedium),
                       const SizedBox(height: 6),
-                      if (equipped)
+                      if (ownerOnly && !owned)
+                        const Text('اختصاصی مالک بازی 🔒',
+                            style: TextStyle(color: Colors.orangeAccent))
+                      else if (equipped)
                         const Text('تجهیز شده',
                             style: TextStyle(color: RadicalTheme.gold))
                       else if (owned)
@@ -109,8 +112,15 @@ class FrameShopScreen extends ConsumerWidget {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.diamond,
-                                size: 16, color: Colors.cyanAccent),
+                            Icon(
+                              usesDiamonds
+                                  ? Icons.diamond
+                                  : Icons.monetization_on,
+                              size: 16,
+                              color: usesDiamonds
+                                  ? Colors.cyanAccent
+                                  : RadicalTheme.gold,
+                            ),
                             const SizedBox(width: 4),
                             Text('$price',
                                 style: RadicalTheme.textTheme.bodyMedium),
@@ -140,17 +150,37 @@ class FrameShopScreen extends ConsumerWidget {
         ),
       );
 
-  Future<void> _onTap(BuildContext context, WidgetRef ref,
-      RadicalFrameTier tier, bool owned, int price) async {
+  Future<void> _onTap(
+    BuildContext context,
+    WidgetRef ref,
+    RadicalFrameTier tier,
+    bool owned,
+    int price,
+    bool ownerOnly,
+  ) async {
     final ctrl = ref.read(frameOwnershipProvider.notifier);
+    if (ownerOnly && !owned) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('این قاب اختصاصی مالک بازی است و از فروشگاه قابل خرید نیست.')),
+      );
+      return;
+    }
     if (owned) {
       await ctrl.equipFrame(tier);
       return;
     }
-    final ok = await ctrl.buyWithWallet(tier, price);
+    final ok = await ctrl.buyWithWallet(
+      tier,
+      price,
+    );
     if (!ok && context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('الماس کافی نیست')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'الماس کافی نیست',
+          ),
+        ),
+      );
     }
   }
 }

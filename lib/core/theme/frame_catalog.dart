@@ -6,12 +6,14 @@ class FramePng {
   final String nameFa;
   final RadicalFrameTier tier;
   final int price;
+  final bool ownerOnly;
   const FramePng({
     required this.id,
     required this.assetPath,
     required this.nameFa,
     required this.tier,
     required this.price,
+    this.ownerOnly = false,
   });
 }
 
@@ -45,12 +47,15 @@ class FrameCatalogPng {
     FramePng(id: 'f27', assetPath: 'assets/frames/set_oval/frame_03_kingcrown.png', nameFa: 'کینگ کراون', tier: RadicalFrameTier.diamond, price: 3000),
     FramePng(id: 'f28', assetPath: 'assets/frames/set_oval/frame_04_diamondcrystal.png', nameFa: 'دایموند کریستال', tier: RadicalFrameTier.platinum, price: 2200),
     FramePng(id: 'f29', assetPath: 'assets/frames/set_oval/frame_05_imperialgold.png', nameFa: 'امپریال گلد', tier: RadicalFrameTier.platinum, price: 2000),
-    FramePng(id: 'f30', assetPath: 'assets/frames/set_oval/frame_06_mythic.png', nameFa: 'میتیک', tier: RadicalFrameTier.legendary, price: 8000),
+    FramePng(id: 'f30', assetPath: 'assets/frames/set_oval/frame_06_mythic.png', nameFa: 'میتیک', tier: RadicalFrameTier.legendary, price: 4000),
     FramePng(id: 'f31', assetPath: 'assets/frames/set_oval/frame_07_wolf.png', nameFa: 'سردیس گرگ', tier: RadicalFrameTier.diamond, price: 3800),
-    FramePng(id: 'f32', assetPath: 'assets/frames/set_oval/frame_08_demon.png', nameFa: 'دیمون', tier: RadicalFrameTier.diamond, price: 4500),
-    FramePng(id: 'f33', assetPath: 'assets/frames/set_oval/frame_09_dragon.png', nameFa: 'دراگون', tier: RadicalFrameTier.legendary, price: 5000),
+    FramePng(id: 'f32', assetPath: 'assets/frames/set_oval/frame_08_demon.png', nameFa: 'دیمون', tier: RadicalFrameTier.diamond, price: 4000),
+    FramePng(id: 'f33', assetPath: 'assets/frames/set_oval/frame_09_dragon.png', nameFa: 'دراگون', tier: RadicalFrameTier.legendary, price: 4000),
     FramePng(id: 'f34', assetPath: 'assets/frames/set_oval/frame_10_galaxy.png', nameFa: 'گلکسی', tier: RadicalFrameTier.diamond, price: 3500),
     FramePng(id: 'f35', assetPath: 'assets/frames/set_oval/frame_11_thunder.png', nameFa: 'تندر', tier: RadicalFrameTier.platinum, price: 2600),
+    // فریم‌های اختصاصی مالک بازی (قیمت خیلی بالا؛ فقط با کد مالک باز می‌شوند)
+    FramePng(id: 'f36', assetPath: 'assets/frames/set_oval/frame_12_eagle.png', nameFa: 'عقاب سلطنتی (اختصاصی)', tier: RadicalFrameTier.legendary, price: 4000, ownerOnly: true),
+    FramePng(id: 'f37', assetPath: 'assets/frames/set_oval/frame_13_phoenix.png', nameFa: 'ققنوس آتشین (اختصاصی)', tier: RadicalFrameTier.legendary, price: 4000, ownerOnly: true),
   ];
 
   static final List<FramePng> all = <FramePng>[..._base, ..._extra];
