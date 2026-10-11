@@ -1,20 +1,21 @@
 # Deploy Mafia Radical backend to Liara
 
-This repository contains a Flutter app and a separate starter Node.js backend in `backend/`.
-The root `package.json` is the Node.js deployment entry point for platforms that build from the repository root.
+The repository contains the Flutter app and a separate Node.js WebSocket backend in `backend/`. The root `package.json` starts `backend/server.js`.
 
 ## Liara settings
 - App type: Node.js
-- Branch: `deploy/liara-node-backend`
+- Branch: `feat/mafia-backend-completion` after the pull request is reviewed and merged
 - Node.js: 20 or newer
-- Start command: `npm start` (if the panel asks for a start command)
-- Health check path: `/health` (if configurable)
-- Port: use the platform-provided `PORT`; the server reads `process.env.PORT`.
+- Build/install: `npm install`
+- Start command: `npm start`
+- Validation before deployment: `npm run check` and `npm test`
+- Health check path: `/health`
+- Port: use the platform-provided `PORT`; the server reads `process.env.PORT`
 
-After deployment, open `https://YOUR-APP-DOMAIN/health`. A successful response should be JSON with `"status":"ok"`.
-The WebSocket endpoint uses the same host with `wss://YOUR-APP-DOMAIN` on HTTPS deployments.
+After deploying to a **staging app**, open the assigned domain with `/health`. A successful response should be JSON containing `"status":"ok"`. On an HTTPS deployment, WebSocket clients must use `wss://` on the same host.
 
-## Important limitations
-This is a starter backend, not a production-ready online Mafia game. Lobby state is kept in memory and disappears when the process restarts. Authentication, persistent database storage, wallet/purchase integrity, authoritative game phases/roles/voting, rate limiting, and production integration tests are not implemented. Do not use it to store real user balances or launch public competitive matches yet.
+## Before connecting Flutter
+The backend now supports a playable, in-memory MVP protocol, but Flutter's endpoint constants and mock-mode settings have intentionally not been changed. First test lobby join, readiness, chat, start, private role assignment, night actions, voting, and win conditions with several clients. Then configure the Flutter URLs in a separate reviewed change.
 
-The Flutter app has separate lobby/game socket clients and must be explicitly configured and tested against the deployed URL before the app is connected. The current starter server does not implement the full game protocol; game actions return an error rather than running an actual match.
+## Important production gaps
+This is not production-ready for public launch. Player IDs are client-supplied and there is no authentication, persistent database, multi-instance state sharing, account security, durable wallet/purchases, inventory, ranking, or moderation. Room/game state disappears on restart. Role counts and phase durations are MVP defaults and must be checked against the intended Mafia Radical rules. The included test is only an HTTP health smoke test, not a full integration, security, or load test. Do not use this version for real-money purchases or paid diamonds.
