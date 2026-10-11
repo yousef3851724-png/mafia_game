@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - feat/mafia-ai-foundation
   pull_request:
     branches:
       - main
