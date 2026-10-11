@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 
 import '../screens/splash/splash_screen.dart';
+import '../features/auth/auth_screen.dart';
 import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../features/profile/avatar_selection_screen.dart';
@@ -18,6 +19,7 @@ class RadicalRoutes {
 
   static const splash = '/';
   static const onboarding = '/onboarding';
+  static const auth = '/auth';
   static const home = '/home';
   static const avatarSelection = '/avatar-selection';
   static const frameShop = '/frame-shop';
@@ -57,6 +59,11 @@ final GoRouter radicalRouter = GoRouter(
       path: RadicalRoutes.onboarding,
       name: 'onboarding',
       builder: (context, state) => const OnboardingScreen(),
+    ),
+    GoRoute(
+      path: RadicalRoutes.auth,
+      name: 'auth',
+      builder: (context, state) => const AuthScreen(),
     ),
     GoRoute(
       path: RadicalRoutes.home,

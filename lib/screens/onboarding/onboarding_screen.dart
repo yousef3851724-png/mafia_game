@@ -22,7 +22,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Future<void> _finish() async {
     await ref.read(onboardingServiceProvider).setOnboardingSeen();
     if (!mounted) return;
-    context.go(RadicalRoutes.home);
+    context.go(RadicalRoutes.auth);
   }
 
   @override
