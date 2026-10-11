@@ -359,6 +359,218 @@ wss.on('connection', async ws => {
   });
 });
 
+
+const groupNameSchema = z.string().trim().min(3).max(64);
+const groupAcronymSchema = z.string().trim().toUpperCase().regex(/^[A-Z0-9]{2,8}$/);
+const groupDescriptionSchema = z.string().trim().max(280).default('');
+const groupVisibilitySchema = z.enum(['public', 'private', 'approval']);
+
+async function getGlobalRoles(playerId) {
+  const result = await pool.query('SELECT role FROM player_global_roles WHERE player_id = $1', [playerId]);
+  return new Set(result.rows.map(row => row.role));
+}
+async function getGroupRole(groupId, playerId) {
+  const result = await pool.query(
+    "SELECT role, membership_status FROM player_group_members WHERE group_id = $1 AND player_id = $2",
+    [groupId, playerId]
+  );
+  return result.rows[0] || null;
+}
+function publicGroup(row, membership = null) {
+  return {
+    id: row.id, name: row.name, acronym: row.acronym, description: row.description,
+    visibility: row.visibility, officialVerified: row.official_verified === true,
+    eagleBadge: row.official_verified === true,
+    creatorId: row.creator_id, leaderId: row.leader_id,
+    memberCount: Number(row.member_count || 0),
+    myRole: membership?.membership_status === 'active' ? membership.role : null,
+    membershipStatus: membership?.membership_status || null,
+    createdAt: row.created_at
+  };
+}
+
+app.get('/api/v1/groups', auth, async (req, res, next) => {
+  try {
+    const result = await pool.query(
+      `SELECT g.*, COUNT(m.player_id) FILTER (WHERE m.membership_status = 'active')::int AS member_count,
+              mine.role AS my_role, mine.membership_status AS my_status
+       FROM player_groups g
+       LEFT JOIN player_group_members m ON m.group_id = g.id
+       LEFT JOIN player_group_members mine ON mine.group_id = g.id AND mine.player_id = $1
+       WHERE g.visibility = 'public' OR mine.player_id IS NOT NULL
+       GROUP BY g.id, mine.role, mine.membership_status
+       ORDER BY g.official_verified DESC, g.created_at DESC LIMIT 100`,
+      [req.auth.sub]
+    );
+    res.json({ groups: result.rows.map(row => publicGroup(row, row.my_status ? { role: row.my_role, membership_status: row.my_status } : null)) });
+  } catch (error) { next(error); }
+});
+
+app.post('/api/v1/groups', auth, async (req, res, next) => {
+  try {
+    const input = z.object({
+      name: groupNameSchema,
+      acronym: groupAcronymSchema,
+      description: groupDescriptionSchema,
+      visibility: groupVisibilitySchema.default('public')
+    }).safeParse(req.body || {});
+    if (!input.success) return fail(res, 400, 'VALIDATION_ERROR', 'نام، مخفف یا تنظیمات گروه معتبر نیست.');
+    const groupId = crypto.randomUUID();
+    const result = await withTransaction(pool, async client => {
+      const inserted = await client.query(
+        `INSERT INTO player_groups(id, name, acronym, description, visibility, creator_id, leader_id)
+         VALUES ($1,$2,$3,$4,$5,$6,$6)
+         RETURNING *`,
+        [groupId, input.data.name, input.data.acronym, input.data.description, input.data.visibility, req.auth.sub]
+      );
+      await client.query(
+        "INSERT INTO player_group_members(group_id, player_id, role, membership_status) VALUES ($1,$2,'manager','active')",
+        [groupId, req.auth.sub]
+      );
+      await client.query(
+        "INSERT INTO player_group_audit(group_id, actor_id, target_id, action) VALUES ($1,$2,$2,'group_created')",
+        [groupId, req.auth.sub]
+      );
+      return inserted.rows[0];
+    });
+    res.status(201).json({ group: publicGroup({ ...result, member_count: 1 }, { role: 'manager', membership_status: 'active' }) });
+  } catch (error) {
+    if (error.code === '23505') return fail(res, 409, 'ACRONYM_TAKEN', 'این مخفف قبلاً استفاده شده است.');
+    next(error);
+  }
+});
+
+app.get('/api/v1/groups/:groupId', auth, async (req, res, next) => {
+  try {
+    const groupId = z.string().uuid().safeParse(req.params.groupId);
+    if (!groupId.success) return fail(res, 400, 'VALIDATION_ERROR', 'شناسه گروه معتبر نیست.');
+    const result = await pool.query(
+      `SELECT g.*, COUNT(m.player_id) FILTER (WHERE m.membership_status = 'active')::int AS member_count
+       FROM player_groups g LEFT JOIN player_group_members m ON m.group_id = g.id
+       WHERE g.id = $1 GROUP BY g.id`,
+      [groupId.data]
+    );
+    const group = result.rows[0];
+    if (!group) return fail(res, 404, 'GROUP_NOT_FOUND', 'گروه پیدا نشد.');
+    const membership = await getGroupRole(group.id, req.auth.sub);
+    if (group.visibility !== 'public' && !membership) return fail(res, 404, 'GROUP_NOT_FOUND', 'گروه پیدا نشد.');
+    res.json({ group: publicGroup(group, membership) });
+  } catch (error) { next(error); }
+});
+
+app.get('/api/v1/groups/:groupId/members', auth, async (req, res, next) => {
+  try {
+    const groupId = z.string().uuid().safeParse(req.params.groupId);
+    if (!groupId.success) return fail(res, 400, 'VALIDATION_ERROR', 'شناسه گروه معتبر نیست.');
+    const group = await pool.query('SELECT id, visibility FROM player_groups WHERE id = $1', [groupId.data]);
+    if (!group.rowCount) return fail(res, 404, 'GROUP_NOT_FOUND', 'گروه پیدا نشد.');
+    const membership = await getGroupRole(groupId.data, req.auth.sub);
+    if (group.rows[0].visibility !== 'public' && !membership) return fail(res, 404, 'GROUP_NOT_FOUND', 'گروه پیدا نشد.');
+    const members = await pool.query(
+      `SELECT p.id, p.username, p.avatar_id, p.frame_id, m.role, m.joined_at
+       FROM player_group_members m JOIN players p ON p.id = m.player_id
+       WHERE m.group_id = $1 AND m.membership_status = 'active'
+       ORDER BY CASE m.role WHEN 'manager' THEN 0 WHEN 'leader' THEN 1 ELSE 2 END, m.joined_at`,
+      [groupId.data]
+    );
+    res.json({ members: members.rows.map(row => ({
+      id: row.id, username: row.username, avatarId: row.avatar_id, frameId: row.frame_id,
+      role: row.role, roleLabel: row.role === 'manager' ? 'مدیر گروه' : row.role === 'leader' ? 'لیدر گروه' : 'عضو',
+      joinedAt: row.joined_at
+    })) });
+  } catch (error) { next(error); }
+});
+
+app.post('/api/v1/groups/:groupId/join', auth, async (req, res, next) => {
+  try {
+    const groupId = z.string().uuid().safeParse(req.params.groupId);
+    if (!groupId.success) return fail(res, 400, 'VALIDATION_ERROR', 'شناسه گروه معتبر نیست.');
+    const result = await withTransaction(pool, async client => {
+      const found = await client.query('SELECT * FROM player_groups WHERE id = $1 FOR UPDATE', [groupId.data]);
+      const group = found.rows[0];
+      if (!group) return { error: 'GROUP_NOT_FOUND' };
+      const existing = await client.query('SELECT membership_status FROM player_group_members WHERE group_id = $1 AND player_id = $2', [group.id, req.auth.sub]);
+      if (existing.rowCount && existing.rows[0].membership_status === 'active') return { status: 'active' };
+      const status = group.visibility === 'approval' ? 'pending' : group.visibility === 'private' ? 'private_denied' : 'active';
+      if (status === 'private_denied') return { error: 'INVITATION_REQUIRED' };
+      await client.query(
+        `INSERT INTO player_group_members(group_id, player_id, role, membership_status)
+         VALUES ($1,$2,'member',$3)
+         ON CONFLICT (group_id, player_id) DO UPDATE SET membership_status = EXCLUDED.membership_status`,
+        [group.id, req.auth.sub, status]
+      );
+      await client.query(
+        "INSERT INTO player_group_audit(group_id, actor_id, target_id, action, details) VALUES ($1,$2,$2,'join_requested',$3::jsonb)",
+        [group.id, req.auth.sub, JSON.stringify({ status })]
+      );
+      return { status };
+    });
+    if (result.error === 'GROUP_NOT_FOUND') return fail(res, 404, result.error, 'گروه پیدا نشد.');
+    if (result.error === 'INVITATION_REQUIRED') return fail(res, 403, result.error, 'برای ورود به این گروه دعوت‌نامه لازم است.');
+    res.json({ membershipStatus: result.status, message: result.status === 'pending' ? 'درخواست عضویت ثبت شد.' : 'عضویت گروه فعال شد.' });
+  } catch (error) { next(error); }
+});
+
+app.post('/api/v1/groups/:groupId/leader', auth, async (req, res, next) => {
+  try {
+    const groupId = z.string().uuid().safeParse(req.params.groupId);
+    const targetId = z.string().uuid().safeParse(req.body?.playerId);
+    if (!groupId.success || !targetId.success) return fail(res, 400, 'VALIDATION_ERROR', 'شناسه گروه یا کاربر معتبر نیست.');
+    const result = await withTransaction(pool, async client => {
+      const groupResult = await client.query('SELECT * FROM player_groups WHERE id = $1 FOR UPDATE', [groupId.data]);
+      const group = groupResult.rows[0];
+      if (!group) return { error: 'GROUP_NOT_FOUND' };
+      const actorRole = await client.query(
+        "SELECT role FROM player_group_members WHERE group_id = $1 AND player_id = $2 AND membership_status = 'active'",
+        [group.id, req.auth.sub]
+      );
+      if (group.creator_id !== req.auth.sub && !['manager', 'leader'].includes(actorRole.rows[0]?.role)) return { error: 'FORBIDDEN' };
+      const target = await client.query(
+        "SELECT 1 FROM player_group_members WHERE group_id = $1 AND player_id = $2 AND membership_status = 'active'",
+        [group.id, targetId.data]
+      );
+      if (!target.rowCount) return { error: 'TARGET_NOT_MEMBER' };
+      await client.query("UPDATE player_group_members SET role = 'member' WHERE group_id = $1 AND role = 'leader'", [group.id]);
+      await client.query("UPDATE player_group_members SET role = 'leader' WHERE group_id = $1 AND player_id = $2", [group.id, targetId.data]);
+      await client.query('UPDATE player_groups SET leader_id = $2, updated_at = NOW() WHERE id = $1', [group.id, targetId.data]);
+      await client.query(
+        "INSERT INTO player_group_audit(group_id, actor_id, target_id, action) VALUES ($1,$2,$3,'leader_assigned')",
+        [group.id, req.auth.sub, targetId.data]
+      );
+      return { leaderId: targetId.data };
+    });
+    if (result.error === 'GROUP_NOT_FOUND') return fail(res, 404, result.error, 'گروه پیدا نشد.');
+    if (result.error === 'FORBIDDEN') return fail(res, 403, result.error, 'اجازه تغییر لیدر این گروه را ندارید.');
+    if (result.error === 'TARGET_NOT_MEMBER') return fail(res, 400, result.error, 'لیدر باید عضو فعال گروه باشد.');
+    res.json({ leaderId: result.leaderId });
+  } catch (error) { next(error); }
+});
+
+app.post('/api/v1/groups/:groupId/leave', auth, async (req, res, next) => {
+  try {
+    const groupId = z.string().uuid().safeParse(req.params.groupId);
+    if (!groupId.success) return fail(res, 400, 'VALIDATION_ERROR', 'شناسه گروه معتبر نیست.');
+    const result = await withTransaction(pool, async client => {
+      const groupResult = await client.query('SELECT * FROM player_groups WHERE id = $1 FOR UPDATE', [groupId.data]);
+      const group = groupResult.rows[0];
+      if (!group) return { error: 'GROUP_NOT_FOUND' };
+      if (group.creator_id === req.auth.sub) return { error: 'TRANSFER_REQUIRED' };
+      const deleted = await client.query('DELETE FROM player_group_members WHERE group_id = $1 AND player_id = $2', [group.id, req.auth.sub]);
+      if (!deleted.rowCount) return { error: 'NOT_MEMBER' };
+      if (group.leader_id === req.auth.sub) await client.query('UPDATE player_groups SET leader_id = NULL WHERE id = $1', [group.id]);
+      await client.query(
+        "INSERT INTO player_group_audit(group_id, actor_id, target_id, action) VALUES ($1,$2,$2,'member_left')",
+        [group.id, req.auth.sub]
+      );
+      return { ok: true };
+    });
+    if (result.error === 'GROUP_NOT_FOUND') return fail(res, 404, result.error, 'گروه پیدا نشد.');
+    if (result.error === 'TRANSFER_REQUIRED') return fail(res, 409, result.error, 'پیش از خروج، مالکیت گروه را منتقل کنید یا گروه را ببندید.');
+    if (result.error === 'NOT_MEMBER') return fail(res, 404, result.error, 'عضو این گروه نیستید.');
+    res.json({ left: true });
+  } catch (error) { next(error); }
+});
+
 app.use((error, _req, res, _next) => {
   console.error('Request failed:', error.message);
   if (res.headersSent) return;
