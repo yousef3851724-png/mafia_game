@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import '../../features/store/controllers/store_controller.dart';
 import '../../features/store/store_items.dart';
 import '../../features/store/equip_screen.dart';
@@ -12,7 +14,6 @@ import '../../core/providers/player_profile.dart';
 import '../../core/services/owner_access.dart';
 import '../../core/theme/radical_theme.dart';
 import '../../core/widgets/radical_avatar_frame.dart';
-import '../../core/widgets/radical_bottom_nav.dart';
 import '../../features/lobbies/lobby_hub_screen.dart';
 import '../../features/profile/profile_screen.dart';
 
@@ -40,9 +41,9 @@ class HomeScreen extends ConsumerWidget {
             },
           ),
         ),
-        bottomNavigationBar: RadicalBottomNav(
+        bottomNavigationBar: _HomeBar(
           activeTab: activeTab,
-          onChanged: (tab) => ref.read(homeTabProvider.notifier).state = tab,
+          onTab: (tab) => ref.read(homeTabProvider.notifier).state = tab,
         ),
       ),
     );
@@ -117,15 +118,15 @@ class _HomeTabBody extends ConsumerWidget {
 
     void goShop() =>
         ref.read(homeTabProvider.notifier).state = RadicalHomeTab.shop;
-    void goLobby() =>
-        ref.read(homeTabProvider.notifier).state = RadicalHomeTab.lobby;
+    void goProfile() =>
+        ref.read(homeTabProvider.notifier).state = RadicalHomeTab.profile;
 
     return Stack(
       fit: StackFit.expand,
       children: [
-        // پس‌زمینه‌ی سینمایی (اختیاری): اگر فایل نبود چیزی نشان داده نمی‌شود.
+        // پس‌زمینه‌ی نهایی (لوگو، مرد، گرگ‌ها و شهر) بدون هیچ دکمه‌ای روی تصویر.
         Image.asset(
-          'assets/images/home_bg.png',
+          'assets/images/home_bg.jpg',
           fit: BoxFit.cover,
           alignment: Alignment.topCenter,
           errorBuilder: (_, __, ___) => const SizedBox.shrink(),
@@ -136,67 +137,97 @@ class _HomeTabBody extends ConsumerWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color(0xF2060508),
-                Color(0xF2060508),
+                Color(0xCC060508),
                 Color(0x00060508),
                 Color(0x00060508),
-                Color(0xE6060508),
+                Color(0xF2060508),
               ],
-              stops: [0.0, 0.14, 0.34, 0.55, 1.0],
+              stops: [0.0, 0.14, 0.60, 1.0],
             ),
           ),
         ),
-        // چیدمان فیزیکی مثل طرح: آواتار چپ، کیف پول راست.
+        // چیدمان فیزیکی مثل طرح: آواتار چپ، کیف پول و آیکن‌ها راست.
         Directionality(
           textDirection: TextDirection.ltr,
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                padding: const EdgeInsets.fromLTRB(12, 8, 8, 0),
                 child: Row(
                   children: [
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const EquipScreen())),
-                      child: RadicalAvatarFrame(
-                        avatarAssetPath: avPath,
-                        framePath: frPath,
-                        tier: frPath == null
-                            ? RadicalFrameTier.none
-                            : RadicalFrameTier.gold,
-                        size: 52,
-                        isOnline: true,
-                      ),
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        GestureDetector(
+                          onTap: goProfile,
+                          child: RadicalAvatarFrame(
+                            avatarAssetPath: avPath,
+                            framePath: frPath,
+                            tier: frPath == null
+                                ? RadicalFrameTier.none
+                                : RadicalFrameTier.gold,
+                            size: 52,
+                            isOnline: true,
+                          ),
+                        ),
+                        Positioned(
+                          left: -4,
+                          bottom: -4,
+                          child: _LevelBadge(text: _fa(profile?.level ?? 1)),
+                        ),
+                      ],
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            onLongPress: () => _ownerDialog(context, ref),
-                            child: Text(profile?.name ?? '...',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: RadicalTheme.textTheme.titleMedium),
-                          ),
-                          Text('سطح ${_fa(profile?.level ?? 1)}',
-                              style: RadicalTheme.textTheme.bodyMedium),
-                        ],
+                      flex: 2,
+                      child: GestureDetector(
+                        onLongPress: () => _ownerDialog(context, ref),
+                        child: Text(
+                          profile?.name ?? '...',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: RadicalTheme.textTheme.titleMedium
+                              ?.copyWith(fontSize: 14),
+                        ),
                       ),
                     ),
-                    _WalletPill(
-                      icon: Icons.monetization_on,
-                      color: RadicalTheme.gold,
-                      text: _fa(wallet.coins),
-                      onTap: goShop,
-                    ),
-                    const SizedBox(width: 6),
-                    _WalletPill(
-                      icon: Icons.diamond,
-                      color: Colors.cyanAccent,
-                      text: _fa(wallet.diamonds),
-                      onTap: goShop,
+                    Flexible(
+                      flex: 5,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerRight,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _WalletPill(
+                              icon: Icons.monetization_on,
+                              color: RadicalTheme.gold,
+                              text: _fa(wallet.coins),
+                              onTap: goShop,
+                            ),
+                            const SizedBox(width: 5),
+                            _WalletPill(
+                              icon: Icons.diamond,
+                              color: Colors.cyanAccent,
+                              text: _fa(wallet.diamonds),
+                              onTap: goShop,
+                            ),
+                            const SizedBox(width: 4),
+                            _TopIcon(
+                              icon: Icons.mail_outline_rounded,
+                              onTap: () => _soon(context),
+                            ),
+                            _TopIcon(
+                              icon: Icons.settings_rounded,
+                              onTap: () => _soon(context),
+                            ),
+                            _TopIcon(
+                              icon: Icons.menu_rounded,
+                              onTap: () => _soon(context),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -205,28 +236,28 @@ class _HomeTabBody extends ConsumerWidget {
                 child: Stack(
                   children: [
                     Positioned(
-                      left: 12,
-                      top: 12,
+                      left: 8,
+                      top: 14,
                       child: Column(
                         children: [
                           _SideAction(
                             icon: Icons.card_giftcard_rounded,
                             label: 'جوایز روزانه',
-                            onTap: () => context.push('/lucky-wheel'),
+                            onTap: () => context.push(RadicalRoutes.luckyWheel),
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 8),
                           _SideAction(
-                            icon: Icons.casino_rounded,
-                            label: 'گردونه شانس',
-                            onTap: () => context.push('/lucky-wheel'),
+                            icon: Icons.emoji_events_rounded,
+                            label: 'ماموریت‌ها',
+                            onTap: () => _soon(context),
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 8),
                           _SideAction(
-                            icon: Icons.event_outlined,
+                            icon: Icons.workspace_premium_rounded,
                             label: 'رویدادها',
                             onTap: () => _soon(context),
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 8),
                           _SideAction(
                             icon: Icons.storefront_rounded,
                             label: 'فروشگاه',
@@ -237,104 +268,27 @@ class _HomeTabBody extends ConsumerWidget {
                     ),
                     Align(
                       alignment: Alignment.bottomCenter,
-                      child: LayoutBuilder(
-                        builder: (context, c) => FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.bottomCenter,
-                          child: SizedBox(
-                            width: c.maxWidth,
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 14),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const _TitleLogo(),
-                                  const SizedBox(height: 16),
-                                  FractionallySizedBox(
-                                    widthFactor: 0.92,
-                                    child: _AngledButton(
-                                      label: 'بازی دوستانه',
-                                      icon: Icons.groups_rounded,
-                                      colors: const [
-                                        Color(0xFF223247),
-                                        Color(0xFF111826),
-                                      ],
-                                      border: const Color(0xFF6C86A3),
-                                      onTap: () =>
-                                          context.go(RadicalRoutes.passAndPlay),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  FractionallySizedBox(
-                                    widthFactor: 0.84,
-                                    child: _AngledButton(
-                                      label: 'پخش زنده',
-                                      icon: Icons.sensors_rounded,
-                                      colors: const [
-                                        Color(0xFF9B1B24),
-                                        Color(0xFF4A0A10),
-                                      ],
-                                      border: RadicalTheme.crimsonBright,
-                                      onTap: () => _soon(context),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  FractionallySizedBox(
-                                    widthFactor: 0.76,
-                                    child: _AngledButton(
-                                      label: 'تیم‌های خصوصی',
-                                      icon: Icons.groups_3_rounded,
-                                      colors: const [
-                                        Color(0xFF16386B),
-                                        Color(0xFF0B1B33),
-                                      ],
-                                      border: const Color(0xFF3B82F6),
-                                      onTap: goLobby,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  FractionallySizedBox(
-                                    widthFactor: 0.92,
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: _AngledButton(
-                                            label: 'مسابقات',
-                                            icon: Icons.emoji_events_rounded,
-                                            height: 48,
-                                            fontSize: 13,
-                                            showArrow: false,
-                                            colors: const [
-                                              Color(0xFF3F1D66),
-                                              Color(0xFF1A0B2E),
-                                            ],
-                                            border: const Color(0xFFA855F7),
-                                            onTap: () => _soon(context),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: _AngledButton(
-                                            label: 'جدول رده‌بندی',
-                                            icon: Icons.leaderboard_rounded,
-                                            height: 48,
-                                            fontSize: 13,
-                                            showArrow: false,
-                                            colors: const [
-                                              Color(0xFF2E2511),
-                                              Color(0xFF14110A),
-                                            ],
-                                            border: RadicalTheme.gold,
-                                            onTap: () => _soon(context),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(22, 0, 22, 18),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _MainPlayButton(
+                              label: 'بازی دوستانه',
+                              onTap: () =>
+                                  context.go(RadicalRoutes.passAndPlay),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'با دوستانت بازی کن و لذت ببر',
+                              textAlign: TextAlign.center,
+                              style: RadicalTheme.textTheme.bodyMedium
+                                  ?.copyWith(
+                                fontSize: 12,
+                                color: RadicalTheme.goldSoft,
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
                     ),
@@ -345,6 +299,51 @@ class _HomeTabBody extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _LevelBadge extends StatelessWidget {
+  final String text;
+  const _LevelBadge({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 22,
+      height: 22,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: RadicalTheme.ink,
+        border: Border.all(color: RadicalTheme.gold, width: 1.5),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+          color: RadicalTheme.goldBright,
+        ),
+      ),
+    );
+  }
+}
+
+class _TopIcon extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  const _TopIcon({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.all(5),
+        child: Icon(icon, size: 22, color: RadicalTheme.goldSoft),
+      ),
     );
   }
 }
@@ -405,12 +404,12 @@ class _SideAction extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 44,
-              height: 44,
-              decoration: RadicalTheme.glassCard(radius: 14),
-              child: Icon(icon, color: RadicalTheme.gold, size: 22),
+              width: 46,
+              height: 46,
+              decoration: RadicalTheme.glassCard(radius: 23, accent: true),
+              child: Icon(icon, color: RadicalTheme.gold, size: 23),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 3),
             Text(
               label,
               maxLines: 1,
@@ -430,70 +429,61 @@ class _SideAction extends StatelessWidget {
   }
 }
 
-/// دکمه‌ی گوشه‌بریده مثل طرح: آیکن چپ، متن وسط، فلش راست.
-class _AngledButton extends StatelessWidget {
+/// دکمه‌ی اصلی پایین صفحه مثل طرح: قاب طلایی گوشه‌بریده، آیکن بالا، فلش‌ها دو طرف.
+class _MainPlayButton extends StatelessWidget {
   final String label;
-  final IconData icon;
-  final List<Color> colors;
-  final Color border;
   final VoidCallback onTap;
-  final double height;
-  final double fontSize;
-  final bool showArrow;
-  const _AngledButton({
-    required this.label,
-    required this.icon,
-    required this.colors,
-    required this.border,
-    required this.onTap,
-    this.height = 56,
-    this.fontSize = 16,
-    this.showArrow = true,
-  });
+  const _MainPlayButton({required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final shape = BeveledRectangleBorder(
-      borderRadius: BorderRadius.circular(16),
-      side: BorderSide(color: border, width: 1.3),
-    );
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        height: height,
-        padding: const EdgeInsets.symmetric(horizontal: 14),
+        height: 68,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: ShapeDecoration(
-          shape: shape,
-          gradient: LinearGradient(
+          shape: BeveledRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+            side: const BorderSide(color: RadicalTheme.gold, width: 1.6),
+          ),
+          gradient: const LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: colors,
+            colors: [Color(0xE61C1409), Color(0xF2090705)],
           ),
           shadows: [
             BoxShadow(
-              color: border.withValues(alpha: .25),
-              blurRadius: 10,
+              color: RadicalTheme.gold.withValues(alpha: .28),
+              blurRadius: 14,
             ),
           ],
         ),
         child: Row(
           children: [
-            Icon(icon, color: RadicalTheme.textPrimary, size: 24),
+            const Icon(Icons.keyboard_double_arrow_left_rounded,
+                color: RadicalTheme.gold, size: 24),
             Expanded(
-              child: Center(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: RadicalTheme.textTheme.titleMedium
-                      ?.copyWith(fontSize: fontSize),
-                ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.groups_rounded,
+                      color: RadicalTheme.goldBright, size: 22),
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: RadicalTheme.textTheme.titleMedium?.copyWith(
+                      fontSize: 19,
+                      color: RadicalTheme.goldBright,
+                    ),
+                  ),
+                ],
               ),
             ),
-            if (showArrow)
-              Icon(Icons.keyboard_double_arrow_left_rounded,
-                  color: border, size: 20),
+            const Icon(Icons.keyboard_double_arrow_right_rounded,
+                color: RadicalTheme.gold, size: 24),
           ],
         ),
       ),
@@ -501,56 +491,134 @@ class _AngledButton extends StatelessWidget {
   }
 }
 
-/// لوگوی متنی: «مافیا» نقره‌ای و «رادیکال» قرمز، با حاشیه‌ی تیره برای خوانایی.
-class _TitleLogo extends StatelessWidget {
-  const _TitleLogo();
+class _BarItem {
+  final String label;
+  final IconData icon;
+  final IconData activeIcon;
+  final RadicalHomeTab? tab;
+  final VoidCallback? onTap;
+  _BarItem(this.label, this.icon, this.activeIcon, {this.tab, this.onTap});
+}
 
-  Widget _word(String text, double size, List<Color> colors) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: size,
-            fontWeight: FontWeight.w900,
-            height: 1.15,
-            foreground: Paint()
-              ..style = PaintingStyle.stroke
-              ..strokeWidth = 6
-              ..strokeJoin = StrokeJoin.round
-              ..color = const Color(0xFF060508),
-          ),
-        ),
-        ShaderMask(
-          blendMode: BlendMode.srcIn,
-          shaderCallback: (r) => LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: colors,
-          ).createShader(r),
-          child: Text(
-            text,
-            style: TextStyle(
-              fontSize: size,
-              fontWeight: FontWeight.w900,
-              height: 1.15,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+/// نوار پایین شش‌تایی مثل طرح: خانه، بازی، قاب، دوستان، لابی‌ها، فروشگاه.
+class _HomeBar extends StatelessWidget {
+  final RadicalHomeTab activeTab;
+  final ValueChanged<RadicalHomeTab> onTab;
+  const _HomeBar({required this.activeTab, required this.onTab});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _word('مافیا', 56, const [Color(0xFFFFFFFF), Color(0xFFB4B4C0)]),
-        _word('رادیکال', 40, const [Color(0xFFFF5A5A), Color(0xFFB11226)]),
-      ],
+    final items = <_BarItem>[
+      _BarItem('خانه', Icons.home_outlined, Icons.home_rounded,
+          tab: RadicalHomeTab.home),
+      _BarItem('بازی', Icons.style_outlined, Icons.style_rounded,
+          onTap: () => context.go(RadicalRoutes.passAndPlay)),
+      _BarItem('قاب', Icons.shield_outlined, Icons.shield_rounded,
+          onTap: () => Navigator.of(context)
+              .push(MaterialPageRoute(builder: (_) => const EquipScreen()))),
+      _BarItem('دوستان', Icons.people_outline_rounded, Icons.people_alt_rounded,
+          onTap: () => _soon(context)),
+      _BarItem('لابی‌ها', Icons.groups_outlined, Icons.groups_rounded,
+          tab: RadicalHomeTab.lobby),
+      _BarItem('فروشگاه', Icons.diamond_outlined, Icons.diamond_rounded,
+          tab: RadicalHomeTab.shop),
+    ];
+
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+        child: Container(
+          decoration: BoxDecoration(
+            color: RadicalTheme.ink.withValues(alpha: .82),
+            border: const Border(
+              top: BorderSide(color: RadicalTheme.lineGold, width: 1),
+            ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Directionality(
+              textDirection: TextDirection.ltr,
+              child: SizedBox(
+                height: 64,
+                child: Row(
+                  children: [
+                    for (final it in items)
+                      Expanded(
+                        child: _BarButton(
+                          item: it,
+                          active: it.tab != null && it.tab == activeTab,
+                          onTap: () {
+                            final t = it.tab;
+                            if (t != null) {
+                              onTab(t);
+                            } else {
+                              it.onTap?.call();
+                            }
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BarButton extends StatelessWidget {
+  final _BarItem item;
+  final bool active;
+  final VoidCallback onTap;
+  const _BarButton({
+    required this.item,
+    required this.active,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = active ? RadicalTheme.goldBright : RadicalTheme.smoke;
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: active
+                ? RadicalTheme.gold.withValues(alpha: .12)
+                : Colors.transparent,
+            border: Border.all(
+              color: active ? RadicalTheme.gold : Colors.transparent,
+              width: 1.2,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(active ? item.activeIcon : item.icon,
+                  size: 24, color: color),
+              const SizedBox(height: 2),
+              Text(
+                item.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: active ? FontWeight.w800 : FontWeight.w500,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
