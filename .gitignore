@@ -37,3 +37,6 @@ _deleted_backup/
 *.bak
 
 backend/node_modules/
+*.jks
+*.keystore
+key.properties
