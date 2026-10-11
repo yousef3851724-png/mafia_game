@@ -50,6 +50,17 @@ class StoreController extends StateNotifier<StoreState> {
     await _save(item.category);
   }
 
+  /// اعطای مالکیت بدون پرداخت (برای دسترسی مالک بازی).
+  Future<void> grantOwned(StoreCategory c, Iterable<String> ids,
+      {String? equipId}) async {
+    final set = {...(state.owned[c] ?? <String>{}), ...ids};
+    state = StoreState(
+      owned: {...state.owned, c: set},
+      equipped: equipId == null ? state.equipped : {...state.equipped, c: equipId},
+    );
+    await _save(c);
+  }
+
   /// true یعنی خرید موفق بود.
   Future<bool> buy(StoreItem item) async {
     if (state.isOwned(item)) return false;

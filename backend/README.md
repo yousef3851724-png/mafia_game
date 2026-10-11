@@ -1,31 +1,49 @@
-# Mafia Radical Node.js backend starter
+# Mafia Radical backend
 
-This directory is a **starter implementation**, not a production-ready game backend.
+This service is intended to be the persistent online backend for the Flutter game. It uses PostgreSQL for player accounts, rooms, membership, and event history. It does not use mock players or an in-memory database.
 
-## Included
-- HTTP health endpoint at `/health`
-- WebSocket connection on the same server
-- In-memory lobby membership, ready state, seat changes, chat, host kick, and start-request validation
-- Configurable port and room size
+## Requirements
 
-## Run locally
-Requires Node.js 20 or newer.
+- Node.js 22 or newer
+- PostgreSQL 15 or newer
+- A private, persistent PostgreSQL database in the deployment environment
 
-```sh
-npm install
-npm run check
-npm start
-```
+## Local setup
 
-Open `http://localhost:8080/health` to verify the process.
+1. Copy `.env.example` to `.env` and set `DATABASE_URL` and a randomly generated `JWT_SECRET` of at least 32 characters.
+2. Create the PostgreSQL database and database user with least-privilege permissions.
+3. Install dependencies with `npm ci` after committing the generated lockfile from the supported deployment environment, or run `npm install` to generate it.
+4. Apply migrations using `npm run migrate`.
+5. Start the service using `npm start`.
 
-## Liara
-Deploy the **backend directory** as a Node.js app and configure the platform to route to the port provided by `PORT` (the default is 8080). After deployment, test the health endpoint before changing the Flutter app's endpoint constants.
+Never commit `.env`, database credentials, production JWT secrets, signing keys, or user data.
 
-## Important limitations before public launch
-- Rooms and players are stored in memory and disappear when the process restarts.
-- There is no authentication or token verification yet. The client-supplied player ID is not a secure identity.
-- No database, persistent wallet, purchases, inventory, ranking, or moderation is implemented.
-- The start event is only a request; the authoritative Mafia game engine, secret role assignment, night actions, voting, timers, reconnect recovery, rate limiting, and abuse protection must be implemented and tested before real users play.
-- Do not use this starter to handle real money, paid diamonds, or valuable account state.
-- The Flutter app currently uses placeholder WebSocket URLs and mock mode in its lobby provider. Switch it only after the deployed backend is tested and the message protocol is aligned.
+## API currently implemented
+
+- `GET /health` — process/database health
+- `POST /api/v1/auth/register` — creates a persistent account with an initial wallet (100,000 coins, 100,000 diamonds)
+- `POST /api/v1/auth/login` — password verification and signed access token
+- `GET /api/v1/me` — authenticated player profile
+- `GET /api/v1/rooms` — list waiting rooms
+- `POST /api/v1/rooms` — create room
+- `POST /api/v1/rooms/join` — join by room code
+- `POST /api/v1/rooms/:code/ready` — set ready state
+- `POST /api/v1/rooms/:code/start` — owner starts a game after readiness checks
+- `GET /api/v1/rooms/:code/state` — private role and public game state for a room member
+- WebSocket `/lobby?roomCode=XXXXXX&token=...` — authenticated room membership, player snapshots, ready updates, and persistent room chat
+
+## Important integration status
+
+The existing Flutter lobby/game socket clients use a placeholder URL and mock mode. They must be updated in a separate, reviewed Flutter change to use the deployed HTTPS/WSS origin and the token-based protocol. Do not point a release build at a local phone-only address.
+
+This is a backend foundation, not a claim that all online Mafia gameplay is finished. Server-authoritative voting, night-action validation/resolution, phase timers, elimination, reconnection recovery, economy transactions, moderation, and end-to-end client integration still need to be completed before calling the online game production-ready. The game role-count policy also needs confirmation against the current in-app role distribution before release.
+
+## Moderation and locked-lobby recording status
+
+See [`docs/MODERATION_AND_LOCKED_LOBBY_RECORDING.md`](../docs/MODERATION_AND_LOCKED_LOBBY_RECORDING.md) for the role/permission policy, locked-lobby monitoring requirements, continuous audio recording and consent policy, AI alert workflow, privacy/retention requirements, and acceptance criteria. Migration `002_moderation_recording.sql` adds the database foundation for role assignments, moderation/audit records, consent, recording metadata, AI alerts, and recording access logs.
+
+**Important:** these are schema and specification changes, not a deployed recording system. The current backend does not yet implement the moderation APIs, creator web panel, media/SFU pipeline, audio storage/upload, speech recognition, beep filtering, retention worker, or AI alert delivery. Do not advertise locked-lobby audio recording as active until those components are implemented and end-to-end tested. Audio recording must be gated by clear notice/consent and use private storage with a defined retention period.
+
+## Tests
+
+Run `npm test` for the pure game-rule tests and `npm run check` for a syntax check. Database integration tests require a disposable PostgreSQL test database and should be run before deployment.

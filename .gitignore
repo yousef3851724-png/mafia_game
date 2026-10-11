@@ -35,3 +35,5 @@ _deleted_backup/
 *.bak2
 _deleted_backup/
 *.bak
+
+backend/node_modules/
