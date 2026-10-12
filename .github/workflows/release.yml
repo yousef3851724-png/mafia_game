@@ -69,10 +69,10 @@ jobs:
         run: flutter test
 
       - name: Build signed release APK
-        run: flutter build apk --release
+        run: flutter build apk --release --dart-define=MAFIA_API_BASE_URL=https://mafia-radical-api.liara.run --dart-define=API_BASE_URL=https://mafia-radical-api.liara.run
 
       - name: Build signed release AAB
-        run: flutter build appbundle --release
+        run: flutter build appbundle --release --dart-define=MAFIA_API_BASE_URL=https://mafia-radical-api.liara.run --dart-define=API_BASE_URL=https://mafia-radical-api.liara.run
 
       - name: Verify APK signature
         run: |
