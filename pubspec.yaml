@@ -67,3 +67,10 @@ flutter:
 # Android launcher and native splash use the checked-in native resources:
 # android/app/src/main/res/drawable/mafia_radical_launcher.xml
 # android/app/src/main/res/drawable*/launch_background.xml
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: false
+  image_path: "assets/logo/app_icon_round.png"
+  adaptive_icon_background: "assets/logo/app_icon_bg.png"
+  adaptive_icon_foreground: "assets/logo/app_icon_fg.png"

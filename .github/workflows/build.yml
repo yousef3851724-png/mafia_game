@@ -88,6 +88,9 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Generate app icons
+        run: bash tool/gen_icons.sh
+
       - name: Analyze
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
