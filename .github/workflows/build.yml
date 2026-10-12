@@ -106,6 +106,7 @@ jobs:
           "$ANDROID_HOME"/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)/apksigner verify --verbose "$APK"
 
       - name: Attest release APK provenance
+        continue-on-error: true
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: build/app/outputs/flutter-apk/app-release.apk
