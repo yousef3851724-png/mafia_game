@@ -88,6 +88,11 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+
       - name: Generate app icons
         run: bash tool/gen_icons.sh
 
