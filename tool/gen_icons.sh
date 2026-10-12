@@ -21,7 +21,7 @@ command -v "$IM" >/dev/null 2>&1 || {
   exit 1
 }
 
-"$IM" "$SOURCE_ICON" -resize 1024x1024 -alpha set \\( -size 1024x1024 xc:none -fill white -draw "circle 512,512 512,0" \\) -compose DstIn -composite "$OUTPUT_DIR/app_icon_round.png"
+"$IM" "$SOURCE_ICON" -resize 1024x1024 -alpha set \( -size 1024x1024 xc:none -fill white -draw "circle 512,512 512,0" \) -compose DstIn -composite "$OUTPUT_DIR/app_icon_round.png"
 "$IM" "$OUTPUT_DIR/app_icon_round.png" -resize 660x660 -background none -gravity center -extent 1024x1024 "$OUTPUT_DIR/app_icon_fg.png"
 "$IM" -size 1024x1024 xc:none "$OUTPUT_DIR/app_icon_bg.png"
 
