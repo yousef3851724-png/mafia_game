@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/lobby_socket.dart';
 import '../domain/lobby_realtime_state.dart';
 
-const kLobbyWsUrl = 'wss://your-server.example.com/lobby';
+const kLobbyWsUrl = 'wss://mafia-radical-api.liara.run/lobby';
 const kLobbyUseMock = true;
 
 final lobbyRealtimeProvider =
