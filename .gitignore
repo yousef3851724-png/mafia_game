@@ -45,3 +45,8 @@ backup.sql
 out.txt
 .env
 *.db
+backend.zip
+backup.sql
+out.txt
+.env
+*.db
