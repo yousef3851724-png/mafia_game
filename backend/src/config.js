@@ -11,7 +11,9 @@ const schema = z.object({
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must contain at least 32 characters'),
   JWT_EXPIRES_IN: z.string().default('7d'),
   CORS_ORIGINS: z.string().default(''),
-  TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0)
+  TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
+  OPENAI_API_KEY: z.string().optional().default(''),
+  OPENAI_MODEL: z.string().trim().min(1).default('gpt-4.1-mini')
 });
 
 function loadConfig(env = process.env) {

@@ -19,4 +19,6 @@ test('configuration parses a valid minimum environment and CORS list', () => {
   assert.equal(config.PORT, 3001);
   assert.deepEqual(config.CORS_ORIGINS, ['https://admin.example.com', 'https://game.example.com']);
   assert.equal(config.DATABASE_SSL, false);
+  assert.equal(config.OPENAI_API_KEY, '');
+  assert.equal(config.OPENAI_MODEL, 'gpt-4.1-mini');
 });

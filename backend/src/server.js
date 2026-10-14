@@ -15,6 +15,7 @@ const { createDatabase, withTransaction } = require('./db');
 const { signAccessToken, verifyAccessToken, requireAuth } = require('./security');
 const { assignRoles, getWinner } = require('./game-rules');
 const { createModerationRouter } = require('./moderation');
+const OpenAI = require('openai');
 
 const config = loadConfig();
 const pool = createDatabase(config);
@@ -33,6 +34,8 @@ app.use(rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: 'draft-8', le
 
 const authLimiter = rateLimit({ windowMs: 15 * 60_000, limit: 10, standardHeaders: 'draft-8', legacyHeaders: false });
 const auth = requireAuth(config, pool);
+const openai = config.OPENAI_API_KEY ? new OpenAI({ apiKey: config.OPENAI_API_KEY }) : null;
+const aiLimiter = rateLimit({ windowMs: 60_000, limit: 10, standardHeaders: 'draft-8', legacyHeaders: false });
 app.use('/api/v1/moderation', createModerationRouter({ pool, auth }));
 const usernameSchema = z.string().trim().min(3).max(24).regex(/^[\p{L}\p{N}_-]+$/u);
 const passwordSchema = z.string().min(10).max(128);
@@ -62,6 +65,43 @@ async function appendEvent(client, roomId, actorId, eventType, payload = {}) {
     [roomId, actorId || null, eventType, JSON.stringify(payload)]
   );
 }
+
+
+app.post('/api/v1/ai/assistant', auth, aiLimiter, async (req, res) => {
+  if (!openai) {
+    return fail(res, 503, 'AI_NOT_CONFIGURED', 'سرویس هوش مصنوعی هنوز در سرور پیکربندی نشده است.');
+  }
+
+  const input = z.object({
+    message: z.string().trim().min(1).max(2000),
+    language: z.enum(['fa', 'en']).optional().default('fa')
+  }).safeParse(req.body);
+
+  if (!input.success) {
+    return fail(res, 400, 'VALIDATION_ERROR', 'پیام معتبر نیست یا از حد مجاز طولانی‌تر است.');
+  }
+
+  try {
+    const response = await openai.responses.create({
+      model: config.OPENAI_MODEL,
+      instructions: input.data.language === 'fa'
+        ? 'تو دستیار رسمی بازی Mafia Radical هستی. به فارسی پاسخ بده. قوانین بازی را روشن توضیح بده، راهبردهای منصفانه پیشنهاد کن و ادعای دسترسی به اطلاعات پنهان یا وضعیت زنده بازی نکن مگر اینکه در ورودی ارائه شده باشد. کوتاه و مفید پاسخ بده.'
+        : 'You are the official Mafia Radical game assistant. Explain game rules clearly, offer fair strategy, and do not claim access to hidden information or live game state unless it is provided. Be concise and helpful.',
+      input: input.data.message,
+      max_output_tokens: 500
+    });
+
+    const answer = typeof response.output_text === 'string' ? response.output_text.trim() : '';
+    if (!answer) {
+      return fail(res, 502, 'AI_EMPTY_RESPONSE', 'پاسخ هوش مصنوعی دریافت نشد؛ دوباره تلاش کنید.');
+    }
+    return res.json({ answer, model: config.OPENAI_MODEL });
+  } catch (error) {
+    // Do not log request contents, credentials, or raw provider errors.
+    console.error('OpenAI request failed:', error?.status || error?.name || 'unknown_error');
+    return fail(res, 502, 'AI_PROVIDER_ERROR', 'ارتباط با سرویس هوش مصنوعی برقرار نشد؛ بعداً دوباره تلاش کنید.');
+  }
+});
 
 app.get('/health', async (_req, res) => {
   try {
