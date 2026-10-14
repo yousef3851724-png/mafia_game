@@ -40,3 +40,8 @@ backend/node_modules/
 *.jks
 *.keystore
 key.properties
+backend.zip
+backup.sql
+out.txt
+.env
+*.db
