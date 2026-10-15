@@ -5,11 +5,11 @@ enum MafiaLogoScenario { classic, darkCity, western, halloween, prison, cyberpun
 
 /// Canonical Mafia Radical branding. The scenario argument is retained for
 /// compatibility, while the master Radical wordmark stays consistent.
-class MafiaRadicalLogo extends StatelessWidget {
+class LegacyMafiaRadicalLogo extends StatelessWidget {
   final double size;
   final MafiaLogoScenario scenario;
 
-  const MafiaRadicalLogo({super.key, this.size = 110, this.scenario = MafiaLogoScenario.classic});
+  const LegacyMafiaRadicalLogo({super.key, this.size = 110, this.scenario = MafiaLogoScenario.classic});
 
   @override
   Widget build(BuildContext context) {
@@ -42,4 +42,19 @@ class MafiaRadicalLogo extends StatelessWidget {
       ),
     );
   }
+}
+
+class MafiaRadicalLogo extends StatelessWidget {
+  final double size;
+  final MafiaLogoScenario scenario;
+
+  const MafiaRadicalLogo({super.key, this.size = 110, this.scenario = MafiaLogoScenario.classic});
+
+  @override
+  Widget build(BuildContext context) => Image.asset(
+        'assets/logo/mafia_radical_logo.png',
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+      );
 }
