@@ -1,0 +1,5 @@
+{
+  "app": "mafia-radical-api",
+  "platform": "node",
+  "port": 3000
+}
