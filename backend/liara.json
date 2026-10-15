@@ -1,9 +1,8 @@
 {
-  "app": "mafia-radical-apt",
+  "app": "mafia-radical-api",
   "platform": "node",
   "port": 3000,
   "node": {
     "version": "22"
   }
 }
-
