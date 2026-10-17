@@ -73,7 +73,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const RadicalLogoMark(size: 150),
+                const RadicalRingMark(size: 150),
                 const SizedBox(height: 24),
                 Text('مافیا رادیکال', style: RadicalTheme.textTheme.displayLarge),
                 const SizedBox(height: 8),

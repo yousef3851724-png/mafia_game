@@ -35,3 +35,23 @@ class RadicalLogoMark extends StatelessWidget {
         fit: BoxFit.contain,
       );
 }
+
+/// حلقه‌ی طلایی ساده (بدون کلاه و ستاره) برای صفحه‌ی لودینگ.
+class RadicalRingMark extends StatelessWidget {
+  const RadicalRingMark({super.key, this.size = 120});
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: const Color(0xFF0A0A0A),
+          border: Border.all(
+            color: const Color(0xFFE3B873),
+            width: size * 0.065,
+          ),
+        ),
+      );
+}
