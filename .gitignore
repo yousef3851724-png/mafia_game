@@ -50,3 +50,5 @@ backup.sql
 out.txt
 .env
 *.db
+backend-mess/
+mafia_game-backup-*/

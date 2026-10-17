@@ -1,4 +1,5 @@
 name: CD-Liara
+
 on:
   push:
     branches:
@@ -6,18 +7,44 @@ on:
     paths:
       - "backend/**"
       - ".github/workflows/liara.yml"
+  workflow_dispatch:
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: update-liara
+
+      - name: Test backend
+        working-directory: backend
+        run: |
+          npm ci
+          npm run check
+          npm test
+
+      - name: Install Liara CLI
+        run: npm install -g @liara/cli@9
+
+      - name: Deploy to Liara
         working-directory: backend
         env:
           LIARA_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
         run: |
-          npm i -g @liara/cli@9
-          liara deploy --app="mafia-radical-api" --api-token="$LIARA_TOKEN" --no-app-logs
+          test -n "$LIARA_TOKEN" || {
+            echo "LIARA_API_TOKEN secret is missing"
+            exit 1
+          }
+
+          export http_proxy=http://proxy.liara.ir:6666
+          export https_proxy=http://proxy.liara.ir:6666
+
+          liara deploy \
+            --app="mafia-radical-api" \
+            --port=3000 \
+            --api-token="$LIARA_TOKEN" \
+            --no-app-logs
