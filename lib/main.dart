@@ -10,7 +10,6 @@ import 'core/theme/radical_theme.dart';
 
 void main() {
   var appStarted = false;
-  var appStarted = false;
 
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -39,11 +38,9 @@ void main() {
     };
 
     appStarted = true;
-    appStarted = true;
     runApp(const ProviderScope(child: WalletPersistence(child: MafiaRadicalApp())));
   }, (error, stack) {
     debugPrint('UNCAUGHT ASYNC ERROR: $error\n$stack');
-    if (appStarted == false) { appStarted = true; runApp(_StartupErrorApp('$error $stack')); }
     if (!appStarted) {
       appStarted = true;
       runApp(_StartupErrorApp('$error\n\n$stack'));
@@ -99,31 +96,6 @@ class MafiaRadicalApp extends StatelessWidget {
           child: child ?? const SizedBox.shrink(),
         );
       },
-    );
-  }
-}
-
-class _StartupErrorApp extends StatelessWidget {
-  const _StartupErrorApp(this.message);
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: Colors.black,
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: SelectableText(
-              message,
-              style: const TextStyle(color: Colors.red, fontSize: 12),
-              textDirection: TextDirection.ltr,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
