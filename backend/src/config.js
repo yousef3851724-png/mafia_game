@@ -13,7 +13,10 @@ const schema = z.object({
   CORS_ORIGINS: z.string().default(''),
   TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
   OPENAI_API_KEY: z.string().optional().default(''),
-  OPENAI_MODEL: z.string().trim().min(1).default('gpt-4.1-mini')
+  OPENAI_MODEL: z.string().trim().min(1).default('gpt-4.1-mini'),
+  ZARINPAL_MERCHANT_ID: z.string().optional().default(''),
+  ZARINPAL_SANDBOX: z.enum(['true', 'false']).default('true'),
+  PUBLIC_BASE_URL: z.string().optional().default('')
 });
 
 function loadConfig(env = process.env) {
@@ -26,6 +29,7 @@ function loadConfig(env = process.env) {
   return Object.freeze({
     ...value,
     DATABASE_SSL: value.DATABASE_SSL === 'true',
+    ZARINPAL_SANDBOX: value.ZARINPAL_SANDBOX === 'true',
     CORS_ORIGINS: value.CORS_ORIGINS.split(',').map(x => x.trim()).filter(Boolean)
   });
 }

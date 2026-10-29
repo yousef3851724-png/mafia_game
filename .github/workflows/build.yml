@@ -105,7 +105,7 @@ jobs:
       - name: Build signed release APK with unique Android versionCode
         env:
           BUILD_NUMBER: ${{ github.run_number }}
-        run: flutter build apk --release --build-number "$BUILD_NUMBER" --dart-define=MAFIA_API_BASE_URL=https://mafia-radical-api.liara.run --dart-define=API_BASE_URL=https://mafia-radical-api.liara.run
+        run: flutter build apk --release --build-number "$BUILD_NUMBER" --dart-define=MAFIA_API_BASE_URL=https://api.irmafia-game.ir --dart-define=API_BASE_URL=https://api.irmafia-game.ir --dart-define=MAFIA_WS_URL=wss://api.irmafia-game.ir/lobby --dart-define=MAFIA_USE_MOCK=false
 
       - name: Verify APK exists and is signed
         run: |

@@ -15,6 +15,7 @@ const { createDatabase, withTransaction } = require('./db');
 const { signAccessToken, verifyAccessToken, requireAuth } = require('./security');
 const { assignRoles, getWinner } = require('./game-rules');
 const { createModerationRouter } = require('./moderation');
+const { createPaymentsRouter } = require('./payments');
 const OpenAI = require('openai');
 
 const config = loadConfig();
@@ -37,6 +38,7 @@ const auth = requireAuth(config, pool);
 const openai = config.OPENAI_API_KEY ? new OpenAI({ apiKey: config.OPENAI_API_KEY }) : null;
 const aiLimiter = rateLimit({ windowMs: 60_000, limit: 10, standardHeaders: 'draft-8', legacyHeaders: false });
 app.use('/api/v1/moderation', createModerationRouter({ pool, auth }));
+app.use('/api/v1/payments', createPaymentsRouter({ pool, auth, config }));
 const usernameSchema = z.string().trim().min(3).max(24).regex(/^[\p{L}\p{N}_-]+$/u);
 const passwordSchema = z.string().min(10).max(128);
 const roomCodeSchema = z.string().trim().toUpperCase().regex(/^[A-Z2-9]{6}$/);

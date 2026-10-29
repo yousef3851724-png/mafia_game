@@ -8,8 +8,8 @@ import '../domain/entities/game_phase.dart';
 import '../domain/entities/game_role.dart';
 import '../domain/game_realtime_state.dart';
 
-const kGameWsUrl = 'wss://mafia-radical-api.liara.run/lobby';
-const kGameUseMock = true;
+const kGameWsUrl = String.fromEnvironment('MAFIA_WS_URL', defaultValue: 'wss://api.irmafia-game.ir/lobby');
+const kGameUseMock = bool.fromEnvironment('MAFIA_USE_MOCK', defaultValue: true);
 
 final gameRealtimeProvider =
     StateNotifierProvider.autoDispose<GameRealtimeController, GameRealtimeState>(
