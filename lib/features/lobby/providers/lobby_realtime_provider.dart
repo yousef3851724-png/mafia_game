@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/lobby_socket.dart';
 import '../domain/lobby_realtime_state.dart';
 
-const kLobbyWsUrl = String.fromEnvironment('MAFIA_WS_URL', defaultValue: 'wss://api.irmafia-game.ir/lobby');
+const kLobbyWsUrl = String.fromEnvironment('MAFIA_WS_URL', defaultValue: 'wss://api.mafia-radical.ir/lobby');
 const kLobbyUseMock = bool.fromEnvironment('MAFIA_USE_MOCK', defaultValue: true);
 
 final lobbyRealtimeProvider =

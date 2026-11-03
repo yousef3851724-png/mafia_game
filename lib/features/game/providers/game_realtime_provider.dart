@@ -8,7 +8,7 @@ import '../domain/entities/game_phase.dart';
 import '../domain/entities/game_role.dart';
 import '../domain/game_realtime_state.dart';
 
-const kGameWsUrl = String.fromEnvironment('MAFIA_WS_URL', defaultValue: 'wss://api.irmafia-game.ir/lobby');
+const kGameWsUrl = String.fromEnvironment('MAFIA_WS_URL', defaultValue: 'wss://api.mafia-radical.ir/lobby');
 const kGameUseMock = bool.fromEnvironment('MAFIA_USE_MOCK', defaultValue: true);
 
 final gameRealtimeProvider =
