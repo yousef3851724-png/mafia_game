@@ -1,18 +1,30 @@
-name: Deploy to Cloudflare Pages
+name: Deploy to Cloudflare
+
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches:
+      - main # یا master، بسته به اینکه برنچ اصلی شما چیست
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: cloudflare/wrangler-action@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # نسخه ۲۰ برای سازگاری با رنگر
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build # اگر پروژه‌تان اسکریپت build ندارد، این خط را حذف کنید
+
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy site --project-name=mafia-radical
