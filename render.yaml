@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: mafia-radical-api
+    runtime: node
+    region: frankfurt
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mafia-radical-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_SSL
+        value: "false"
+      - key: TRUST_PROXY
+        value: "1"
+
+databases:
+  - name: mafia-radical-db
+    databaseName: mafia_radical
+    user: mafia_radical_user
+    plan: free
+    region: frankfurt
