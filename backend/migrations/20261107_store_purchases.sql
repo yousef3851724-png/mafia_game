@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS store_products (
 
 CREATE TABLE IF NOT EXISTS store_purchases (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  player_id TEXT NOT NULL REFERENCES players(id) ON DELETE RESTRICT,
+  player_id UUID NOT NULL REFERENCES players(id) ON DELETE RESTRICT,
   provider TEXT NOT NULL CHECK (provider IN ('cafebazaar','myket')),
   product_id TEXT NOT NULL REFERENCES store_products(id) ON DELETE RESTRICT,
   provider_order_id TEXT,
@@ -34,7 +34,7 @@ CREATE INDEX IF NOT EXISTS store_purchases_player_created_idx
 
 CREATE TABLE IF NOT EXISTS inventory_ledger (
   id BIGSERIAL PRIMARY KEY,
-  player_id TEXT NOT NULL REFERENCES players(id) ON DELETE RESTRICT,
+  player_id UUID NOT NULL REFERENCES players(id) ON DELETE RESTRICT,
   purchase_id UUID REFERENCES store_purchases(id) ON DELETE RESTRICT,
   item_type TEXT NOT NULL CHECK (item_type IN ('coins','diamonds','avatar','frame','sticker','tombstone')),
   item_ref TEXT,
