@@ -7,7 +7,7 @@ const { Render } = require('@renderinc/sdk');
 const DIAGNOSTIC_COMMAND = 'node --version && npm --version && uname -s';
 const MAX_OUTPUT_CHARS = 4000;
 
-function createRenderSandboxesRouter({ pool, auth }) {
+function createRenderSandboxesRouter({ pool, auth, RenderClient = Render }) {
   const router = express.Router();
 
   router.use(auth);
@@ -19,7 +19,7 @@ function createRenderSandboxesRouter({ pool, auth }) {
   }));
 
   router.post('/diagnostics', async (req, res) => {
-    let sandbox;
+    let sandboxId;
     let sandboxes;
 
     try {
@@ -49,15 +49,17 @@ function createRenderSandboxesRouter({ pool, auth }) {
 
       // No game data, database credentials, player tokens, or other secrets
       // are passed into this isolated environment.
-      sandboxes = new Render().sandboxes;
-      sandbox = await sandboxes.create({
+      sandboxes = new RenderClient().sandboxes;
+      const sandbox = await sandboxes.create({
         timeoutSeconds: 300,
         idleTimeoutSeconds: 300,
         networkPolicy: { type: 'deny-all' },
         wait: true
       });
 
-      const events = await sandboxes.exec(sandbox.id, DIAGNOSTIC_COMMAND);
+      sandboxId = sandbox.id;
+
+      const events = await sandboxes.exec(sandboxId, DIAGNOSTIC_COMMAND);
       let output = '';
       let exitCode = null;
 
@@ -70,21 +72,22 @@ function createRenderSandboxesRouter({ pool, auth }) {
       }
 
       return res.status(exitCode === 0 ? 200 : 502).json({
-        sandbox: { id: sandbox.id, status: 'completed' },
+        sandbox: { status: 'completed' },
         command: 'runtime-diagnostics',
         exitCode,
         output
       });
     } catch (error) {
+      sandboxId ||= error?.sandboxId;
       // Do not log API credentials, command payloads, or raw provider responses.
       console.error('Render sandbox operation failed:', error?.name || 'unknown_error');
       return res.status(502).json({
         error: { code: 'SANDBOX_OPERATION_FAILED', message: 'اجرای آزمایشی Render Sandbox ناموفق بود.' }
       });
     } finally {
-      if (sandbox && sandboxes) {
+      if (sandboxId && sandboxes) {
         try {
-          await sandboxes.terminate(sandbox.id);
+          await sandboxes.terminate(sandboxId);
         } catch (error) {
           console.error('Render sandbox cleanup failed:', error?.name || 'unknown_error');
         }
