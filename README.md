@@ -14,7 +14,7 @@
 - ✅ تست‌های Flutter و تحلیل CI
 - ✅ Android launcher branding
 - ✅ Production signing workflow جداگانه و امن
-
+![Streak](streak.svg)
 ---
 
 ## 🧱 ساختار پروژه
