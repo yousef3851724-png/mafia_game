@@ -17,6 +17,7 @@ const { assignRoles, getWinner } = require('./game-rules');
 const { createModerationRouter } = require('./moderation');
 const { createPaymentsRouter } = require('./payments');
 const { createRenderSandboxesRouter } = require('./render-sandboxes');
+const { INITIAL_PLAYER_WALLET } = require('./wallet');
 const OpenAI = require('openai');
 
 const config = loadConfig();
@@ -135,10 +136,10 @@ app.post('/api/v1/auth/register', authLimiter, async (req, res, next) => {
     let inserted;
     try {
       inserted = await pool.query(
-        `INSERT INTO players(id, username, username_normalized, password_hash, referral_code, referred_by)
-         VALUES ($1, $2, $3, $4, $5, $6)
+        `INSERT INTO players(id, username, username_normalized, password_hash, referral_code, referred_by, coins, diamonds)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING id, username, referral_code, level, xp, coins, diamonds, games_played, games_won, avatar_id, frame_id`,
-        [id, username, username.toLocaleLowerCase(), passwordHash, referralCode, referral?.rows[0]?.id || null]
+        [id, username, username.toLocaleLowerCase(), passwordHash, referralCode, referral?.rows[0]?.id || null, INITIAL_PLAYER_WALLET.coins, INITIAL_PLAYER_WALLET.diamonds]
       );
     } catch (error) {
       if (error.code === '23505') return fail(res, 409, 'USERNAME_TAKEN', 'این نام کاربری قبلاً ثبت شده است.');
