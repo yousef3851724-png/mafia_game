@@ -47,4 +47,5 @@ jobs:
             --app="mafia-radical-api" \
             --port=3000 \
             --api-token="$LIARA_TOKEN" \
-            --no-app-logs
+            --no-app-logs \
+            --debug
