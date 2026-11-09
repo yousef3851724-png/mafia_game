@@ -52,3 +52,10 @@ out.txt
 *.db
 backend-mess/
 mafia_game-backup-*/
+claude-code-starter-kit/
+.cloudflared*.json
+.cloudflare*.json
+backend/cloudflare_token.tf
+claude-code-starter-kit/
+requirements.txt
+ai_engine.py
