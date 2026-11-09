@@ -59,3 +59,4 @@ backend/cloudflare_token.tf
 claude-code-starter-kit/
 requirements.txt
 ai_engine.py
+server.log
