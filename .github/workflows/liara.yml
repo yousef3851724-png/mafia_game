@@ -11,6 +11,7 @@ on:
 
 jobs:
   deploy:
+    if: ${{ false }} # Liara deployment intentionally disabled; Render is the active hosting target.
     runs-on: ubuntu-latest
 
     steps:
