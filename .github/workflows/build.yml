@@ -105,7 +105,7 @@ jobs:
       - name: Build signed release APK with unique Android versionCode
         env:
           BUILD_NUMBER: ${{ github.run_number }}
-        run: flutter build apk --release --build-number "$BUILD_NUMBER" --dart-define=MAFIA_API_BASE_URL=https://REAL-NAME.onrender.com --dart-define=API_BASE_URL=https://REAL-NAME.onrender.com --dart-define=MAFIA_WS_URL=wss://REAL-NAME.onrender.com/lobby --dart-define=MAFIA_USE_MOCK=false
+        run: flutter build apk --release --android-skip-build-dependency-validation --build-number "$BUILD_NUMBER" --dart-define=MAFIA_API_BASE_URL=https://REAL-NAME.onrender.com --dart-define=API_BASE_URL=https://REAL-NAME.onrender.com --dart-define=MAFIA_WS_URL=wss://REAL-NAME.onrender.com/lobby --dart-define=MAFIA_USE_MOCK=false
 
       - name: Verify APK exists and is signed
         run: |

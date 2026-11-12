@@ -72,7 +72,7 @@ jobs:
         run: flutter test
 
       - name: Build signed release APK
-        run: flutter build apk --release --dart-define=MAFIA_API_BASE_URL=https://REAL-NAME.onrender.com --dart-define=API_BASE_URL=https://REAL-NAME.onrender.com --dart-define=MAFIA_WS_URL=wss://REAL-NAME.onrender.com/lobby --dart-define=MAFIA_USE_MOCK=false
+        run: flutter build apk --release --android-skip-build-dependency-validation --dart-define=MAFIA_API_BASE_URL=https://REAL-NAME.onrender.com --dart-define=API_BASE_URL=https://REAL-NAME.onrender.com --dart-define=MAFIA_WS_URL=wss://REAL-NAME.onrender.com/lobby --dart-define=MAFIA_USE_MOCK=false
 
       - name: Build signed release AAB
         run: flutter build appbundle --release --dart-define=MAFIA_API_BASE_URL=https://REAL-NAME.onrender.com --dart-define=API_BASE_URL=https://REAL-NAME.onrender.com --dart-define=MAFIA_WS_URL=wss://REAL-NAME.onrender.com/lobby --dart-define=MAFIA_USE_MOCK=false
