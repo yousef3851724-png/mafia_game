@@ -36,7 +36,7 @@ class StoreHubScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cats = StoreCategory.values;
+    final cats = StoreCategory.values.where((c) => c != StoreCategory.gif).toList();
     final wallet = ref.watch(walletProvider);
     return Directionality(
       textDirection: TextDirection.rtl,
