@@ -45,3 +45,4 @@ mafia_game-backup-*/
 out.txt
 requirements.txt
 server.log
+pubspec.lock
