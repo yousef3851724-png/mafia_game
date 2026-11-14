@@ -9,8 +9,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: cloudflare/wrangler-action@v3
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: cloudflare/worker
           wranglerVersion: "4.162.0"
+          preCommands: npx wrangler d1 migrations apply DB --remote
           command: deploy
+          secrets: |
+            JWT_SECRET

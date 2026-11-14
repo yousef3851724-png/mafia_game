@@ -3,5 +3,8 @@
   "main": "src/index.js",
   "compatibility_date": "2026-10-01",
   "workers_dev": true,
-  "preview_urls": true
+  "preview_urls": true,
+  "d1_databases": [
+    { "binding": "DB", "database_name": "mafia-radical-db", "database_id": "05333b38-bcb1-4775-a995-0d3a8c652501", "migrations_dir": "migrations" }
+  ]
 }
