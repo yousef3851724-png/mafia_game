@@ -21,18 +21,24 @@ const isMember = (env, roomId, userId) =>
   env.DB.prepare('SELECT 1 AS x FROM zp_room_players WHERE room_id = ? AND player_id = ?')
     .bind(roomId, userId).first();
 
-// PLACEHOLDER: replace with assignRoles from backend/src/game-rules.js
+// Keep the Worker role distribution aligned with backend/src/game-rules.js.
 function assignRoles(ids) {
-  const a = [...ids];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = crypto.getRandomValues(new Uint32Array(1))[0] % (i + 1);
-    [a[i], a[j]] = [a[j], a[i]];
+  const count = ids.length;
+  if (!Number.isInteger(count) || count < 4 || count > 20 || new Set(ids).size !== count) {
+    throw new RangeError('A Mafia Radical game requires 4 to 20 unique players.');
   }
-  const mafia = Math.max(1, Math.floor(a.length / 4));
-  return a.map((playerId, i) => ({
-    playerId,
-    role: i < mafia ? 'mafia' : i === mafia ? 'doctor' : i === mafia + 1 ? 'detective' : 'citizen'
-  }));
+  const mafia = count <= 5 ? 1 : count <= 8 ? 2 : count <= 12 ? 3 : count <= 16 ? 4 : 5;
+  const roles = [
+    ...Array(mafia).fill('mafia'),
+    'doctor',
+    'detective',
+    ...Array(count - mafia - 2).fill('citizen')
+  ];
+  for (let i = roles.length - 1; i > 0; i--) {
+    const j = crypto.getRandomValues(new Uint32Array(1))[0] % (i + 1);
+    [roles[i], roles[j]] = [roles[j], roles[i]];
+  }
+  return ids.map((playerId, index) => ({ playerId, role: roles[index] }));
 }
 
 async function route(request, env, pathname, userId) {
