@@ -64,18 +64,14 @@ export default {
       const { hash, salt } = await hashPassword(password);
       const id = crypto.randomUUID();
       try {
-        await env.DB.prepare('INSERT INTO users (id, username, password_hash, salt) VALUES (?, ?, ?, ?)')
+        await env.DB.prepare('INSERT INTO users (id, username, password_hash, salt, coins, diamonds) VALUES (?, ?, ?, ?, 500, 10)')
           .bind(id, username, hash, salt).run();
       } catch (e) {
         if (String(e).includes('UNIQUE')) return err('USERNAME_TAKEN', 'این نام قبلاً گرفته شده', 409);
         throw e;
       }
-      // Explicit registration defaults affect only newly created accounts; existing balances are never updated here.
-      const initialCoins = 500;
-      const initialDiamonds = 10;
-      await env.DB.prepare('UPDATE users SET coins = ?, diamonds = ? WHERE id = ?')
-        .bind(initialCoins, initialDiamonds, id).run();
-      return json({ token: await signJwt({ sub: id, username }, env.JWT_SECRET), user: { id, username, coins: initialCoins, diamonds: initialDiamonds } }, 201);
+      // Explicit defaults apply only to this newly inserted account; existing balances are untouched.
+      return json({ token: await signJwt({ sub: id, username }, env.JWT_SECRET), user: { id, username, coins: 500, diamonds: 10 } }, 201);
     }
 
     if (m === 'POST' && pathname === '/api/auth/login') {
