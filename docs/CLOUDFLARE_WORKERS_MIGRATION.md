@@ -74,3 +74,19 @@ This is a staged migration plan only. It does not replace or deploy the existing
 - Current standard account wallet constant is 500 coins and 10 diamonds.
 - Current room WebSocket endpoint is /lobby?roomCode=...&token=....
 - Existing README documents that server-authoritative voting, night-action resolution, phase timers, reconnection recovery, economy transactions, and full end-to-end client integration are not yet complete.
+
+## Audit findings — 2026-11-14
+
+The current Worker implementation is not approved for production cutover. The following compatibility blockers were found by comparing it with `backend/src`:
+
+- **Password hashes are incompatible:** PostgreSQL accounts use Argon2id, while the preview Worker currently hashes/verifies PBKDF2. Existing users cannot safely sign in through that Worker. Do not reset or rewrite password hashes as a workaround.
+- **Account schema is not migrated:** the preview Worker creates a separate `users` table, while the current service uses `players` and related tables. The three D1 SQL files create empty tables; they do not copy any existing users, balances, room history, payment records, or moderation data.
+- **Wallet defaults are inconsistent:** the preview D1 schema defaults to 100 coins / 0 diamonds; the current backend's standard new-player wallet is 500 coins / 10 diamonds. The preview registration response also hardcodes the old 100 / 0 values. Do not enable registration against this schema.
+- **JWT compatibility is incomplete:** the current backend signs JWTs with issuer `mafia-radical-api` and audience `mafia-radical-app`; the preview Worker currently omits those claims and does not validate them.
+- **API coverage is incomplete:** the Worker currently has only a subset of the production API. Moderation, groups, full game-state transitions, game history, and the current AI endpoint are not at parity.
+- **Realtime coverage is incomplete:** the Durable Object currently handles basic ready/chat messages; the current client/game protocol needs full authorization, gameplay actions, disconnect/reconnect behavior, and parity tests before cutover.
+- **Payments need reconciliation:** package prices and idempotent payment settlement must match the current backend and the approved 500-coin package price of 25,000 toman before any live payment route is enabled.
+
+### Deployment guard
+
+The automatic push-triggered Cloudflare deployment and automatic remote D1 migration were disabled on this branch. Preview deployment is now manual-only. Do not run D1 migrations against a live account database and do not change Flutter API/WSS URLs until the blockers above are closed and a restorable backup plus end-to-end compatibility tests are verified.
