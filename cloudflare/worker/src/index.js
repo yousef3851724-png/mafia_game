@@ -1,3 +1,5 @@
+import { handleLobby } from './lobby.js';
+export { LobbyRoom } from './lobby.js';
 import { handleRooms } from './rooms.js';
 import { handlePayments } from './payments.js';
 import { hashPassword, safeEqual, signJwt, verifyJwt } from './auth.js';
@@ -28,6 +30,13 @@ export default {
     }
 
     if (!env.DB || !env.JWT_SECRET) return err('NOT_CONFIGURED', 'DB or JWT_SECRET missing', 503);
+
+    if (pathname === '/lobby' && request.headers.get('upgrade') === 'websocket') {
+      const q = new URL(request.url).searchParams;
+      const pl = await verifyJwt(q.get('token') || '', env.JWT_SECRET);
+      if (!pl) return err('UNAUTHORIZED', 'توکن نامعتبر', 401);
+      return handleLobby(request, env, pl, q.get('roomCode'));
+    }
 
     if (pathname === '/api/rooms' || pathname.startsWith('/api/rooms/')) {
       const token = (request.headers.get('authorization') || '').replace(/^Bearer /, '');
