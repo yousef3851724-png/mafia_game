@@ -1,3 +1,4 @@
+import { handlePayments } from './payments.js';
 import { hashPassword, safeEqual, signJwt, verifyJwt } from './auth.js';
 
 const json = (data, status = 200) =>
@@ -26,6 +27,18 @@ export default {
     }
 
     if (!env.DB || !env.JWT_SECRET) return err('NOT_CONFIGURED', 'DB or JWT_SECRET missing', 503);
+
+    if (pathname.startsWith('/api/payments/')) {
+      let userId = null;
+      if (pathname === '/api/payments/create') {
+        const token = (request.headers.get('authorization') || '').replace(/^Bearer /, '');
+        const pl = await verifyJwt(token, env.JWT_SECRET);
+        if (!pl) return err('UNAUTHORIZED', 'توکن نامعتبر', 401);
+        userId = pl.sub;
+      }
+      const r = await handlePayments(request, env, pathname, userId);
+      if (r) return r;
+    }
 
     if (m === 'POST' && pathname === '/api/auth/register') {
       const { username, password } = await body(request);
