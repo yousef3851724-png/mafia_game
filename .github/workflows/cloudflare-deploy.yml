@@ -1,0 +1,27 @@
+name: Deploy Cloudflare Worker (manual preview only)
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_preview:
+        description: "Deploy the current Worker preview after compatibility review"
+        required: true
+        type: boolean
+        default: false
+jobs:
+  deploy:
+    if: ${{ inputs.deploy_preview == true }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cloudflare/wrangler-action@v3
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          ZARINPAL_MERCHANT_ID: ${{ secrets.ZARINPAL_MERCHANT_ID }}
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: cloudflare/worker
+          wranglerVersion: "4.162.0"
+          command: deploy
+          secrets: |
+            JWT_SECRET
+            ZARINPAL_MERCHANT_ID
