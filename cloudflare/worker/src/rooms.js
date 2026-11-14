@@ -41,9 +41,9 @@ async function route(request, env, pathname, userId) {
 
   if (sub.length === 0 && m === 'GET') {
     const { results } = await env.DB.prepare(
-      `SELECT r.id, r.code, r.status, r.max_players, r.created_at, u.username AS owner_name,
+      `SELECT r.id, r.code, r.status, r.max_players, r.created_at, COALESCE(u.username, 'بازیکن') AS owner_name,
          (SELECT COUNT(*) FROM zp_room_players rp WHERE rp.room_id = r.id) AS player_count
-       FROM zp_rooms r JOIN users u ON u.id = r.owner_id
+       FROM zp_rooms r LEFT JOIN users u ON u.id = r.owner_id
        WHERE r.status = 'waiting' ORDER BY r.created_at DESC LIMIT 50`
     ).all();
     return json({ rooms: results.map((r) => ({
