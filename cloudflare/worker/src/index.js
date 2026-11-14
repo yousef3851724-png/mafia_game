@@ -1,3 +1,4 @@
+import { handleRooms } from './rooms.js';
 import { handlePayments } from './payments.js';
 import { hashPassword, safeEqual, signJwt, verifyJwt } from './auth.js';
 
@@ -13,7 +14,7 @@ async function body(request) {
 
 export default {
   async fetch(request, env) {
-    const { pathname } = new URL(request.url);
+    const pathname = new URL(request.url).pathname.replace(/^\/api\/v1\//, '/api/');
     const m = request.method;
 
     if (m === 'GET' && pathname === '/health') {
@@ -27,6 +28,13 @@ export default {
     }
 
     if (!env.DB || !env.JWT_SECRET) return err('NOT_CONFIGURED', 'DB or JWT_SECRET missing', 503);
+
+    if (pathname === '/api/rooms' || pathname.startsWith('/api/rooms/')) {
+      const token = (request.headers.get('authorization') || '').replace(/^Bearer /, '');
+      const pl = await verifyJwt(token, env.JWT_SECRET);
+      if (!pl) return err('UNAUTHORIZED', 'توکن نامعتبر', 401);
+      return handleRooms(request, env, pathname, pl.sub);
+    }
 
     if (pathname.startsWith('/api/payments/')) {
       let userId = null;
