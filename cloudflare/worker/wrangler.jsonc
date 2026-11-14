@@ -3,10 +3,17 @@
   "name": "mafia-radical",
   "main": "src/index.js",
   "compatibility_date": "2026-11-14",
-  "hyperdrive": [
+  "d1_databases": [
     {
-      "binding": "HYPERDRIVE",
-      "id": "REPLACE_WITH_HYPERDRIVE_ID"
+      "binding": "DB",
+      "database_name": "mafia-radical-db",
+      "database_id": "05333b38-bcb1-4775-a995-0d3a8c652501"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV_BINDING",
+      "id": "2ca580ce34444ccfa8c74eb11868e03c"
     }
   ]
 }
