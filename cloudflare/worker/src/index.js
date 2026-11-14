@@ -24,8 +24,8 @@ export default {
         service: 'Mafia Radical API Worker',
         status: 'ok',
         database: env.DB ? 'configured' : 'not_configured',
-        websocket: 'not_configured',
-        phase: 'auth'
+        websocket: env.LOBBY ? 'configured' : 'not_configured',
+        phase: 'auth_rooms_payments'
       });
     }
 
@@ -70,7 +70,12 @@ export default {
         if (String(e).includes('UNIQUE')) return err('USERNAME_TAKEN', 'این نام قبلاً گرفته شده', 409);
         throw e;
       }
-      return json({ token: await signJwt({ sub: id, username }, env.JWT_SECRET), user: { id, username, coins: 100, diamonds: 0 } }, 201);
+      // Explicit registration defaults affect only newly created accounts; existing balances are never updated here.
+      const initialCoins = 500;
+      const initialDiamonds = 10;
+      await env.DB.prepare('UPDATE users SET coins = ?, diamonds = ? WHERE id = ?')
+        .bind(initialCoins, initialDiamonds, id).run();
+      return json({ token: await signJwt({ sub: id, username }, env.JWT_SECRET), user: { id, username, coins: initialCoins, diamonds: initialDiamonds } }, 201);
     }
 
     if (m === 'POST' && pathname === '/api/auth/login') {
