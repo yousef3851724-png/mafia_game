@@ -45,3 +45,5 @@ mafia_game-backup-*/
 out.txt
 requirements.txt
 server.log
+*.backup
+mafia_game/
