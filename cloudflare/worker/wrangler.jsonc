@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "mafia-api-v2",
+  "name": "mafia-radical",
   "main": "src/index.js",
   "compatibility_date": "2026-10-01",
   "workers_dev": true,
@@ -27,7 +27,9 @@
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": ["LobbyRoom"]
+      "new_sqlite_classes": [
+        "LobbyRoom"
+      ]
     }
   ]
 }
