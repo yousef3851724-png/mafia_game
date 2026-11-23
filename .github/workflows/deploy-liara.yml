@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: 20
       - run: npm i -g @liara/cli@5
-      - run: liara deploy --app "mafia-radical-api" --api-token "$LIARA_API_TOKEN" --platform node --port 3000 --detach
+      - run: liara deploy --app "mafia-radical-api" --api-token "$LIARA_API_TOKEN" --platform node --port 3000 --detach --debug
         working-directory: backend
         env:
           LIARA_API_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
