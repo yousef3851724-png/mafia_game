@@ -1,15 +1,10 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "mafia-radical",
+  "name": "mafia-api-v2",
   "main": "src/index.js",
   "compatibility_date": "2026-10-01",
-  "workers_dev": false,
-  "routes": [
-    {
-      "pattern": "api.mafia-radical.ir",
-      "custom_domain": true
-    }
-  ],
+  "workers_dev": true,
+  "preview_urls": false,
   "d1_databases": [
     {
       "binding": "DB",
