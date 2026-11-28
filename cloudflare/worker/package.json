@@ -1,0 +1,13 @@
+{
+  "name": "mafia-radical-cloudflare-worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check src/postgres-index.js && node --check src/postgres-db.js && node --check src/postgres-auth.js"
+  },
+  "dependencies": {
+    "pg": "^8.16.3"
+  }
+}
