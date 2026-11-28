@@ -14,7 +14,8 @@ export async function withPostgres(env, callback, ClientConstructor = Client) {
     throw error;
   }
 
-  const client = new Client({
+  // Use the injected constructor in tests; production defaults to pg.Client.
+  const client = new ClientConstructor({
     connectionString,
     application_name: 'mafia-radical-cloudflare-worker',
     connectionTimeoutMillis: 5000
