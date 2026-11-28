@@ -5,8 +5,8 @@ const json = (data, status = 200) => Response.json(data, {
   status,
   headers: { 'cache-control': 'no-store' }
 });
-
-const failure = (status, code, message) => json({ error: { code, message } }, status);
+const failure = (status, code, message, extra = {}) =>
+  json({ error: { code, message, ...extra } }, status);
 
 async function health(env) {
   try {
@@ -43,13 +43,31 @@ export default {
       if (!identity) return failure(401, 'INVALID_TOKEN', 'نشست معتبر نیست؛ دوباره وارد شوید.');
 
       try {
-        const result = await withPostgres(env, (client) => client.query(
-          `SELECT id, username, referral_code, level, xp, coins, diamonds,
-                  games_played, games_won, avatar_id, frame_id
-           FROM players WHERE id = $1`,
-          [identity.sub]
-        ));
-        const row = result.rows[0];
+        const result = await withPostgres(env, async (client) => {
+          const ban = await client.query(
+            `SELECT ends_at FROM player_bans
+             WHERE player_id = $1 AND revoked_at IS NULL
+               AND starts_at <= NOW() AND ends_at > NOW()
+             ORDER BY ends_at DESC LIMIT 1`,
+            [identity.sub]
+          );
+          if (ban.rowCount) return { bannedUntil: ban.rows[0].ends_at };
+
+          const player = await client.query(
+            `SELECT id, username, referral_code, level, xp, coins, diamonds,
+                    games_played, games_won, avatar_id, frame_id
+             FROM players WHERE id = $1`,
+            [identity.sub]
+          );
+          return { row: player.rows[0] || null };
+        });
+
+        if (result.bannedUntil) {
+          return failure(403, 'ACCOUNT_BANNED', 'حساب کاربری به‌طور موقت مسدود است.', {
+            until: result.bannedUntil
+          });
+        }
+        const row = result.row;
         if (!row) return failure(401, 'ACCOUNT_NOT_FOUND', 'حساب کاربری پیدا نشد.');
 
         return json({
