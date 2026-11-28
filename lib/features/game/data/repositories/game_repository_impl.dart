@@ -2,7 +2,6 @@ import '../../domain/entities/player.dart';
 import '../../domain/repositories/i_game_repository.dart';
 import '../datasources/game_local_datasource.dart';
 import '../datasources/game_remote_datasource.dart';
-import '../models/game_state_model.dart';
 
 class GameRepositoryImpl implements IGameRepository {
   final GameRemoteDataSource remoteDataSource;

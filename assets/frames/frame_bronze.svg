@@ -1,0 +1,19 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer glow -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="#8B7355" stroke-width="3" opacity="0.5"/>
+  
+  <!-- Main frame -->
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#8B7355" stroke-width="4"/>
+  
+  <!-- Inner ring -->
+  <circle cx="100" cy="100" r="85" fill="none" stroke="#8B7355" stroke-width="1" opacity="0.6"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="100" cy="25" r="3" fill="#8B7355"/>
+  <circle cx="175" cy="100" r="3" fill="#8B7355"/>
+  <circle cx="100" cy="175" r="3" fill="#8B7355"/>
+  <circle cx="25" cy="100" r="3" fill="#8B7355"/>
+  
+  <!-- Text -->
+  <text x="100" y="110" font-size="14" text-anchor="middle" fill="#8B7355" font-weight="bold">برنز</text>
+</svg>

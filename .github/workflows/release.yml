@@ -1,0 +1,108 @@
+name: Production Android Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Validate signing secrets
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          test -n "$KEYSTORE_B64"
+          test -n "$STORE_PASSWORD"
+          test -n "$KEY_ALIAS"
+          test -n "$KEY_PASSWORD"
+
+      - name: Prepare release keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          printf '%s' "$KEYSTORE_B64" | tr -d "[:space:]" | base64 --decode > android/mafia-release.jks
+          echo "KEYSTORE_SHA256: $(sha256sum android/mafia-release.jks | cut -d" " -f1)"
+          cat > android/key.properties <<EOF
+          storePassword=$STORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=../mafia-release.jks
+          EOF
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Generate app icons
+        run: bash tool/gen_icons.sh
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      - name: Test
+        run: flutter test
+
+      - name: Build signed release APK
+        run: flutter build apk --release --android-skip-build-dependency-validation --dart-define=MAFIA_API_BASE_URL=https://mafia-radical-api.onrender.com --dart-define=API_BASE_URL=https://mafia-radical-api.onrender.com --dart-define=MAFIA_WS_URL=wss://mafia-radical-api.onrender.com/lobby --dart-define=MAFIA_USE_MOCK=false
+
+      - name: Build signed release AAB
+        run: flutter build appbundle --release --dart-define=MAFIA_API_BASE_URL=https://mafia-radical-api.onrender.com --dart-define=API_BASE_URL=https://mafia-radical-api.onrender.com --dart-define=MAFIA_WS_URL=wss://mafia-radical-api.onrender.com/lobby --dart-define=MAFIA_USE_MOCK=false
+
+      - name: Verify APK signature
+        run: |
+          $ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)/apksigner verify --verbose build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Attest signed APK provenance
+        continue-on-error: true
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
+
+      - name: Prepare release assets
+        run: |
+          cp build/app/outputs/flutter-apk/app-release.apk "mafia-radical-${GITHUB_REF_NAME#v}.apk"
+          cp build/app/outputs/bundle/release/app-release.aab "mafia-radical-${GITHUB_REF_NAME#v}.aab"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            mafia-radical-*.apk
+            mafia-radical-*.aab
+
+      - name: Clean up signing material
+        if: always()
+        run: |
+          rm -f android/mafia-release.jks android/key.properties

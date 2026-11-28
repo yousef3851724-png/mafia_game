@@ -1,0 +1,9 @@
+{
+  "app": "mafia-radical-api",
+  "platform": "node",
+  "path": "backend",
+  "port": 3000,
+  "node": {
+    "version": "22"
+  }
+}

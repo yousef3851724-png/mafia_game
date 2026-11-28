@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../state/game_bloc.dart';
 import '../state/game_state.dart';
 import '../widgets/player_avatar_card.dart';
+import '../../../../core/theme/radical_theme.dart';
 
 class GameRoomScreen extends StatefulWidget {
   final String roomId;
@@ -120,7 +121,7 @@ class _GameRoomScreenState extends State<GameRoomScreen> {
             margin: const EdgeInsets.all(12),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E),
+              color: RadicalTheme.panel,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -157,7 +158,7 @@ class _GameRoomScreenState extends State<GameRoomScreen> {
                         children: [
                           Positioned.fill(
                             child: PlayerAvatarCard(
-                              player: player,
+                              playerName: player.name,
                               isSelected: selectedPlayerId == player.id,
                               onTap: () {
                                 if (hasVoted || player.id == state.currentPlayerId) return;

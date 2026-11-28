@@ -1,0 +1,21 @@
+{
+  "name": "mafia-radical",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Node.js WebSocket backend for Mafia Radical",
+  "scripts": {
+    "start": "node backend/server.js",
+    "check": "node --check backend/server.js && node --check backend/server.test.js",
+    "test": "node --test backend/*.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "pg": "^8.23.1",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "vitest": "^5.1.0"
+  }
+}

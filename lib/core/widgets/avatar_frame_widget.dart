@@ -1,9 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../theme/radical_theme.dart';
 
-enum FrameType { none, gold, fire, lightning, neon }
+enum FrameType {
+  none,
+  gold,
+  fire,
+  lightning,
+  neon,
+}
+
+extension FrameTypeSvg on FrameType {
+  String? get svgAsset {
+    switch (this) {
+      case FrameType.gold:
+        return 'assets/frames/frame_gold.svg';
+      case FrameType.fire:
+        return 'assets/frames/frame_fire.svg';
+      case FrameType.lightning:
+        return 'assets/frames/frame_lightning.svg';
+      case FrameType.neon:
+        return 'assets/frames/frame_neon.svg';
+      case FrameType.none:
+        return null;
+    }
+  }
+}
 
 class AvatarFrameWidget extends StatelessWidget {
   final String? imageUrl;
+  final String? fallbackAsset;
   final String fallbackInitial;
   final FrameType frameType;
   final double size;
@@ -12,6 +38,7 @@ class AvatarFrameWidget extends StatelessWidget {
   const AvatarFrameWidget({
     super.key,
     this.imageUrl,
+    this.fallbackAsset,
     this.fallbackInitial = '?',
     this.frameType = FrameType.none,
     this.size = 70.0,
@@ -21,15 +48,14 @@ class AvatarFrameWidget extends StatelessWidget {
   Color _getFrameColor() {
     switch (frameType) {
       case FrameType.fire:
-        return const Color(0xFFFF4500); // نارنجی/آتشی
+        return RadicalTheme.violetBright;
       case FrameType.lightning:
-        return const Color(0xFF00E5FF); // آبی/صاعقه‌ای
+        return RadicalTheme.goldBright;
       case FrameType.gold:
-        return const Color(0xFFFFD700); // طلایی
+        return RadicalTheme.goldBright;
       case FrameType.neon:
-        return const Color(0xFF39FF14); // سبز نئونی
+        return RadicalTheme.violet;
       case FrameType.none:
-      default:
         return Colors.transparent;
     }
   }
@@ -37,90 +63,130 @@ class AvatarFrameWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final frameColor = _getFrameColor();
+    final frameAsset = frameType.svgAsset;
     final hasFrame = frameType != FrameType.none;
+    final frameSize = size + 16;
 
     return SizedBox(
-      width: size + 16,
-      height: size + 16,
+      width: frameSize,
+      height: frameSize,
       child: Stack(
+        clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
-          // افکت Glow دور فریم (برای فریم‌های برقی و آتشی)
-          if (hasFrame && isAlive)
-            Container(
-              width: size + 10,
-              height: size + 10,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: frameColor.withOpacity(0.6),
-                    blurRadius: 12,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-            ),
-
-          // حاشیه / فریم بیرونی
-          if (hasFrame)
-            Container(
-              width: size + 8,
-              height: size + 8,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isAlive ? frameColor : Colors.grey.shade700,
-                  width: 3.5,
-                ),
-              ),
-            ),
-
-          // دایره آواتار اصلی
           Container(
             width: size,
             height: size,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isAlive ? const Color(0xFF2A2A2A) : Colors.black87,
+              color: isAlive ? RadicalTheme.panel3 : RadicalTheme.ink,
             ),
-            child: ClipOval(
-              child: imageUrl != null && imageUrl!.isNotEmpty
-                  ? Image.network(
-                      imageUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _buildFallback(),
-                    )
-                  : _buildFallback(),
-            ),
+            child: ClipOval(child: _buildImage()),
           ),
-
-          // وضعیت بازیکن مرده (علامت X قرمز)
+          if (hasFrame && isAlive)
+            IgnorePointer(
+              child: Container(
+                width: frameSize,
+                height: frameSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: RadicalTheme.goldGlow(
+                    blur: 12,
+                    opacity: .10,
+                  )
+                      .map(
+                        (shadow) => shadow.copyWith(
+                          color: frameColor.withValues(
+                            alpha: shadow.color.a * 0.7,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            ),
+          if (hasFrame && frameAsset != null)
+            IgnorePointer(
+              child: Opacity(
+                opacity: isAlive ? 1.0 : 0.35,
+                child: SvgPicture.asset(
+                  frameAsset,
+                  width: frameSize,
+                  height: frameSize,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.center,
+                ),
+              ),
+            ),
+          if (hasFrame && frameAsset == null)
+            Container(
+              width: frameSize - 2,
+              height: frameSize - 2,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isAlive ? frameColor : RadicalTheme.panel3,
+                  width: 3.5,
+                ),
+              ),
+            ),
           if (!isAlive)
             Container(
               width: size,
               height: size,
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.black54,
+                color: Color(0xB806070B),
               ),
-              child: const Icon(Icons.close, color: Colors.redAccent, size: 40),
+              child: const Icon(
+                Icons.close,
+                color: RadicalTheme.violetBright,
+                size: 40,
+              ),
             ),
         ],
       ),
     );
   }
 
-  Widget _buildFallback() {
-    return Center(
-      child: Text(
-        fallbackInitial.isNotEmpty ? fallbackInitial[0].toUpperCase() : '?',
-        style: TextStyle(
-          fontSize: size * 0.4,
-          fontWeight: FontWeight.bold,
-          color: isAlive ? Colors.white : Colors.grey,
-        ),
-      ),
-    );
+  Widget _buildImage() {
+    if (fallbackAsset != null && fallbackAsset!.isNotEmpty) {
+      final path = fallbackAsset!.toLowerCase();
+      if (path.endsWith('.svg')) {
+        return SvgPicture.asset(
+          fallbackAsset!,
+          fit: BoxFit.cover,
+          placeholderBuilder: (_) => _buildRemoteOrFallback(),
+        );
+      }
+      return Image.asset(
+        fallbackAsset!,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _buildRemoteOrFallback(),
+      );
+    }
+    return _buildRemoteOrFallback();
   }
+
+  Widget _buildRemoteOrFallback() {
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      return Image.network(
+        imageUrl!,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _buildFallback(),
+      );
+    }
+    return _buildFallback();
+  }
+
+  Widget _buildFallback() => Center(
+        child: Text(
+          fallbackInitial.isNotEmpty ? fallbackInitial[0].toUpperCase() : '?',
+          style: TextStyle(
+            fontSize: size * .4,
+            fontWeight: FontWeight.bold,
+            color: isAlive ? RadicalTheme.textPrimary : RadicalTheme.smoke,
+          ),
+        ),
+      );
 }

@@ -1,0 +1,200 @@
+import 'dart:math' as math;
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../theme/radical_frame_tier.dart';
+import '../theme/radical_theme.dart';
+
+/// Shared Radical avatar renderer used by home, profile, picker and gameplay.
+class RadicalAvatarFrame extends StatefulWidget {
+  final String avatarAssetPath;
+  final RadicalFrameTier tier;
+  final double size;
+  final bool isOnline;
+  final bool showBadge;
+  final String? framePath;
+
+  const RadicalAvatarFrame({
+    super.key,
+    required this.avatarAssetPath,
+    this.tier = RadicalFrameTier.none,
+    this.size = 72,
+    this.isOnline = false,
+    this.showBadge = true,
+    this.framePath,
+  });
+
+  @override
+  State<RadicalAvatarFrame> createState() => _RadicalAvatarFrameState();
+}
+
+class _RadicalAvatarFrameState extends State<RadicalAvatarFrame>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2200),
+    );
+    _controller.repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+
+  /// فریم‌های بالدار (وسط خالی کوچک‌تر از کل تصویر): نسبت بزرگ‌نمایی نسبت به آواتار.
+  static double? _wingScale(String path) {
+    if (path.contains('frame_12_eagle')) return 2.54;
+    if (path.contains('frame_13_phoenix')) return 2.508;
+    return null;
+  }
+
+  Widget _buildAvatarImage() {
+    final path = widget.avatarAssetPath;
+    Widget fallback() => Container(
+          width: widget.size,
+          height: widget.size,
+          color: RadicalTheme.panel2,
+          alignment: Alignment.center,
+          child: Icon(
+            Icons.person_rounded,
+            size: widget.size * .46,
+            color: RadicalTheme.goldBright,
+          ),
+        );
+    if (path.toLowerCase().endsWith('.svg')) {
+      return SvgPicture.asset(
+        path,
+        width: widget.size,
+        height: widget.size,
+        fit: BoxFit.cover,
+        placeholderBuilder: (_) => fallback(),
+      );
+    }
+    return Image.asset(
+      path,
+      width: widget.size,
+      height: widget.size,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) => fallback(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final data = RadicalFrameData.of(widget.tier);
+    final animated = data.isAnimated;
+
+    return SizedBox(
+      width: widget.size + 20,
+      height: widget.size + 20,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          final rotation = animated ? _controller.value * math.pi * 2 : 0.0;
+          return Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              if (widget.framePath == null && widget.tier != RadicalFrameTier.none)
+                Transform.rotate(
+                  angle: rotation,
+                  child: Container(
+                    width: widget.size + 12,
+                    height: widget.size + 12,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: SweepGradient(colors: data.gradientColors),
+                      boxShadow: [
+                        BoxShadow(
+                          color: data.glowColor,
+                          blurRadius: animated ? 22 : 14,
+                          spreadRadius: animated ? 3 : 1,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              Container(
+                width: widget.size + 3,
+                height: widget.size + 3,
+                padding: const EdgeInsets.all(2.5),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: RadicalTheme.ink,
+                  border: widget.tier == RadicalFrameTier.none
+                      ? Border.all(color: RadicalTheme.line)
+                      : null,
+                ),
+                child: ClipOval(
+                  child: _buildAvatarImage(),
+                ),
+              ),
+              if (widget.framePath != null && _wingScale(widget.framePath!) == null)
+                Image.asset(
+                  widget.framePath!,
+                  width: widget.size + 16,
+                  height: widget.size + 16,
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.high,
+                ),
+              if (widget.framePath != null && _wingScale(widget.framePath!) != null)
+                OverflowBox(
+                  minWidth: (widget.size - 2) * _wingScale(widget.framePath!)! * 0.98,
+                  maxWidth: (widget.size - 2) * _wingScale(widget.framePath!)! * 0.98,
+                  minHeight: (widget.size - 2) * _wingScale(widget.framePath!)! * 0.98,
+                  maxHeight: (widget.size - 2) * _wingScale(widget.framePath!)! * 0.98,
+                  child: Image.asset(
+                    widget.framePath!,
+                    width: (widget.size - 2) * _wingScale(widget.framePath!)! * 0.98,
+                    height: (widget.size - 2) * _wingScale(widget.framePath!)! * 0.98,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
+                  ),
+                ),
+              if (widget.isOnline)
+                Positioned(
+                  right: 3,
+                  bottom: 5,
+                  child: Container(
+                    width: math.max(10, widget.size * .15),
+                    height: math.max(10, widget.size * .15),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF48D597),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: RadicalTheme.ink, width: 2),
+                    ),
+                  ),
+                ),
+              if (widget.showBadge && data.badgeIcon != null && widget.tier != RadicalFrameTier.none)
+                Positioned(
+                  left: -1,
+                  top: 1,
+                  child: Container(
+                    width: math.max(18, widget.size * .25),
+                    height: math.max(18, widget.size * .25),
+                    decoration: BoxDecoration(
+                      color: RadicalTheme.ink,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: data.gradientColors.first, width: 1.5),
+                    ),
+                    child: Icon(
+                      data.badgeIcon,
+                      size: widget.size * .15,
+                      color: data.gradientColors.first,
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}

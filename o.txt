@@ -1,0 +1,31 @@
+frame_01_frozen.png
+frame_02_hellfire.png
+frame_03_kingcrown.png
+frame_04_diamondcrystal.png
+frame_05_imperialgold.png
+frame_06_mythic.png
+frame_07_wolf.png
+frame_08_demon.png
+frame_09_dragon.png
+frame_10_galaxy.png
+frame_11_thunder.png
+----
+assets/frames/set_oval/frame_01_frozen.png (426, 702)
+assets/frames/set_oval/frame_02_hellfire.png (426, 714)
+assets/frames/set_oval/frame_03_kingcrown.png (426, 699)
+----
+/storage/emulated/0/DCIM/Screenshots:
+Screenshot_۲۰۲۶-۱۰-۰۸-۱۱-۲۹-۵۰-۸۲۸_com.termux.jpg
+Screenshot_۲۰۲۶-۱۰-۰۸-۱۱-۲۹-۴۷-۰۸۷_com.termux.jpg
+Screenshot_۲۰۲۶-۱۰-۰۸-۱۱-۲۲-۵۴-۲۶۵_com.termux.jpg
+Screenshot_۲۰۲۶-۱۰-۰۸-۱۱-۲۱-۵۲-۹۴۱_com.termux.jpg
+Screenshot_۲۰۲۶-۱۰-۰۸-۱۱-۱۹-۱۰-۷۰۰_com.termux.jpg
+Screenshot_۲۰۲۶-۱۰-۰۸-۱۰-۴۰-۰۰-۹۴۴_com.yousef.mafia_radical.jpg
+Screenshot_۲۰۲۶-۱۰-۰۸-۱۰-۳۲-۱۴-۸۰۵_com.yousef.mafia_radical.jpg
+Screenshot_۲۰۲۶-۱۰-۰۸-۱۰-۳۱-۴۰-۵۶۹_com.yousef.mafia_radical.jpg
+Screenshot_۲۰۲۶-۱۰-۰۷-۲۳-۵۰-۲۵-۹۱۱_com.yousef.mafia_radical.jpg
+Screenshot_۲۰۲۶-۱۰-۰۷-۲۳-۴۲-۵۰-۸۱۴_com.yousef.mafia_radical.jpg
+Screenshot_۲۰۲۶-۱۰-۰۷-۲۳-۴۲-۴۷-۵۵۱_com.yousef.mafia_radical.jpg
+Screenshot_۲۰۲۶-۱۰-۰۷-۲۳-۴۲-۴۴-۰۷۴_com.yousef.mafia_radical.jpg
+Screenshot_۲۰۲۶-۱۰-۰۷-۲۳-۳۴-۱۸-۹۱۵_com.android.chrome.jpg
+Screenshot_۲۰۲۶-۱۰-۰۷-۲۳-۲۸-۵۵-۷۱۱_com.termux.jpg

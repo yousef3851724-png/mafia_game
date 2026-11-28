@@ -1,0 +1,37 @@
+'use strict';
+
+const { z } = require('zod');
+
+const schema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  HOST: z.string().default('0.0.0.0'),
+  PORT: z.coerce.number().int().min(1).max(65535).default(3000),
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+  DATABASE_SSL: z.enum(['true', 'false']).default('false'),
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must contain at least 32 characters'),
+  JWT_EXPIRES_IN: z.string().default('7d'),
+  CORS_ORIGINS: z.string().default(''),
+  TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
+  OPENAI_API_KEY: z.string().optional().default(''),
+  OPENAI_MODEL: z.string().trim().min(1).default('gpt-4.1-mini'),
+  ZARINPAL_MERCHANT_ID: z.string().optional().default(''),
+  ZARINPAL_SANDBOX: z.enum(['true', 'false']).default('true'),
+  PUBLIC_BASE_URL: z.string().optional().default('')
+});
+
+function loadConfig(env = process.env) {
+  const parsed = schema.safeParse(env);
+  if (!parsed.success) {
+    const details = parsed.error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`).join('; ');
+    throw new Error(`Invalid backend configuration: ${details}`);
+  }
+  const value = parsed.data;
+  return Object.freeze({
+    ...value,
+    DATABASE_SSL: value.DATABASE_SSL === 'true',
+    ZARINPAL_SANDBOX: value.ZARINPAL_SANDBOX === 'true',
+    CORS_ORIGINS: value.CORS_ORIGINS.split(',').map(x => x.trim()).filter(Boolean)
+  });
+}
+
+module.exports = { loadConfig };
